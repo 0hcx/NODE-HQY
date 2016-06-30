@@ -4,8 +4,16 @@ var userSchema = require('../db/schema/user');
 var dbHelper = require('../db/dbHelper');
 
 
+	// router.get('/blog', function(req, res, next) {
+	//   res.render('blog', { title: 'Express', layout: 'main' });
+	// });
+
 router.get('/blog', function(req, res, next) {
-  res.render('blog', { title: 'Express', layout: 'main' });
+	dbHelper.findNews(req, function (success, data) {
+		res.render('blog', {
+			entries: data
+		});
+	})
 });
 
 router.get('/login', function(req, res, next) {
@@ -17,6 +25,7 @@ router.post('/login', function(req, res, next) {
     res.send(doc);
   })
 });
+
 router.get('/', function(req, res, next) {
 	//res.render('index', { title: 'Express' });
 	var mongoose = require('mongoose');

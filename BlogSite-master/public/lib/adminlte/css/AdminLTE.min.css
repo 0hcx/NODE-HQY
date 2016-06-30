@@ -1,5 +1,5 @@
 body {
-    background-color: #8B8986;
+    background-color: #d4d4d4;
 }
 .login-wrap {
     position: relative;
@@ -129,7 +129,7 @@ body {
     border-left: none;
 }
 .header-modal {
-    height: 700px;
+    height: 800px;
     background: url("/img/background.jpg");
     background-size: cover;
 }
@@ -144,6 +144,7 @@ body {
     width: 292px;
     height: 40px;
     background-color: #00B7FF;
+    border-radius: 7px;
 }
 .author .row,
 .main-menu .row {
@@ -157,40 +158,15 @@ body {
 .author .col-md-3,
 .main-menu .col-md-3 {
     height: 40px;
-    border-right: 1px solid #9d9d9d;
 }
 .main-menu {
     display: inline-block;
     width: 720px;
     height: 40px;
+    margin-left: 12px;
     padding: 0;
     background-color: #FF4500;
-}
-.about {
-    height: 100px;
-    padding: 5px;
-    background-color: #00B7FF;
-}
-.about p {
-    width: 280px;
-    height: 80px;
-}
-.others {
-    height: 400px;
-    padding: 0;
-    background-color: #9d9d9d;
-}
-.main-carousel {
-    width: 720px;
-    height: 200px;
-    padding: 0;
-    background-color: #449d44;
-}
-.main-list {
-    width: 720px;
-    height: 300px;
-    padding: 0;
-    background-color: #d58512;
+    border-radius: 7px;
 }
 .author-img {
     margin: -40px 0 0 -18px;
@@ -198,4 +174,72 @@ body {
 .author-img img {
     width: 80px;
     height: 80px;
+}
+.content-wrapper {
+    position: absolute;
+    top: 160px;
+    left: 385px;
+    width: 720px;
+    margin-left: 10px;
+    padding: 0;
+}
+.content-wrapper .content .row {
+    width: 100%;
+    margin-left: 0;
+    padding: 0;
+}
+.content-wrapper .box-body text {
+    width: 90%;
+}
+.content-wrapper .box-body .textarea {
+    width: 100%;
+    height: 400px;
+    margin: 20px 0 0 0;
+}
+.main-sidebar {
+    position: absolute;
+    top: 160px;
+    left: 90px;
+    width: 292px;
+    height: 400px;
+    border-radius: 7px;
+}
+.about {
+    height: 150px;
+    background-color: #d4d4d4;
+    border-radius: 10px;
+}
+.others {
+    height: 240px;
+    margin-top: 10px;
+    background-color: #d4d4d4;
+    border-radius: 7px;
+}
+.blog-list {
+    width: 720px;
+    height: 120px;
+    padding: 10px;
+    background-color: #d4d4d4;
+    border-radius: 7px;
+    margin-bottom: 10px;
+}
+.blog-list img {
+    width; 100px;
+    height: 100px;
+}
+.blog-list ul {
+    position: relative;
+    top: -100px;
+    left: 20%;
+}
+.blog-list h3 {
+    width: 300px;
+    margin: 0 0 0 -17px;
+}
+.blog-list p {
+    width: 500px;
+    margin: 0 0 0 -17px;
+}
+.me-content {
+    padding: 10px;
 }

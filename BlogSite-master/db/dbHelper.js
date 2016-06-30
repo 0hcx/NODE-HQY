@@ -63,16 +63,27 @@ exports.addNews = function(data, cb) {
     })
 };
 
-exports.findNews = function(data, cb) {
-    News.find({author:'576c9d17f67254902ba0664d'})
-        .populate('author')
-        .exec(function(err, docs) {
+exports.findNews = function(req, cb) {
+	News.find({author:'577374a73e5758541ed9beaa'})
+		.populate('author')
+		.exec(function(err, docs) {
 
-            var newsList=new Array();
-            for(var i=0;i<docs.length;i++) {
-                newsList.push(docs[i].toObject());
-            }
-            console.log(newsList);
-        });
+			var newsList=new Array();
+			for(var i=0;i<docs.length;i++) {
+				newsList.push(docs[i].toObject());
 
+			}
+			// console.log(newsList);
+			cb(true,newsList);
+		});
+//     var page = req.query.page || 1 ;
+//     this.pageQuery(page, PAGE_SIZE, News, 'author', {}, {
+//         created_time: 'desc'
+//     }, function(error, data){
+//         if(error){
+//             next(error);
+//         }else{
+//             cb(true,data);
+//         }
+//     });
 };

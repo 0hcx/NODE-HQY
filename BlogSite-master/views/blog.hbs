@@ -1,2 +1,15 @@
-
-
+<div class="content-wrapper">
+	<section class="content">
+	{{#each entries}}
+		<div class="blog-list">
+			<figure>
+				<img src="/img/login.png">
+			</figure>
+			<ul>
+				<h3>{{title}}</h3>
+				<p>{{content}}</p>
+			</ul>
+		</div>
+	{{/each}}
+	</section>
+</div>
