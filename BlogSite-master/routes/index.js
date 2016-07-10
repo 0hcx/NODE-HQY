@@ -1,59 +1,61 @@
 var express = require('express');
+var fs = require('fs');
+var NodePDF = require('nodepdf');
+
 var router = express.Router();
-var userSchema = require('../db/schema/user');
 var dbHelper = require('../db/dbHelper');
+var config = require('../config');
 
 
-	// router.get('/blog', function(req, res, next) {
-	//   res.render('blog', { title: 'Express', layout: 'main' });
-	// });
-
-router.get('/blog', function(req, res, next) {
+router.get('/blogs', function(req, res, next) {
 	dbHelper.findNews(req, function (success, data) {
-		res.render('blog', {
-			entries: data
+		res.render('blogs', {
+			entries: data.results,
+			pageCount: data.pageCount,
+			pageNumber: data.pageNumber,
+			count: data.count
 		});
 	})
 });
 
-router.get('/login', function(req, res, next) {
-  res.render('login', { layout: 'lg' });
-});
+// router.get('/login', function(req, res, next) {
+//   res.render('login', { layout: 'lg' });
+// });
+//
+// router.post('/login', function(req, res, next) {
+//   dbHelper.findUsr(req.body, function (success, doc) {
+//     res.send(doc);
+//   })
+// });
 
-router.post('/login', function(req, res, next) {
-  dbHelper.findUsr(req.body, function (success, doc) {
-    res.send(doc);
-  })
-});
-
-router.get('/', function(req, res, next) {
-	//res.render('index', { title: 'Express' });
-	var mongoose = require('mongoose');
-
-	mongoose.connect('mongodb://127.0.0.1:27017/test');
-
-	var Schema = mongoose.Schema;
-
-	var blogSchema = new Schema({
-		title:  String,
-		author: String,
-		body:   String
-	});
-
-	var Blog = mongoose.model('Blog', blogSchema);
-
-	var User = mongoose.model('User', userSchema);
-
-	var user = new User({
-		username: 'hqy',
-		password: '123'
-	})
-	user.save(function (err) {
-		if(err){
-			console.log('保存失败');
-		}
-		console.log('success');
-	})
+// router.get('/', function(req, res, next) {
+// 	//res.render('index', { title: 'Express' });
+// 	var mongoose = require('mongoose');
+//
+// 	mongoose.connect('mongodb://127.0.0.1:27017/test');
+//
+// 	var Schema = mongoose.Schema;
+//
+// 	var blogSchema = new Schema({
+// 		title:  String,
+// 		author: String,
+// 		body:   String
+// 	});
+//
+// 	var Blog = mongoose.model('Blog', blogSchema);
+//
+// 	var User = mongoose.model('User', userSchema);
+//
+// 	var user = new User({
+// 		username: 'hqy',
+// 		password: '123'
+// 	})
+// 	user.save(function (err) {
+// 		if(err){
+// 			console.log('保存失败');
+// 		}
+// 		console.log('success');
+// 	})
 
 // 	blog = new Blog({
 // 		title: '1',
@@ -108,6 +110,6 @@ router.get('/', function(req, res, next) {
 // 		console.log(docs);
 // 	})
 //
-})
+// })
 
 module.exports = router;

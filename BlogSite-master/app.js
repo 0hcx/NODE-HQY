@@ -5,14 +5,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var exphbs      = require('express-handlebars');
+var hbsHelper = require('./lib/hbsHelper');
+var session     = require('express-session');
+var authority = require('./db/authority');
 
 var mongoose = require('mongoose');
 var config = require('./config');
 var dbHelper = require('./db/dbHelper')
 
-
-var routes = require('./routes/index');
-var admin = require('./routes/admin');
 
 var app = express();
 
@@ -22,10 +22,11 @@ app.set('view engine', 'hbs');
 
 //配置hbs基础模板和分块模板
 var hbs = exphbs.create({
-  partialsDir: 'views/partials',
-  layoutsDir: "views/layouts/",
-  defaultLayout: 'main',
-  extname: '.hbs'
+	partialsDir: 'views/partials',
+	layoutsDir: "views/layouts/",
+	defaultLayout: 'main',
+	extname: '.hbs',
+	helpers: hbsHelper
 });
 app.engine('hbs', hbs.engine);
 
@@ -43,37 +44,51 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/admin', admin);
+config.site.path = path.join(__dirname, 'public');
+
+//加入session支持
+app.use(session({
+	name:'blogOfLiyang',
+	maxAge: 30 * 1000,
+	secret: 'liyang-web-node-secret-key',
+	resave: false,
+	saveUninitialized: false
+}));
+
+
+app.use('/', require('./routes/login'));
+app.use('/pdf', require('./routes/pdf'));
+app.use('/p', authority.isAuthenticated, require('./routes/index'));
+app.use('/admin', authority.isAuthenticated, require('./routes/admin'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  res.render('./error/404', {layout: 'error'});
+	var err = new Error('Not Found');
+	err.status = 404;
+	res.render('./error/404', {layout: 'error'});
 });
 
 
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('./error/500', {
-      message: err.message,
-      error: err
-    });
-  });
+	app.use(function(err, req, res, next) {
+		res.status(err.status || 500);
+		res.render('./error/500', {
+			message: err.message,
+			error: err
+		});
+	});
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('./error/500', {
-    message: err.message,
-    error: {}
-  });
+	res.status(err.status || 500);
+	res.render('./error/500', {
+		message: err.message,
+		error: {}
+	});
 });
 
 

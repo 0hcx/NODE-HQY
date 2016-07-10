@@ -8,6 +8,7 @@ body {
     width: 398px;
     height: 350px;
     background: #f5f5f5;
+    border-radius: 10px;
 }
 .login-box {
     position: relative;
@@ -15,6 +16,7 @@ body {
     height: 350px;
     margin: 100px auto 20px;
     border: 1px solid #777;
+    border-radius: 10px;
 }
 .login-box-msg {
     position: absolute;
@@ -24,8 +26,9 @@ body {
     text-align: center;
 }
 .login-img img {
-    width: 400px;
+    width: 398px;
     height: 130px;
+    border-radius: 10px 10px 0 0;
 }
 .lgn-header {
     margin-top: 60px;
@@ -129,7 +132,7 @@ body {
     border-left: none;
 }
 .header-modal {
-    height: 800px;
+    height: 1000px;
     background: url("/img/background.jpg");
     background-size: cover;
 }
@@ -192,9 +195,12 @@ body {
     width: 90%;
 }
 .content-wrapper .box-body .textarea {
-    width: 100%;
-    height: 400px;
+    width: 690px;
+    max-width: 690px;
+    height: 200px;
+    max-height: 400px;
     margin: 20px 0 0 0;
+    border-radius: 7px;
 }
 .main-sidebar {
     position: absolute;
@@ -242,4 +248,8 @@ body {
 }
 .me-content {
     padding: 10px;
+}
+.postdate {
+    position: absolute;
+    margin: 35px 0 0 -20px;
 }
