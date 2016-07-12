@@ -99,7 +99,7 @@ exports.findNewsOne = function(req, id, cb) {
 		.exec(function(err, docs) {
 			cb(true,docs.toObject());
 		});
-	console.log("3");
+	console.log("查找一个");
 };
 
 exports.pageQuery = function (page, pageSize, Model, populate, queryParams, sortParams, callback) {

@@ -18,6 +18,15 @@ router.get('/blogs', function(req, res, next) {
 	})
 });
 
+router.get('/:id', function(req, res, next) {
+	var id = req.params.id;
+	dbHelper.findNewsOne(req, id, function (success, data) {
+		res.render('blog',{
+			entries: data,
+		});
+	})
+}); 
+
 // router.get('/login', function(req, res, next) {
 //   res.render('login', { layout: 'lg' });
 // });
