@@ -1,16 +1,16 @@
 <div class="content-wrapper blog-position">
 	<section class="content">
 			<div class="blog-list">
-				<figure>
-					<img src="/img/login.png">
-				</figure>
+				<!--<figure>-->
+					<!--<img src="/img/login.png">-->
+				<!--</figure>-->
 				<ul>
 					<h3>{{entries.title}}</h3>
-					<p>{{entries.content}}</p>
+					<p>{{{entries.content}}}</p>
 					<span class="postdate">
 						<b>{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})</b>
 					</span>
-
+					<div class="menu-block read-back"><a href="/p/blogs" class="btn btn-primary btn-sm pull-left">返回</a></div>
 				</ul>
 
 			</div>

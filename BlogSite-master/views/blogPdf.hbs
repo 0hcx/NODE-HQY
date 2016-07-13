@@ -1,12 +1,12 @@
 <div class="blog-pdf">
 	<section class="content">
 			<div class="blog-list">
-				<figure>
-					<img src="/img/login.png">
-				</figure>
+				<!--<figure>-->
+					<!--<img src="/img/login.png">-->
+				<!--</figure>-->
 				<ul>
 					<h3>{{entries.title}}</h3>
-					<p>{{entries.content}}</p>
+					<p>{{{entries.content}}}</p>
 					<span class="postdate">
 						<b>{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})</b>
 					</span>

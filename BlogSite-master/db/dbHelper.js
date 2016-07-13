@@ -1,8 +1,19 @@
+// var entries = require('./jsonRes');
+// var mongoose = require('./db.js');
+// var User = require('./schema/user');
+// var News = require('./schema/news');
+// var webHelper = require('../lib/webHelper');
+// var async = require('async');
+// var md = webHelper.Remarkable();
 var entries = require('./jsonRes');
 var mongoose = require('./db.js');
 var User = require('./schema/user');
 var News = require('./schema/news');
+
+
+
 var webHelper = require('../lib/webHelper');
+var config = require('../config');
 var async = require('async');
 var md = webHelper.Remarkable();
 
@@ -52,7 +63,10 @@ exports.addUser = function(data, cb) {
 };
 
 exports.addNews = function(data, cb) {
-
+	
+	//将markdown格式的新闻内容转换成html格式
+	data.content = md.render(data.content);
+	
     var news = new News({
         title: data.title,
         content: data.content,
@@ -61,9 +75,16 @@ exports.addNews = function(data, cb) {
 
     news.save(function(err,doc){
         if (err) {
-            cb(false,err);
+            // cb(false,err);
+	        entries.code = 99;
+	        entries.msg = err;
+	        cb(false,entries);
         }else{
-            cb(true,entries);
+            // cb(true,entries);
+	        entries.code = 0;
+	        entries.msg = '发布新闻成功！';
+	        entries.data = doc.toObject();
+	        cb(true,entries);
         }
     })
 };

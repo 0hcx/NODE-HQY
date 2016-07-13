@@ -2,17 +2,17 @@
 	<section class="content">
 		{{#each entries}}
 			<div class="blog-list">
-				<figure>
-					<img src="/img/login.png">
-				</figure>
+				<!--<figure>-->
+					<!--<img src="/img/login.png">-->
+				<!--</figure>-->
 				<ul>
 					<h3>{{title}}</h3>
-					<p>{{content}}</p>
+					<p>{{{content}}}</p>
 					<span class="postdate">
 						<b>{{timeFromNow meta.createAt}}({{formatDate meta.createAt}})</b>
 					</span>
-					<div class="menu-block"><a href="/p/{{_id}}" class="btn btn-primary btn-sm">更多</a></div>
-					<div class="menu-block"><a href="/pdf/{{_id}}" class="btn btn-primary btn-sm pull-right">导出pdf</a></div>
+					<div class="menu-block read-more"><a href="/p/{{_id}}" class="btn btn-primary btn-sm pull-left">阅读更多</a></div>
+					<div class="menu-block ctn-export"><a href="/pdf/{{_id}}" class="btn btn-primary btn-sm pull-left">导出pdf</a></div>
 				</ul>
 
 			</div>

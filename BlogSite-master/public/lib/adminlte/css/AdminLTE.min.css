@@ -161,6 +161,7 @@ body {
 .author .col-md-3,
 .main-menu .col-md-3 {
     height: 40px;
+    padding: 0 10px 0 10px;
 }
 .main-menu {
     display: inline-block;
@@ -229,31 +230,88 @@ body {
     border-radius: 7px;
     margin-bottom: 10px;
 }
-.blog-list img {
+.blog-list p img {
+    position: absolute;
+    left: -140px;
+    top: 0;
     width; 100px;
     height: 100px;
 }
 .blog-list ul {
     position: relative;
-    top: -100px;
+    top: 0;
     left: 20%;
 }
 .blog-list h3 {
     width: 300px;
-    margin: 0 0 0 -17px;
+    margin: 0 0 0 -36px;
 }
 .blog-list p {
     width: 500px;
-    margin: 0 0 0 -17px;
+    margin: 0 0 0 -34px;
+}
+.blog-list .read-more,
+.blog-list .read-back {
+    position: relative;
+    top: 30px;
+    left: -36px;
+}
+.blog-list .ctn-export {
+    position: relative;
+    top: 30px;
+    left: -20px;
 }
 .me-content {
     padding: 10px;
 }
 .postdate {
     position: absolute;
-    margin: 35px 0 0 -20px;
+    margin: -45px 0 0 350px;
 }
 .blog-pdf {
     position: absolute;
 
+}
+
+.pg-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999999990;
+    display: none;
+}
+.pg-wrapper>.pg-layer {
+    width: 400px;
+    *height: 24px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform:translate(-50%,-50%);
+}
+.pg-wrapper>.pg-layer>.pg-bar {
+    width: 100%;
+}
+.pg-wrapper>.pg-layer>.pg-info{
+    position: absolute;
+    top:2px;
+    left: 190px;
+    font: 12px/1.5 "微软雅黑";
+    color: #666;
+}
+.box-footer #uploadFile  {
+    opacity: 0;
+    width: 104px;
+    height: 34px;
+    float: left;
+    position: absolute;
+    top: 360px;
+    left: 18px;
+}
+.main-menu a {
+    text-decoration: none;
+    font-weight: bold ;
+    color: #0e2231;
 }
