@@ -12,7 +12,7 @@ module.exports = {
     },
 
     formatDate: function (date) {
-        return moment(date).format('LL');  ;
+        return moment(date).format('L');
     },
 
     number: function(value) {

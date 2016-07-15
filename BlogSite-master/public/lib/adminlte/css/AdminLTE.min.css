@@ -266,7 +266,7 @@ body {
 }
 .postdate {
     position: absolute;
-    margin: -45px 0 0 350px;
+    margin: -45px 0 0 370px;
 }
 .blog-pdf {
     position: absolute;
@@ -314,4 +314,121 @@ body {
     text-decoration: none;
     font-weight: bold ;
     color: #0e2231;
+}
+
+@media (max-width: 768px) {
+    .nav li {
+        margin-left: 0;
+    }
+    .main-header {
+        float: left;
+        width: auto;
+        height: 50px;
+        margin-top: 30px;
+    }
+    .header-modal,
+    .main-sidebar {
+        display: none;
+    }
+    .content-wrapper {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 400px;
+    }
+    .blog-list {
+        width: auto;
+        height: 120px;
+        padding: 10px;
+        background-color: #d4d4d4;
+        border-radius: 7px;
+        margin-bottom: 10px;
+    }
+    .blog-list p img {
+        position: absolute;
+        left: -140px;
+        top: 0;
+        width; 100px;
+        height: 100px;
+    }
+    .blog-list ul {
+        position: relative;
+        top: 0;
+        left: 35%;
+        width: 250px;
+    }
+    .blog-list h3 {
+        width: 100px;
+        margin: 0 0 0 -36px;
+    }
+    .blog-list p {
+        width: 200px;
+        margin: 0 0 0 -34px;
+    }
+    .blog-list .read-more,
+    .blog-list .read-back {
+        position: relative;
+        top: 30px;
+        left: -36px;
+    }
+    .blog-list .ctn-export {
+        position: relative;
+        top: 30px;
+        left: -20px;
+    }
+    .me-content {
+        padding: 10px;
+    }
+    .postdate {
+        position: absolute;
+        margin: 0;
+    }
+    .blog-pdf {
+        position: absolute;
+
+    }
+}
+
+@media (max-width: 400px) {
+    .nav li {
+        margin-left: 0;
+    }
+    .main-header {
+        float: left;
+        width: auto;
+        height: 50px;
+        margin-top: 30px;
+    }
+    .header-modal,
+    .main-sidebar {
+        display: none;
+    }
+    .content-wrapper {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 350px;
+    }
+    .blog-list {
+        width: auto;
+        height: 120px;
+        padding: 0;
+        background-color: #d4d4d4;
+        border-radius: 7px;
+        margin-bottom: 10px;
+    }
+    .blog-list p img {
+        position: absolute;
+        left: -140px;
+        top: 0;
+        width; 100px;
+        height: 100px;
+    }
+    .blog-list ul {
+        position: relative;
+        top: 0;
+        left: 40%;
+        width: 200px;
+        margin: 0;;
+    }
 }

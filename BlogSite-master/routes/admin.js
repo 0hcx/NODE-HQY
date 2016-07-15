@@ -24,10 +24,10 @@ console.log("开始上传");
 	var path = "";
 	var fields = [];
 
-	form.encoding = 'utf-8';
-	form.uploadDir = "public/uploadFile";
-	form.keepExtensions = true;
-	form.maxFieldsSize = 30000 * 1024 * 1024;
+	form.encoding = 'utf-8';                    //上传文件编码格式
+	form.uploadDir = "public/uploadFile";     //上传文件保存路径（必须在public下新建）
+	form.keepExtensions = true;                 //保持上传文件后缀
+	form.maxFieldsSize = 30000 * 1024 * 1024;   //上传文件格式最大值
 
 
 	var uploadprogress = 0;
@@ -36,19 +36,19 @@ console.log("开始上传");
 	form.parse(req);
 
 	form.on('field', function(field, value) {
-		console.log(field + ":" + value);
+		console.log(field + ":" + value);       //上传的参数数据
 	})
 		.on('file', function(field, file) {
-			path = '\\' + file.path;
+			path = '\\' + file.path;            //上传的文件数据
 		})
 		.on('progress', function(bytesReceived, bytesExpected) {
 
-			uploadprogress = (bytesReceived / bytesExpected * 100).toFixed(0);
+			uploadprogress = (bytesReceived / bytesExpected * 100).toFixed(0);  //计算进度
 			console.log("upload----"+ uploadprogress);
 			io.sockets.in('sessionId').emit('uploadProgress', uploadprogress);
 		})
 		.on('end', function() {
-
+			//上传完发送成功的json数据
 			console.log('-> upload done\n');
 			entries.code = 0;
 			entries.data = path;
