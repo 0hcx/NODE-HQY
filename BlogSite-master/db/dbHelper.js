@@ -45,22 +45,38 @@ exports.findUsr = function(data, cb) {
 }
 
 exports.addUser = function(data, cb) {
-
-    var user = new User({
-        username: data.usr,
-        password: data.pwd,
-        email: data.email,
-        adr: data.adr
-    });
-
-    user.save(function(err, doc) {
+    
+    //检查用户名是否已经存在
+    User.findOne({
+        username: data.usr
+    }, function(err, doc) {
         if (err) {
-            //cb(false, err);
-            console.log("注册成功！")
-        } else {
-            cb(true, entries);
+            console.log(err)
+        } else if (doc != null) {
+            entries.code = 99;
+            entries.msg = '该用户名已存在！';
+            cb(false, entries);
+        } else if (doc==null) {
+            //不存在则添加
+            var user = new User({
+                username: data.usr,
+                password: data.pwd,
+                email: data.email,
+                adr: data.adr
+            });
+
+            user.save(function(err, doc) {
+                if (err) {
+                    cb(false, err);
+                    console.log("注册失败！");
+                } else {
+                    console.log("注册成功！");
+                    cb(true, entries);
+                }
+            })
         }
     })
+
 };
 
 exports.addNews = function(data, cb) {

@@ -72,7 +72,7 @@ function doAddNews() {
 		  if (result.code == 99) {
 			  alert(result.msg);
 		  } else {
-			  notifyInfo("发布成功！");
+			  alert("发布成功！");
 			  location.href = '/p/'+ result.data._id;
 		  }
 	  }

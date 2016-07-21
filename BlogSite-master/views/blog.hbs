@@ -1,12 +1,12 @@
 <div class="content-wrapper blog-position">
-	<section class="content">
-			<div class="blog-list">
+	<section class="content ">
+			<div class="blog-list blog-scroll">
 				<!--<figure>-->
 					<!--<img src="/img/login.png">-->
 				<!--</figure>-->
 				<ul>
 					<h3>{{entries.title}}</h3>
-					<p>{{{entries.content}}}</p>
+					<div class="blog-list-ctn">{{{entries.content}}}</div>
 					<span class="postdate">
 						<b>{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})</b>
 					</span>

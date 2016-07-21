@@ -23,9 +23,10 @@ router.get('/register', function(req, res, next) {
 });
 
 router.post('/register', function(req, res, next) {
-	dbHelper.addUser(req.body, function (success, doc) {
-		res.send(doc);
-	})
+		console.log("注册成功!");
+		dbHelper.addUser(req.body, function (success, doc) {
+			res.send(doc);
+		})
 });
 
 module.exports = router;
