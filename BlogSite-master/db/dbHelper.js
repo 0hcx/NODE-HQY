@@ -79,6 +79,7 @@ exports.addUser = function(data, cb) {
 
 };
 
+//添加新闻
 exports.addNews = function(data, cb) {
 	
 	//将markdown格式的新闻内容转换成html格式
@@ -104,6 +105,27 @@ exports.addNews = function(data, cb) {
 	        cb(true,entries);
         }
     })
+};
+
+//删除新闻
+exports.deleteNews = function(id, cb) {
+
+    News.findById(id, function (err, doc) {
+        if (doc) {
+            doc.remove(function (err, doc) {
+                if (err) {
+                    entries.msg = err;
+                    cb(false,entries);
+                }else{
+                    entries.msg = '删除新闻成功！';
+                    cb(true,entries);
+                }
+            });
+        } else {
+            next(err);
+        }
+    });
+
 };
 
 exports.findNews = function(req, cb) {

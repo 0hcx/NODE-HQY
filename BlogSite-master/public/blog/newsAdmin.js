@@ -8,18 +8,18 @@ function init() {
 		$(".pg-bar").progressbar( "option", "value", parseInt(percent));
 		$(".pg-info").text( percent + '%');
 	});
-	// $("#defaultForm").validate({
-	// 	wrapper:"span",
-	// 	onfocusout:false,
-	// 	submitHandler:function(form) {
-	// 		doAddNews();  //验证成功则调用添加新闻函数
-	// 	}
-	// })
+	$("#defaultForm").validate({
+		wrapper:"span",
+		onfocusout:false,
+		submitHandler:function(form) {
+			doAddNews();  //验证成功则调用添加新闻函数
+		}
+	})
 
 	// $(".pg-bar").progressbar({value: 0});
 	//
 	// $(".pg-bar").progressbar( "option", "max", 100 );
-	$("body").on('click', '#addNewsBtn', doAddNews);
+	// $("body").on('click', '#addNewsBtn', doAddNews);
 	$("body").on('click', '#UploadBtn', doUpload);
 	$("body").on('change', '#uploadFile', preUpload);
 }

@@ -145,7 +145,7 @@ body {
     border-left: none;
 }
 .header-modal {
-    height: 980px;
+    height: 1100px;
     max-height: 9999px !important;
     margin-bottom: 0;
     background: url("https://ss1.bdstatic.com/kvoZeXSm1A5BphGlnYG/skin/528.jpg?2");
@@ -181,7 +181,7 @@ body {
 }
 .main-menu {
     display: inline-block;
-    width: 720px;
+    width: 880px;
     height: 40px;
     margin-left: 12px;
     padding: 0;
@@ -199,10 +199,12 @@ body {
     position: absolute;
     top: 160px;
     left: 35%;
-    width: 720px;
-    min-height: 600px !important;
+    width: 870px;
+    min-height: 160px !important;
     margin-left: 10px;
     padding: 0;
+    border-radius: 10px;
+    background-color: #eae8df;
 }
 .content-wrapper .content .row {
     width: 100%;
@@ -213,8 +215,8 @@ body {
     width: 90%;
 }
 .content-wrapper .box-body .textarea {
-    width: 720px;
-    max-width: 720px;
+    width: 820px;
+    max-width: 820px;
     max-height: 550px;
     margin: 20px 0 0 0;
     border-radius: 7px;
@@ -244,17 +246,19 @@ body {
 }
 .blog-list {
     float: left;
-    width: 720px;
-    height: 120px;
+    width: 840px;
+    height: 140px;
+    margin: 10px;
     padding: 10px;
-    background-color: #d4d4d4;
+    background-color: #f7f6f1;
     border-radius: 7px;
-    margin-bottom: 10px;
 }
 .blog-list-ctns {
-    width: 500px;
-    height: 50px;
-    margin: -2px 0 2px -30px;
+    width: 680px;
+    height: 68px;
+    margin: -2px 0 2px -44px;
+    padding-left: 10px;
+    border-bottom: #e8e2d2 1px solid;
     overflow:hidden;
     white-space:nowrap;
     text-overflow: ellipsis;
@@ -283,31 +287,41 @@ body {
 .blog-list ul {
     position: relative;
     top: 0;
-    left: 20%;
+    left: 18%;
+    width: 640px;
+    height: 120px;
 }
 .blog-list h3 {
-    width: 300px;
-    margin: 0 0 0 -36px;
+    width: 680px;
+    margin: 0 0 0 -44px;
+    padding-left: 7px;
+    border-bottom: #e8e2d2 1px solid;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #867F6F;
+}
+.blog-list .read-more a {
+    margin: 2px 15px 0 -35px;
+}
+.blog-list .ctn-export a {
+    margin-top: 2px;
 }
 .blog-list .read-back {
     float: left;
     position: absolute;
     
 }
-.blog-list .read-more a {
-    margin: 0 15px 0 -35px;
-}
-
 .me-content {
     padding: 10px;
 }
 .postdate {
-    position: absolute;
-    margin: -75px 0 0 370px;
+    float: left;
+    position: relative;
+    margin: 9px 0 0 -178px;
 }
 .blog-pdf {
     position: absolute;
-
 }
 .blog-scroll {
     width: 730px;
@@ -367,6 +381,9 @@ body {
     top: 360px;
     left: 18px;
 }
+.pagination {
+    margin: 16px;
+}
 .main-menu a {
     text-decoration: none;
     font-weight: bold ;
@@ -374,7 +391,7 @@ body {
 }
 .content-wrapper,
 .main-sidebar {
-    opacity: .85;
+    opacity: 1;
 }
 
 
