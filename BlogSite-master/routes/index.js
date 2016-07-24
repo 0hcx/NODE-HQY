@@ -18,6 +18,19 @@ router.get('/blogs', function(req, res, next) {
 	})
 });
 
+router.get('/moocs', function(req, res, next) {
+	dbHelper.findMooc(req, function (success, data) {
+
+		res.render('./moocs', {
+			entries: data.results,
+			pageCount: data.pageCount,
+			pageNumber: data.pageNumber,
+			count: data.count,
+			layout: 'main'
+		});
+	});
+});
+
 router.get('/:id', function(req, res, next) {
 	var id = req.params.id;
 	dbHelper.findNewsOne(req, id, function (success, data) {
@@ -25,7 +38,8 @@ router.get('/:id', function(req, res, next) {
 			entries: data,
 		});
 	})
-}); 
+});
+
 
 // router.get('/login', function(req, res, next) {
 //   res.render('login', { layout: 'lg' });

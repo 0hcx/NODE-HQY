@@ -16,9 +16,8 @@ function init() {
 		}
 	})
 
-	// $(".pg-bar").progressbar({value: 0});
-	//
-	// $(".pg-bar").progressbar( "option", "max", 100 );
+	$(".pg-bar").progressbar({value: 0});
+	$(".pg-bar").progressbar( "option", "max", 100 );
 	// $("body").on('click', '#addNewsBtn', doAddNews);
 	$("body").on('click', '#UploadBtn', doUpload);
 	$("body").on('change', '#uploadFile', preUpload);

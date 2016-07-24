@@ -9,7 +9,9 @@ var entries = require('./jsonRes');
 var mongoose = require('./db.js');
 var User = require('./schema/user');
 var News = require('./schema/news');
-
+var Mooc = require('./schema/mooc');
+var Chapter = require('./schema/chapter');
+var _ = require('underscore');
 
 
 var webHelper = require('../lib/webHelper');
@@ -157,9 +159,58 @@ exports.findNewsOne = function(req, id, cb) {
 	News.findOne({_id: id})
 		.populate('author')
 		.exec(function(err, docs) {
-			cb(true,docs.toObject());
+            var docs = (docs !== null) ? docs.toObject() : '';
+            cb(true,docs);
+			// cb(true,docs.toObject());
 		});
 	console.log("查找一个");
+};
+
+
+//添加慕课
+exports.addMooc = function (data,cb) {
+    var mooc = new Mooc({
+        moocName: data.moocName,
+        teacher: data.teacher,
+        moocThumb: data.moocThumb
+    });
+    for (var i = 0; i < data.weekCount; i++){
+        for(var j = 0; j < data.classHour; j++) {
+            mooc.children.push({
+                content: ' ',
+                title: 'XXXX',
+                week: i,
+                chapter: j
+            });
+        }
+    }
+    mooc.save(function (err,doc) {
+        cb(err,doc);
+    })
+};
+
+//查找慕课
+exports.findMoocOne = function () {
+    Mooc.findOne({_id: id}, function (err,docs) {
+        var mooc = docs.toObject() || ' ';
+
+        mooc.children = _.sortBy( mooc.children , "chapter");
+        mooc.children = _.groupBy( mooc.children , 'week');
+        cb(true,mooc);
+    });
+};
+
+exports.findMooc = function(req, cb) {
+    var page = req.query.page || 1 ;
+    this.pageQuery(page, PAGE_SIZE, Mooc, 'author', {}, {
+        created_time: 'desc'
+    }, function(error, data){
+        if(error){
+            next(error);
+        }else{
+            cb(true,data);
+        }
+    });
 };
 
 exports.pageQuery = function (page, pageSize, Model, populate, queryParams, sortParams, callback) {

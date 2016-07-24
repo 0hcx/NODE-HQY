@@ -21,7 +21,7 @@ router.post('/news', function(req, res, next) {
 
 //渲染新闻列表页面
 router.get('/newsList', function(req, res, next) {
-	console.log("111")
+
 	var msg = req.session['message'] || '';
 	req.session['message'] = "";
 
@@ -100,5 +100,34 @@ console.log("开始上传");
 	});
 
 });
+
+//渲染慕课页面
+router.get('/moocList', function (req, res, next) {
+	console.log("渲染慕课");
+	dbHelper.findMooc(req, function (success, data) {
+		res.render('./admin/moocList',{
+			entries: data.result,
+			pageCount: data.pageCount,
+			pageNumber: data.pageNumber,
+			count: data.count
+
+		});
+	})
+	
+});
+
+
+//渲染新建慕课页面
+router.get('/moocCreate', function (req, res, next) {
+	res.render('./admin/moocCreate',{ layout: 'admin'});
+});
+
+router.post('/moocCreate', function (req, res, next) {
+	dbHelper.addMooc(req.body, function (success, doc) {
+		res.send(doc);
+	})
+});
+
+
 
 module.exports = router;
