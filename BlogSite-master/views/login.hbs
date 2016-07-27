@@ -1,26 +1,32 @@
 <div class="login-wrap">
 	<div class="login-box">
 		<div class="login-img">
-			<img src="https://ss2.bdstatic.com/kfoZeXSm1A5BphGlnYG/skin/113.jpg?2">
+			<img src="/img/login.png">
 		</div>
-		<p class="login-box-msg text-red"></p>
+        <p class="login-box-msg text-red"></p>
 		<div class="login-form">
 			<div class="lgn-input">
 				<form>
 					<div class="input-prepend">
-						<input type="text" placeholder="邮箱/账户/手机号" id="usr">
+                        <span class="input-icon">
+                            <i class="fa fa-user"></i>
+                        </span>
+						<input type="text" placeholder="邮箱/账户/手机号" id="usr" class="input-field" >
 					</div>
 					<div class="input-prepend">
-						<input type="password" placeholder="密码" id="pwd">
+                        <span class="input-icon">
+                            <i class="fa fa-lock"></i>
+                        </span>
+						<input type="password" placeholder="密码" id="pwd" class="input-field">
 					</div>
 				</form>
 				<div class="lgn-btn">
 					<input type="submit" value="立即登录" id="loginBtn">
 				</div>
-                <div>
-                    <a href="/register">注册</a>
-                </div>
 			</div>
 		</div>
+        <div class="reg">
+            <a href="/register">前往注册</a>
+        </div>
 	</div>
 </div>

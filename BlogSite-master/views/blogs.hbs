@@ -1,20 +1,24 @@
 <div class="content-wrapper">
+    <section class="content-header">
+        <h1>最新日志</h1>
+    </section>
 	<section class="content">
 		{{#each entries}}
-			<div class="blog-list">
-				<!--<figure>-->
-					<!--<img src="/img/login.png">-->
-				<!--</figure>-->
-				<ul>
-					<h3 class="title">{{title}}</h3>
-					<div class="blog-list-ctns">{{{content}}}</div>
-					<span class="postdate">
-						<b>{{timeFromNow meta.createAt}}({{formatDate meta.createAt}})</b>
-					</span>
-					<div class="menu-block read-more"><a href="/p/{{_id}}" class="btn btn-primary btn-sm pull-left">阅读更多</a></div>
-					<div class="menu-block ctn-export"><a href="/pdf/{{_id}}" class="btn btn-primary btn-sm pull-left">导出pdf</a></div>
-				</ul>
-
+			<div class="blog-list border-dash">
+                <p class="title">{{title}}</p>
+                <p class="postdate">发布时间：{{timeFromNow meta.createAt}}({{formatDate meta.createAt}})
+                    <span>作者：{{author.username}}</span>
+                </p>
+                <dl>
+                    <dt>
+                        <a href="/p/{{_id}}"><img src="{{newThumb}}" ></a>
+                    </dt>
+                    <dd>
+                        <div class="blog-list-ctns">{{{content}}}</div>
+                        <div class="menu-block read-more"><a href="/p/{{_id}}" class="btn btn-primary btn-md pull-right">阅读全文</a></div>
+                        <div class="menu-block ctn-export"><a href="/pdf/{{_id}}" class="btn btn-primary btn-md pull-right">导出pdf</a></div>
+                    </dd>
+                </dl>
 			</div>
 		{{/each}}
 		<div class="box-footer">

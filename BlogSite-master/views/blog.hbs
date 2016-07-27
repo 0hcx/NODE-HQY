@@ -1,18 +1,12 @@
 <div class="content-wrapper blog-position">
-	<section class="content ">
-			<div class="blog-list blog-scroll">
-				<!--<figure>-->
-					<!--<img src="/img/login.png">-->
-				<!--</figure>-->
-				<ul>
-					<h3 class="title">{{entries.title}}</h3>
-					<div class="blog-list-ctn">{{{entries.content}}}</div>
-					<span class="postdate">
-						<b>{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})</b>
-					</span>
-					<div class="menu-block read-back"><a href="/p/blogs" class="btn btn-primary btn-sm pull-left">返回</a></div>
-				</ul>
-
-			</div>
+	<section class="content">
+        <div class="blog-list blog-one">
+            <h3 class="b-title">{{entries.title}}</h3>
+            <p class="postdate">发布时间：{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})
+                <span>作者：{{entries.author.username}}</span>
+            </p>
+            <div class="blog-list-ctn">{{{entries.content}}}</div>
+        </div>
+        <div class="menu-block read-back"><a href="/p/blogs" class="btn btn-primary btn-sm pull-left">返回</a></div>
 	</section>
 </div>

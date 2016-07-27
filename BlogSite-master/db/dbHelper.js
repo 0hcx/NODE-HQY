@@ -90,7 +90,8 @@ exports.addNews = function(data, cb) {
     var news = new News({
         title: data.title,
         content: data.content,
-        author:data.id
+        author:data.id,
+        newThumb: data.newThumb
     });
 
     news.save(function(err,doc){

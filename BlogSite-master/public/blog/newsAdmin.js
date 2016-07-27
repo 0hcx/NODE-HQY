@@ -45,8 +45,9 @@ function doUpload() {
 		success: function(result) {
 			startReq = false;
 			if (result.code == 0) {
-				
+				$("#newThumb").attr("src",result.data);
 				var picUrl = $.format("![Alt text]({0})",result.data)
+				
 				$("#newsContent").insertAtCaret(picUrl);
 				$(".pg-wrapper").hide();
 				// console.log(result.data);
@@ -65,7 +66,8 @@ function doAddNews() {
 	  data: JSON.stringify({
       'title': $("#newsTitle").val(),
       'content': $("#newsContent").val(),
-      'id': $.cookie('id')
+      'id': $.cookie('id'),
+      'newThumb': $("#newThumb").attr("src")
 	  }),
 	  success: function(result) {
 		  if (result.code == 99) {

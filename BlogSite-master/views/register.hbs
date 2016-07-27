@@ -1,29 +1,38 @@
-<div class="login-wrap">
-	<div class="login-box">
+<div class="login-wrap reg-height">
+	<div class="login-box reg-height">
 		<div class="login-img">
-			<img src="img/login.png">
+			<img src="/img/login.png">
 		</div>
 		<p class="login-box-msg text-red"></p>
 		<div class="login-form">
 			<div class="lgn-input">
 				<form>
 					<div class="input-prepend">
-						<input type="text" placeholder="邮箱/账户/手机号" id="usr">
+                        <span class="input-icon">
+                            <i class="fa fa-user"></i>
+                        </span>
+						<input type="text" placeholder="邮箱/账户/手机号" id="usr" class="input-field" >
 					</div>
 					<div class="input-prepend">
-						<input type="password" placeholder="输入密码" id="pwd">
+                        <span class="input-icon">
+                            <i class="fa fa-lock"></i>
+                        </span>
+						<input type="password" placeholder="输入密码" id="pwd" class="input-field" >
 					</div>
                     <div class="input-prepend">
-                        <input type="password" placeholder="重复输入密码" id="pwd-repeat">
+                        <span class="input-icon">
+                            <i class="fa fa-lock"></i>
+                        </span>
+                        <input type="password" placeholder="重复输入密码" id="pwd-repeat" class="input-field" >
                     </div>
 				</form>
 				<div class="lgn-btn">
 					<input type="submit" value="立即注册" id="registerBtn">
 				</div>
-                <div>
-                    <a href="/">登录</a>
-                </div>
 			</div>
 		</div>
+        <div class="reg">
+            <a href="/">返回登录</a>
+        </div>
 	</div>
 </div>

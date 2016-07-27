@@ -5,6 +5,7 @@ var Schema = mongoose.Schema;
 /* 用户定义 */
 var newsSchema = new Schema({
     title: String,
+    newThumb: String,
     content: String,
     meta: {
         updateAt: {type:Date, default: Date.now()},

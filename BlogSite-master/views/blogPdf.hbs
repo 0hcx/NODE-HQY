@@ -1,17 +1,23 @@
 <div class="blog-pdf">
-	<section class="content">
-			<div class="blog-list">
-				<!--<figure>-->
-					<!--<img src="/img/login.png">-->
-				<!--</figure>-->
-				<ul>
-					<h3>{{entries.title}}</h3>
-					<p>{{{entries.content}}}</p>
-					<span class="postdate">
-						<b>{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})</b>
-					</span>
-				</ul>
+	<!--<section class="content">-->
+			<!--<div class="blog-list">-->
+				<!--<ul>-->
+					<!--<h3>{{entries.title}}</h3>-->
+					<!--<p>{{{entries.content}}}</p>-->
+					<!--<span class="postdate">-->
+						<!--<b>{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})</b>-->
+					<!--</span>-->
+				<!--</ul>-->
 
-			</div>
-	</section>
+			<!--</div>-->
+	<!--</section>-->
+    <section class="content">
+        <div class="blog-list blog-one">
+            <h3 class="b-title">{{entries.title}}</h3>
+            <p class="postdate">发布时间：{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})
+                <span>作者：{{entries.author.username}}</span>
+            </p>
+            <div class="blog-list-ctn">{{{entries.content}}}</div>
+        </div>
+    </section>
 </div>
