@@ -1,3 +1,1144 @@
+# 学习日志【2016/8/2】
+
+nodejs开发指南读后感
+=========================
+
+# http服务器
+
+## 1. 创建http服务器，监听3000端口;
+
+```js
+var http = require("http");
+http.createServer(function(req,res){
+    res.writeHead(200, {'Content-Type': 'text/html'}); 
+    res.write('<h1>Node2.js</h1>');
+    res.end('<p>Hello World</p>');
+}).listen(3000);
+```
+1.  `var http = require('http')`的含义是引出自带的http模块，这个应该不难理解。   
+
+2.  `createServer(function)`方法创建一个http的服务器，它只有一个参数，就是`function`回调函数，回调函数有两个参数，一个是`require`，一个是`response`。  
+
+3.  回调函数里面就是返回的主体了，页面`Header`以及`内容主体`。  
+
+4.  `createServer`函数返回一个web服务器对象，该对象用`listen`方法监听8888端口。  
+
+### 2  http.Server 的事件
+
+`http.Server `是一个基于事件的 HTTP 服务器，所有的请求都被封装为独立的事件，
+开发者只需要对它的事件编写响应函数即可实现 HTTP 服务器的所有功能。它继承自
+`EventEmitter` ，提供了以下几个事件。
+
+1. `request `：当客户端请求到来时，该事件被触发，提供两个参数`req `和`res `，分别是
+http.ServerRequest 和  http.ServerResponse  的实例，表示请求和响应信息。
+
+2.  `connection` ：当 TCP 连接建立时，该事件被触发，提供一个参数  `socket `，为
+`net.Socket `的实例。` connection `事件的粒度要大于  `request `，因为客户端在
+`Keep-Alive `模式下可能会在同一个连接内发送多次请求。
+
+3. ` close `：当服务器关闭时，该事件被触发。注意不是在用户连接断开时。
+
+显式的实现方法：
+```js
+var http = require('http');
+var server = new http.Server();
+server.on('request',function(req,res){
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write('<h1>Node.js</h1>');
+    res.end('<p>Hello World</p>');
+});
+server.listen(3004);
+console.log("port is 3004");
+```
+### 3. http.ServerRequest
+`http.ServerRequest ` 是 HTTP 请求的信息，是后端开发者最关注的内容。它一般由
+http.Server 的  request 事件发送，作为第一个参数传递，通常简称  `request `或  `req `。
+ServerRequest  提供一些属性。
+
+HTTP 请求一般可以分为两部分：请求头（`Request Header`）和请求体（`Requset Body`）
+
+* ` data` ：当请求体数据到来时，该事件被触发。该事件提供一个参数  chunk ，表示接
+收到的数据。如果该事件没有被监听，那么请求体将会被抛弃。该事件可能会被调
+用多次。
+* `end` ：当请求体数据传输完成时，该事件被触发，此后将不会再有数据到来。
+*  `close`： 用户当前请求结束时，该事件被触发。不同于  end ，如果用户强制终止了
+传输，也还是调用` close `。
+
+
+###  4.http.ServerResponse
+http.ServerResponse  是返回给客户端的信息，决定了用户最终能看到的结果。它
+也是由  http.Server 的  request  事件发送的，作为第二个参数传递，一般简称为
+response 或  res 。
+
+http.ServerResponse 有三个重要的成员函数，用于返回响应头、响应内容以及结束
+请求。
+
+* `response.writeHead(statusCode, [headers]) `：向请求的客户端发送响应头。
+statusCode  是 HTTP 状态码，如 200 （请求成功）、404 （未找到）等。 headers
+是一个类似关联数组的对象，表示响应头的每个属性。该函数在一个请求内最多只
+能调用一次，如果不调用，则会自动生成一个响应头。
+*  `response.write(data, [encoding])` ：向请求的客户端发送响应内容。 data 是
+一个  Buffer 或字符串，表示要发送的内容。如果  data 是字符串，那么需要指定
+encoding 来说明它的编码方式，默认是 utf-8 。在 response.end 调用之前，
+response.write  可以被多次调用。
+* `response.end([data], [encoding])` ：结束响应，告知客户端所有发送已经完
+成。当所有要返回的内容发送完毕的时候，该函数 必须 被调用一次。它接受两个可
+选参数，意义和 response.write  相同。如果不调用该函数，客户端将永远处于
+等待状态
+
+### 5.node.js中的url.parse方法使用说明
+
+该方法的含义是:将URL字符串转换成对象并返回
+
+基本语法:url.parse(urlStr, [parseQueryString], [slashesDenoteHost])
+urlStr url字符串
+
+`parseQueryString` 为true时将使用查询模块分析查询字符串，默认为`false`
+slashesDenoteHost
+
+1. 默认为`false`，//foo/bar 形式的字符串将被解释成` { pathname: ‘//foo/bar' }`
+2. 如果设置成`true`，//foo/bar 形式的字符串将被解释成` { host: 'foo', pathname: '/bar' }`
+```js
+var url = require('url');
+var a = url.parse('http://example.com:8080/one?a=index&t=article&m=default');
+console.log(a);
+```
+
+```js
+打印如下:
+ {
+     protocol: 'http:',
+     slashes: true,
+     auth: null,
+     host: 'example.com:8080',
+     port: '8080',
+     hostname: 'example.com',
+     hash: null,
+     search: '?a=index&t=article&m=default',
+     query: 'a=index&t=article&m=default',
+     pathname: '/one',
+     path: '/one?a=index&t=article&m=default',
+     href: 'http://example.com:8080/one?a=index&t=article&m=default'
+ }
+```
+1. node.js中请求如何获取get请求的内容 我们可以使用上面介绍的 url.parse方法
+```js
+var http = require('http');
+var url = require('url');
+var util = require('util');
+http.createServer(function(req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end(util.inspect(url.parse(req.url, true)));
+}).listen(3001);
+```
+* `url.parse(req.url)`，输入 URL 字符串，返回一个对象。
+* `util.inspect(object)`，返回一个对象的字符串表现形式,。通常用于代码调试。
+
+```
+href: 所解析的完整原始 URL。协议名和主机名都已转为小写。例如: http://localhost:8888/p/a/t/h?query=string#hash
+protocol: 请求协议，小写。例如: http:
+host: URL主机名已全部转换成小写, 包括端口信息。例如: localhost:8888
+auth:URL中身份验证信息部分。例如: user:pass，这里没有。
+hostname:主机的主机名部分, 已转换成小写。例如: host.com
+port: 主机的端口号部分。例如: 8888
+pathname: URL的路径部分,位于主机名之后请求查询之前。例如: /p/a/t/h
+search: URL 的“查询字符串”部分，包括开头的问号。例如: ?query=string
+path: pathname 和 search 连在一起。 例如: /p/a/t/h?query=string
+query: 查询字符串中的参数部分（问号后面部分字符串），或者使用querystring.parse()解析后返回的对象。例如: query=string or {'query':'string'}
+hash: URL 的 “#” 后面部分（包括 # 符号） 例如: #hash
+```
+#### querystring反序列化
+
+好了，通过上面，咱们就找到了我们想要获取的信息，那就是`query`对象，它的内容是`hello=Node&hello2=Node2`，那么如何再把这个字符串解析成对象进行访问呢？这里就要用到querystring模块了。
+
+```js
+var querystring = require('querystring');
+var hello = querystring.parse('hello=Node&hello2=Node2').hello;
+var hello2 = querystring.parse('hello=Node&hello2=Node2').hello2;
+console.log("hello值为：" + hello + "; hello2值为：" + hello2);
+```
+
+很简单的一段代码，querystring的parse方法将一个 query string 反序列化为一个对象。然后直接通过key-value对应取值就OK了。
+
+在浏览器运行 http://127.0.0.1:3001/one?a=index&t=article&m=default 这个
+```js
+{
+ protocol: null,
+ slashes: null,
+ auth: null,
+ host: null,
+ port: null,
+ hostname: null,
+ hash: null,
+ search: '?a=index&t=article&m=default',
+ query: { a: 'index', t: 'article', m: 'default' },
+ pathname: '/one',
+ path: '/one?a=index&t=article&m=default',
+ href: '/one?a=index&t=article&m=default'
+}
+```
+通过 `url.parse`,原始的` path` 被解析为一个对象,其中 `query `就是我们所谓的 GET 请求的内容,而路径则是 `pathname`。
+
+2. 如何获取post请求的内容
+```js
+var http = require('http');
+var querystring = require('querystring');
+var util = require('util');
+
+http.createServer(function(req, res) {
+    var post = '';
+    req.on('data', function(chunk) {
+        post += chunk;
+    });
+    req.on('end', function() {
+        post = querystring.parse(post);
+        res.end(util.inspect(post));
+    });
+}).listen(3002);
+```
+定义了一个 `post `变量,用 于在闭包中暂存请求体的信息。通过` req `的 `data 事件监听`函数,每当接受到请求体的数据, 就累加到`post` 变量中。
+在`end `事件触发后,通过` querystring.parse` 将 `post `解析为 真正的` POST `请求格式,然后向客户端返回。
+
+## HTTP 客户端
+
+在Node中通过HTTP模块也可以实现客户端的功能，主要通过两个函数`http.request`和`http.get`作为客户端向HTTP服务器发送请求。
+
+1.`http.request(options, callback)` 发送请求
+请求参数：options，包括host、post、method、path、headers
+
+* host ：请求网站的域名或 IP 地址。
+* port ：请求网站的端口，默认 80。
+* method ：请求方法，默认是 GET。
+* path ：请求的相对于根的路径，默认是“ / ”。 QueryString  应该包含在其中。
+例如  /search?query=byvoid 。
+* headers ：一个关联数组对象，为请求头的内容。
+
+`callback ` 传递一个参数，为` http.ClientResponse `的实例。  
+`http.request ` 返回一个 ` http.ClientRequest `的实例。
+```js
+var http = require('http');
+var querystring = require('querystring');
+var contents = querystring.stringify({
+name: 'byvoid',
+email: 'byvoid@byvoid.com',
+address: 'Zijing 2#, Tsinghua University',
+});
+var options = {
+host: 'www.byvoid.com',
+path: '/application/node/post.php',
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded',
+'Content-Length' : contents.length
+}
+};
+var req = http.request(options, function(res) {
+res.setEncoding('utf8');
+res.on('data', function (data) {
+console.log(data);
+});
+});
+req.write(contents);
+req.end();
+```
+```js
+运行后结果如下:
+array(3) {
+["name"]=>
+string(6) "byvoid"
+["email"]=>
+string(17) "byvoid@byvoid.com"
+["address"]=>
+string(30) "Zijing 2#, Tsinghua University"
+}
+```
+
+
+2.`http.get(options, callback) `发送Get请求，该方法是上面的简化版
+
+唯一的区别在于 http.get
+自动将请求方法设为了 GET 请求，同时不需要手动调用 req.end() 。
+```js
+var http = require('http');
+http.get({host: 'www.byvoid.com'}, function(res) {
+res.setEncoding('utf8');
+res.on('data', function (data) {
+console.log(data);
+});
+});
+```
+3.http.ClientRequest
+
+http.ClientRequest  是由  http.request 或  http.get 返回产生的对象，表示一
+个已经产生而且正在进行中的 HTTP 请求。它提供一个  response  事件，即  http.request
+或  http.get  第二个参数指定的回调函数的绑定对象。我们也可以显式地绑定这个事件的
+监听函数：
+
+```js
+var http = require('http');
+var req = http.get({host: 'www.byvoid.com'});
+req.on('response', function(res) {
+res.setEncoding('utf8');
+res.on('data', function (data) {
+console.log(data);
+});
+});
+```
+`http.ClientRequest  `像  `http.ServerResponse` 一样也提供了  `write`  和 `end ` 函
+数，用于向服务器发送请求体，通常用于 POST、PUT 等操作。所有写结束以后必须调用  `end`
+函数以通知服务器，否则请求无效。 http.ClientRequest  还提供了以下函数。
+
+* `request.abort()` ：终止正在发送的请求。
+* `request.setTimeout(timeout, [callback]) `：设置请求超时时间， timeout 为
+毫秒数。当请求超时以后， callback 将会被调用
+
+4.http.ClientResponse
+
+`http.ClientResponse` 与  `http.ServerRequest `相似，提供了三个事件  `data `、` end`
+和  `close` ，分别在数据到达、传输结束和连接结束时触发，其中 ` data `事件传递一个参数
+`chunk `，表示接收到的数据。
+
+* `response.setEncoding([encoding])` ：设置默认的编码，当  data 事件被触发
+时，数据将会以  encoding 编码。默认值是  `null` ，即不编码，以  Buffer 的形式存
+储。常用编码为 utf8。
+* `response.pause() `：暂停接收数据和发送事件，方便实现下载功能。
+* `response.resume() `：从暂停的状态中恢复
+
+
+# supervisor的使用及nodejs常见的调式代码命令
+
+### 1. supervisor的使用
+nodejs会在第一次引用到某部分时才会去解析脚本文件，之后直接从缓存里面去取，因此对于调式不方面，可以使用安装supervisor
+
+supervisor 可以帮助你实现这个功能,它会监视你对代码的改动,并自动重启 Node.js
+```js
+安装
+$ npm install -g supervisor
+
+启动
+$ supervisor app.js
+```
+如果你使用的是 Linux 或 Mac，直接键入上面的命令很可能会有权限错误。原因是 npm
+需要把 supervisor 安装到系统目录，需要管理员授权，可以使用  `sudo npm install -g
+supervisor` 命令来安装
+
+### 2. 使用npm安装包有二种模式：本地模式和全局模式
+
+本地模式如下：npm install 包名   
+全局模式安装如下：npm install -g 包名 
+
+`本地模式`：该模式是把包安装在当前目录的node_module子目录下，
+Node.js 的require在加载模块时会尝试搜寻 node_modules子目录,因此使用npm本地模式安装 的包可以直接被引用。
+
+`全局模式`：为了减少多重副本而使用全局模式,而是因为本地模式不会注册 PATH 环境变量。举例说明,我们安装 supervisor 是为了在命令行中运行它,
+譬如直接运行 supervisor script.js,这时就需要在 PATH 环境变量中注册 supervisor。npm 本地模式仅仅是把包安装到 node_modules 子目录下,
+其中 的 bin 目录没有包含在 PATH 环境变量中,不能直接在命令行中调用。而当我们使用全局模 式安装时,npm 会将包安装到系统目录,
+譬如 /usr/local/lib/node_modules/,同时 package.json 文 件中 bin 字段包含的文件会被链接到 /usr/local/bin/。/usr/local/bin/ 
+是在PATH 环境变量中默认 定义的，因此就可以直接在命令行中运行 supervisor script.js命令了。
+注意：使用全局模式安装的包并不能直接在 JavaScript 文件中用 require 获 得,因为 require 不会搜索 /usr/local/lib/node_modules/。
+
+### 3. nodejs调式代码命令：
+
+* `run`  执行脚本，在第一行暂停
+* `restart`  重新执行脚本
+* `cont, c`  继续执行，直到遇到下一个断点
+* `next, n ` 单步执行
+* `step, s`  单步执行并进入函数
+* `out, o ` 从函数中步出
+* `setBreakpoint(), sb()`  在当前行设置断点
+* `setBreakpoint(‘f()’), sb(...) ` 在函数f的第一行设置断点
+* `setBreakpoint(‘script.js’, 20), sb(...)  `在 script.js 的第20行设置断点
+* `clearBreakpoint, cb(...)`  清除所有断点
+* `backtrace, b`  显示当前的调用栈
+* `list(5) ` 显示当前执行到的前后5行代码
+* ` watch(expr)`  把表达式 expr 加入监视列表
+* ` unwatch(expr)  `把表达式 expr 从监视列表移除
+* `watchers ` 显示监视列表中所有的表达式和值
+* `repl  `在当前上下文打开即时求值环境
+* `kill ` 终止当前执行的脚本
+* `scripts ` 显示当前已加载的所有脚本
+* `version`  显示 V8 的版本
+
+下面是个简单的例子
+```js
+$ node debug debug.js
+< debugger listening on port 5858
+connecting... ok
+break in /home/byvoid/debug.js:1
+1 var a = 1;
+2 var b = 'world';
+3 var c = function (x) {
+debug> n
+break in /home/byvoid/debug.js:2
+1 var a = 1;
+2 var b = 'world';
+3 var c = function (x) {
+4 console.log('hello ' + x + a);
+debug> sb('debug.js', 4)
+1 var a = 1;
+2 var b = 'world';
+3 var c = function (x) {
+* 4 console.log('hello ' + x + a);
+5 };
+6 c(b);
+7 });
+debug> c
+break in /home/byvoid/debug.js:4
+2 var b = 'world';
+3 var c = function (x) {
+* 4 console.log('hello ' + x + a);
+5 };
+6 c(b);
+debug> repl
+Press Ctrl + C to leave debug repl
+> x
+'world'
+> a + 1
+2
+debug> c
+< hello world1
+program terminated
+```
+
+### 4.使用 node-inspector 调试 Node.js
+
+1. 使用 ` npm install -g node-inspector ` 命令安装 node-inspector，然后在终
+端中通过` node --debug-brk=5858 debug.js ` 命令连接你要除错的脚本的调试服务器，
+
+2. 启动 node-inspector：`$ node-inspector`
+
+3. 在浏览器中打开` http://127.0.0.1:8080/debug?port=5858` ， 即可显示出优雅的 Web 调试工
+具
+
+# 模块和包
+
+ `var http = require('http')`， 其中 http
+是 Node.js 的一个核心模块，其内部是用 C++ 实现的，外部用 JavaScript 封装。
+
+## 1.创建及加载模块
+
+#### 1. 创建模块  
+
+Node.js 提供了 `exports `和  `require`  两个对
+象，其中  `exports `是模块公开的接口， `require `用于从外部获取一个模块的接口，即所获
+取模块的 ` exports 对象`。
+
+```js
+//module.js
+var name;
+exports.setName = function(thyName) {
+name = thyName;
+};
+exports.sayHello = function() {
+console.log('Hello ' + name);
+};
+```
+在同一目录下创建 getmodule.js，内容是：
+```js
+//getmodule.js
+var myModule = require('./module');
+
+myModule.setName('BYVoid');
+myModule.sayHello();
+```
+运行node getmodule.js，结果是：
+```js
+Hello BYVoid
+```
+
+在以上示例中，`module.js `通过 ` exports `对象把` setName`  和  `sayHello `作为模块的`访问接口`，在 `getmodule.js` 中通过  `require('./module') `加载这个模块，然后就可以直接访
+问 module.js 中  `exports` 对象的成员函数了。
+
+#### 2. 单次加载
+
+`require `不会重复加载模块，也就是说无论调用多少次  require， 获得的模块都是`同一个`。
+
+```js
+//loadmodule.js
+
+var hello1 = require('./module');
+hello1.setName('BYVoid');
+
+var hello2 = require('./module');
+hello2.setName('BYVoid 2');
+
+hello1.sayHello();
+```
+运行后发现输出结果是
+```js
+Hello BYVoid 2 
+```
+这是因为变量  hello1 和  hello2 指向的是
+同一个实例，因此  hello1.setName  的结果被 hello2.setName 覆盖，最终输出结果是
+由后者决定的。
+
+#### 3. 覆盖  exports 
+有时候我们只是想把一个对象封装到模块中，例如
+```js
+//singleobject.js
+
+function Hello() {
+    var name;
+    this.setName = function (thyName) {
+    name = thyName;
+    };
+
+    this.sayHello = function () {
+        console.log('Hello ' + name);
+    };
+};
+exports.Hello = Hello;
+```
+此时我们在其他文件中需要通过` require('./singleobject').Hello ` 来获取
+Hello  对象
+
+简化后：
+```js
+//hello.js
+
+function Hello( {
+    var name;
+
+    this.setName = function (thyName) {
+        name = thyName;
+    };
+    
+    this.sayHello = function() {
+        console.log('Hello' + name);
+    };
+})
+
+module.exports = Hello;
+```
+这样就可以直接获得这个对象了：
+```js
+//gethello.js
+
+var Hello = require('./hello');
+
+hello = new Hello();
+hello.setName ('BYVoid');
+hello.sayHello();
+```
+在外部引用该模块时，其接口对象就是要输出的 ` Hello 对象本身`，而不是原先的
+exports 。
+
+1. `exports  `本身仅仅是一个普通的`空对象`，即 `{} `，它专门用来声明接口，本
+质上是通过它为模块闭包的内部建立了一个有限的访问接口。可以用其他东西来代替，譬如我们上面例子中的 Hello  对象
+
+2. 不可以通过对  `exports `直接赋值代替对 `module.exports` 赋值。
+`exports` 实际上只是一个和  module.exports 指向同一个对象的变量，
+它本身会在模块执行结束后释放，但 `module ` 不会，因此只能通过指定
+module.exports  来改变访问接口。
+
+## 2.模块的路径解析
+
+1.核心模块定义在node源代码的lib/目录下，`require()`总是会优先加载核心模块。例如，`require('http')`总是返回编译好的HTTP模块，而不管是否有这个名字的文件模块；
+
+2.如果按文件名没有查找到，那么node会添加`.js`和` .json`后缀名，再尝试加载，如果还是没有找到，最后会加上`.node`的后缀名再次尝试加载；我上面就是直接写的文件名，而没有加后缀；
+
+3.`.js` 会被解析为Javascript纯文本文件，`.json`会被解析为JSON格式的纯文本文件，` .node`则会被解析为编译后的插件模块，由dlopen进行加载；
+
+4.当没有以`/`或`./`来指向一个文件时，这个模块要么是”核心模块”，要么就是从node_modules文件夹加载的；
+
+5.如果指定的路径不存在，require()会抛出一个code属性为`MODULE_NOT_FOUND`的错误。
+
+6.使用安装的模块（node_modules）的调用机制如下面的例子所示。如果位于`/home/ry/projects/foo.js`的文件调用了`require('bar.js')`，那么node查找的位置依次为：
+
+* /home/ry/projects/node_modules/bar.js
+* /home/ry/node_modules/bar.js
+* /home/node_modules/bar.js
+* /node_modules/bar.js
+
+# 了解Node核心模块
+
+### 1.常用工具 util
+
+`util` 是一个 Node.js 核心模块,提供常用函数的集合  
+`var util = require('util')`  
+
+ 1.`util.inherits(constructor, superConstructor)`是一个实现对象间的原型继承的函数.
+
+```js
+function Base(){
+    this.name = 'base';
+    this.base = 1991;
+    this.sayHello = function(){
+        console.log('hello'+this.name);
+    };
+}
+Base.prototype.showName = function(){
+    console.log(this.name);
+}
+function Sub(){
+    this.name = 'Sub';
+}
+util.inherits(Sub, Base);
+
+var objBase = new Base();
+
+objBase.showName(); // base
+objBase.sayHello(); // hellobase
+console.log(objBase); // Base { name: 'base', base: 1991, sayHello: [Function] }
+
+var objSub = new Sub();
+objSub.showName();  // Sub
+//objSub.sayHello(); // 报错,不能继承该方法
+console.log(objSub);  // Sub { name: 'Sub' }
+```
+
+运行结果
+```js
+base
+Hello base
+{ name: 'base', base: 1991, sayHello: [Function] }
+sub
+{ name: 'sub' }
+```
+注意， Sub  仅仅继承了 Base  在原型中定义的函数，而构造函数内部创造的  base  属
+性和  sayHello  函数都没有被  Sub  继承。同时，在原型中定义的属性不会被 console.log 作
+为对象的属性输出。如果我们去掉  objSub.sayHello(); 这行的注释，将会看到：
+```js
+node.js:201
+throw e; // process.nextTick error, or 'error' event on first tick
+^
+TypeError: Object #<Sub> has no method 'sayHello'
+at Object.<anonymous> (/home/byvoid/utilinherits.js:29:8)
+at Module._compile (module.js:441:26)
+at Object..js (module.js:459:10)
+at Module.load (module.js:348:31)
+at Function._load (module.js:308:12)
+at Array.0 (module.js:479:10)
+at EventEmitter._tickCallback (node.js:192:40)
+```
+
+2.`util.inspect(object,[showHidden],[depth],[colors])`是一个将任意对象转换 为字符串的方法,通常用于调试和错误输出。   
+
+它至少接受一个参数 object,即要转换的对象。
+
+* `showHidden`:是一个可选参数,如果值为true,将会输出更多隐藏信息。
+* `depth`: 表示最大递归的层数,如果对象很复杂,你可以指定层数以控制输出信息的多少。如果不指定depth,默认会递归2层,
+指定为 null 表示将不限递归层数完整遍历对象。
+* `colors`: 如果color 值为 true,输出格式将会以 ANSI 颜色编码,通常用于在终端显示更漂亮 的效果。
+```js
+var Person = function(){
+    this.person = "kongzhi";
+    this.toString = function(){
+        return this.name;
+    }
+};
+var obj = new Person();
+
+console.log(util.inspect(obj)); //{ person: 'kongzhi', toString: [Function] }
+console.log(util.inspect(obj,true));
+```
+运行结果是：
+```js
+{ name: 'byvoid', toString: [Function] }
+{ toString:
+{ [Function]
+[prototype]: { [constructor]: [Circular] },
+[caller]: null,
+[length]: 0,
+[name]: '',
+[arguments]: null },
+name: 'byvoid' }
+```
+
+### 3.事件发射器 events
+
+1.`events `模块只提供了一个对象: `events.EventEmitter`。  
+EventEmitter 的核心就 是事件发射与事件监听器功能的封装。
+
+```js
+var events = require('events');
+var emitter = new events.EventEmitter();
+// 注册自定义事件
+emitter.on('someEvent',function(arg1,arg2){
+    console.log("listen1",arg1,arg2); // listen1 kong zhi
+});
+emitter.on('someEvent',function(arg1,arg2){
+   console.log('listen2',arg1,arg2); // listen2 kong zhi
+});
+
+// 触发事件
+emitter.emit('someEvent','kong','zhi');
+```
+
+2.EventEmitter常用的API：
+
+* `EventEmitter.on(event, listener) `为指定事件注册一个监听器,接受一个字符串event 和一个回调函数listener。
+* `EventEmitter.emit(event, [arg1], [arg2], [...]) `发射 event 事件,传递若干可选参数到事件监听器的参数表。
+* `EventEmitter.once(event, listener) `为指定事件注册一个单次监听器,即监听器最多只会触发一次,触发后立刻解除该监听器。
+* `EventEmitter.removeListener(event, listener)` 移除指定事件的某个监听器,listener 必须是该事件已经注册过的监听器。
+* `EventEmitter.removeAllListeners([event])` 移除所有事件的所有监听器, 如果指定 event,则移除指定事件的所有监听器。
+
+3.EventEmitter `定义了一个特殊的事件 error`,它包含了“错误”的语义,我们在遇到 异常的时候通常会发射 error 事件。
+当 error 被发射时,EventEmitter 规定如果没有响 应的监听器,Node.js 会把它当作异常,退出程序并打印调用栈。
+我们一般要为会发射 error 事件的对象设置监听器,避免遇到错误后整个程序崩溃。
+
+```js
+var events = require('events');
+var emitter = new events.EventEmitter();
+emitter.emit('error');
+```
+运行时会显示以下错误：
+```js
+node.js:201
+throw e; // process.nextTick error, or 'error' event on first tick
+^
+Error: Uncaught, unspecified 'error' event.
+at EventEmitter.emit (events.js:50:15)
+at Object.<anonymous> (/home/byvoid/error.js:5:9)
+at Module._compile (module.js:441:26)
+at Object..js (module.js:459:10)
+at Module.load (module.js:348:31)
+at Function._load (module.js:308:12)
+at Array.0 (module.js:479:10)
+at EventEmitter._tickCallback (node.js:192:40)
+```
+
+### 4.文件系统 fs
+
+#### 1. fs.readFile
+
+`fs.readFile(filename,[encoding],[callback(err,data)])`是最简单的读取 文件的函数。  
+* `filename`必选参数,表示文件的字符编码
+* 'encoding' 是回调函数，表示文件的字符编码
+* `callback` 是回调函数,用于接收文件的内容。
+
+如果不指定encoding,则callback就是第二个参数。回调函数提供两个参数`err`和`data`,`err`表 示有没有错误发生,`data `是文件内容。如果指定了 encoding,
+`data` 是一个解析后的字符 串,否则` data` 将会是以 `Buffe`r 形式表示的二进制数据。
+
+```js
+var fs = require('fs');
+
+// 没有指定encoding , data将会是buffer形式表示的二进制数据
+fs.readFile('text.txt',function(err,data){
+   if(err) {
+       console.log(err);
+   }else {
+       console.log(data);
+       // <Buffer 61 61 61 64 73 66 64 66 e9 a2 9d e9 a2 9d e8 80 8c e7 aa 81 e7 84 b6 61 61 61 64 73 66
+       // 64 66 e9 a2 9d e9 a2 9d e8 80 8c e7 aa 81 e7 84 b6 61 61 61 64 ... >
+   }
+});
+```
+```js
+fs.readFile('text.txt','utf-8',function(err,data){
+    if(err) {
+        console.log(err);
+    }else {
+        console.log(data);
+        //aaadsfdf额额而突然aaadsfdf额额而突然aaadsfdf额额而突然aaadsfdf额额而突然aaadsfdf额额而突然aaadsfdf额额而突然
+    }
+});
+```
+
+#### 2.fs.readFileSync
+
+`fs.readFileSync(filename, [encoding])`是 `fs.readFile 同步`的版本。它接受的参数和 fs.readFile 相同,而读取到的文件内容会以函数返回值的形式返回。如果有错误发生,fs 将会`抛出异常`,你需要使用` try` 和 `catch `捕捉并处理异常.
+
+#### 3. fs.open
+
+基本语法: `fs.open(path, flags, [mode], [callback(err, fd)])`是 POSIX open 函数的 封装,
+它接受两个必选参数,path 为文件的路径, flags 可以是以下值。
+
+* `r` :以读取模式打开文件。
+* `r+` :以读写模式打开文件。
+* `w` :以写入模式打开文件,如果文件不存在则创建。
+* `w+` :以读写模式打开文件,如果文件不存在则创建。
+* `a` :以追加模式打开文件,如果文件不存在则创建。
+* `a+` :以读取追加模式打开文件,如果文件不存在则创建。
+
+`mode`参数用于创建文件时给文件指定权限，默认是`0666`。回调函数将会传递一个文件描述符  fd。
+```
+文件权限指的是 POSIX 操作系统中对文件读取和访问权限的规范，通常用一个八进制数来表示。例如 0754 表
+示文件所有者的权限是 7 （读、写、执行），同组的用户权限是 5 （读、执行），其他用户的权限是 4 （读），
+写成字符表示就是 -rwxr-xr--。
+```
+
+# ejs模板引擎
+
+`app.set `是 Express 的参数设置工具,接受一个键(key)和一个值(value),可用的参数如下所示
+```
+1. basepath:基础地址,通常用于 res.redirect() 跳转。
+2. views:视图文件的目录,存放模板文件。
+3. view engine:视图模板引擎。
+4. view options:全局视图参数对象。
+5. view cache:启用视图缓存。
+6. case sensitive routes:路径区分大小写。
+7. strict routing:严格路径,启用后不会忽略路径末尾的“ / ”。
+8. jsonp callback:开启透明的 JSONP 支持。
+```
+来看看app.js 中通过以下两个语句设置了模板引擎和页面模板的位置.
+```js
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+为设置存放模板文件的路径 ,其中__dirname为全局变量,存放当前脚本所在目录
+表明要使用的模板引擎是 ejs,页面模板在 views 子目录下
+```
+在routes/index.js的函数下通过如下语句渲染模板引擎,代码如下:
+```js
+router.get('/', function(req, res, next) {
+   res.render('index', { title: 'Express' });
+});
+```
+* `router.get("/")`的含义是: 截取Get请求方式的url中含有/的请求.
+* `res.render `的功能是调用模板引擎,并将其产生的页面直接返回给客户端。它接受 两个参数,第一个是模板的名称,
+即 views 目录下的模板文件名,不包含文件的扩展名;第二个参数是传递给模板的数据,用于模板翻译.
+
+index.ejs 内容如下:
+
+```html
+<!DOCTYPE html>
+ <html>
+ <head>
+ <title><%= title %></title>
+ <link rel='stylesheet' href='/stylesheets/style.css' />
+ </head>
+ <body>
+ <h1><%= title %></h1>
+ <p>Welcome to <%= title %></p>
+ </body>
+ </html>
+```
+
+上面代码其中有两处 <%= title %>,用于模板变量显示,它们在模板翻译时会被替换 成 Express,因为 res.render 传递了 { title: 'Express' }。
+
+ejs 有以下3种标签:
+
+* `<% code %>`:JavaScript 代码。
+* `<%= code %>`:显示替换过 HTML 特殊字符的内容。
+* `<%- code %>`:显示原始 HTML 内容。
+
+对于HTML 页面的<head>部分以及页眉页脚中的大量内容是重复的内容,我们可以这样前面加<%-include header%>,后面加<%-include footer%>.
+
+## 学会使用片段视图(partials)
+
+Express 的视图系统还支持片段视图(partials),它就是一个页面的片段,通常是重复的 内容,用于迭代显示。
+通过它你可以将相对独立的页面块分割出去,而且可以避免显式地使 用 for 循环。
+
+1. 安装express-partials。进入项目的根目录运行如下命令:
+  `sudo npm install express-partials`
+2. 下载成功后.在app.js 中引用此插件  ` var partials = require(‘express-partials’)`;
+3. 然后再开启此插件, 在app.js 中 app.set(‘view engine’, ‘ejs’); 代码后添加如下代码:
+`app.use(partials());`
+
+下面我们可以来使用片段视图了 partials, 做一个demo如下:  
+在 app.js 中新增以下内容:
+```js
+// 片段视图
+ app.get('/list', function(req, res) {
+    res.render('list', {
+      title: 'List',
+      items: [1991, 'byvoid', 'express', 'Node.js']
+    });
+ });
+```
+在 views 目录下新建 list.ejs,内容是:  
+```html
+<!DOCTYPE html>
+ <html>
+ <head>
+ <title><%= title %></title>
+ <link rel='stylesheet' href='/stylesheets/style.css' />
+ </head>
+ <body>
+ <ul><%- partial('listitem', items) %></ul>
+ </body>
+ </html>
+```
+同时新建 listitem.ejs,内容是:  
+```js
+<li><%= listitem %></li>
+```
+重启后 ,在浏览器访问 http://127.0.0.1:3000/list 即可看到 列表页面;  
+在源代码看到如下代码:  
+```html
+<!DOCTYPE html>
+ <html>
+ <head>
+ <title>List</title>
+ <link rel='stylesheet' href='/stylesheets/style.css' />
+ </head>
+ <body>
+ <ul><li>1991</li><li>byvoid</li><li>express</li><li>Node.js</li></ul>
+ </body>
+ </html>
+```
+`partial` 是一个可以在视图中使用函数,它接受两个参数,第一个是片段视图的名称, 第二个可以是一个对象或一个数组,如果是一个对象,
+那么片段视图中上下文变量引用的就 是这个对象;如果是一个数组,那么其中每个元素依次被迭代应用到片段视图。片段视图中
+上下文变量名就是视图文件名,例如上面的'listitem'.
+
+
+# Express
+
+![](http://images2015.cnblogs.com/blog/561794/201604/561794-20160428221209189-1894732044.png)
+
+### 1.app.js
+
+```js
+var express = require('express');  // 引入express模块
+ var path = require('path');        // 引入path模块
+ var favicon = require('serve-favicon');
+ var logger = require('morgan');
+ var cookieParser = require('cookie-parser');
+ var bodyParser = require('body-parser');
+
+// routes 是一个文件夹形式的本地模块,即./routes/index.js,它的功能 是为指定路径组织返回内容,相当于 MVC 架构中的控制器。
+ var routes = require('./routes/index');
+ var users = require('./routes/users');
+
+// 函数创建了一个应用的实例,后面的所有操作都是针对于这个实例进行的
+ var app = express();
+
+// app.set 是 Express 的参数设置工具,接受一个键(key)和一个值(value),可用的参 数如下所示
+// 1. basepath:基础地址,通常用于 res.redirect() 跳转。
+// 2. views:视图文件的目录,存放模板文件。
+// 3. view engine:视图模板引擎。
+// 4. view options:全局视图参数对象。
+// 5. view cache:启用视图缓存。
+// 6. case sensitive routes:路径区分大小写。
+// 7. strict routing:严格路径,启用后不会忽略路径末尾的“ / ”。
+// 8. jsonp callback:开启透明的 JSONP 支持。
+
+ // view engine setup
+ app.set('views', path.join(__dirname, 'views'));
+ app.set('view engine', 'ejs');
+
+ // Express 依赖于 connect,提供了大量的中间件,可以通过 app.use 启用
+ // 1. bodyParser 的功能是解析客户端请求,通常是通过 POST 发送的内容。
+ // 2. router 是项目的路由支持。
+ // 3. static 提供了静态文件支持。
+ // 4. errorHandler 是错误控制器。
+ // uncomment after placing your favicon in /public
+ //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+ app.use(logger('dev'));
+ app.use(bodyParser.json());
+ app.use(bodyParser.urlencoded({ extended: false }));
+ app.use(cookieParser());
+ app.use(express.static(path.join(__dirname, 'public')));
+
+ app.use('/', routes);
+ app.use('/users', users);
+
+ // catch 404 and forward to error handler
+ app.use(function(req, res, next) {
+ var err = new Error('Not Found');
+ err.status = 404;
+ next(err);
+ });
+
+ // error handlers
+
+ // development error handler
+ // will print stacktrace
+ if (app.get('env') === 'development') {
+ app.use(function(err, req, res, next) {
+ res.status(err.status || 500);
+ res.render('error', {
+ message: err.message,
+ error: err
+ });
+ });
+ }
+
+ // production error handler
+ // no stacktraces leaked to user
+ app.use(function(err, req, res, next) {
+ res.status(err.status || 500);
+ res.render('error', {
+ message: err.message,
+ error: {}
+ });
+ });
+
+ module.exports = app;
+```
+
+### 2. routes/index.js
+routes/index.js 是路由文件,相当于控制器,用于组织展示的内容:
+
+```js
+var express = require('express');
+ var router = express.Router();
+ router.get('/', function(req, res, next) {
+    res.render('index', { title: 'Express' });
+ });
+
+ module.exports = router;
+ // 上面的代码
+ router.get('/', function(req, res, next) {
+    res.render('index', { title: 'Express' });
+ });
+```
+其中只有一个语句 res.render('index', { title: 'Express' }),功能是 调用模板解析引擎,翻译名为 index 的模板,
+并传入一个对象作为参数,这个对象只有一个 2 属性,即 title: 'Express'。
+
+### 3. index.ejs
+
+index.ejs 是模板文件,即 routes/index.js 中调用的模板,内容是:
+
+```js
+<!DOCTYPE html>
+ <html>
+ <head>
+ <title><%= title %></title>
+ <link rel='stylesheet' href='/stylesheets/style.css' />
+ </head>
+ <body>
+ <h1><%= title %></h1>
+ <p>Welcome to <%= title %></p>
+ </body>
+ </html>
+```
+其中包含了形如` <%= title %> `的标签,功能是显示引用的 变量,即 res.render 函数第二个参数传入的对象的属性。
+
+### 4. 在bin目录下有一个文件www,内容如下:
+
+```js
+// Module dependencies.
+var app = require('../app');
+var debug = require('debug')('microblog:server');
+var http = require('http');
+
+// Get port from environment and store in Express.
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+// Create HTTP server.
+var server = http.createServer(app);
+
+// Listen on provided port, on all network interfaces.
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+// Normalize a port into a number, string, or false.
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+//Event listener for HTTP server "error" event.
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+// Event listener for HTTP server "listening" event.
+function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}
+
+上面的代码最主要做的工作时,创建一个http服务器,并且监听默认的端口号是3000;
+```
+
+##### express()内置方法理解如下:
+
+1.`express()`用来创建一个Express的程序。express()方法是express模块导出的顶层方法。如下代码:
+```js
+var express = require('express');
+var app = express();
+```
+
+2.`express.static(root, [options]):`
+express.static是Express中唯一的内建中间件。它以server-static模块为基础开发，负责托管 Express 应用内的静态资源。
+* 参数root为静态资源的所在的根目录。  
+```js
+例如，假设在 public 目录放置了图片、CSS 和 JavaScript 文件，你就可以：
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+现在，public 目录下面的文件就可以访问了
+```
+
+# 理解路由控制
+
+### 1. 工作原理:
+
+访问 http://localhost:3000/,浏览器会向服务器发送请求,app 会 解析请求的路径,调用相应的逻辑。  
+`app.use('/', routes);` 它的作用是routes文件夹下 规定路径为`“/” `默认为index,而index.js代码如下:  
+```js
+router.get('/', function(req, res, next) {
+   res.render('index', { title: 'Express' });
+});
+```
+通 过 `res.render('index', { title: 'Express' }) `调用视图模板 index,传递 title 变量。最终视图模板生成 HTML 页面,返回给浏览器.
+
+### 2. 理解路由规则:
+创建一个地址为 /hello 的页面,内容是当前的服务器时间  
+
+1.在route下新建一个文件hello.js文件;代码如下:
+
+```js
+var express = require('express');
+     var router = express.Router();
+     router.get('/', function(req, res, next) {
+        res.send('The time is ' + new Date().toString());
+     });
+     module.exports = router;
+```
+2. 在app.js头部引入hello模块;添加如下代码:
+```js
+    var hello = require('./routes/hello');
+```
+3. 在已有的路由规则 app.use('/users', users); 后面添加一行:
+```js
+    app.use('/hello', hello);
+```
+### 3. 理解路径匹配
+
+展示一个用户的个人页面,路径为 /users/[username]  
+在app.js加入如下代码:  
+```js
+// 路径匹配
+ app.get('/users/:username', function(req, res) {
+   res.send('user: ' + req.params.username);
+ });
+```
+
+
+
+
+
+
+
 #学习日志 【2016/7/29】
 
 Flex 布局教程：实例篇
