@@ -1,0 +1,46 @@
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+    {{entries.moocName}} <span class="hidden" id="moocId">{{entries._id}}</span>
+    <small>{{entries.teacher}}</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> 慕课管理</a></li>
+        <li><a href="#"><i class="fa fa-dashboard"></i> 慕课编辑</a></li>
+      <li class="active">Content</li>
+    </ol>
+  </section>
+  <!-- Main content -->
+  <section class="content content-edit">
+      <div class="mooc-bar">
+          <div class="bar-line"></div>
+          {{#each entries.children}}
+              <li data-toggle="select" class="mooc-week">
+                  <i>{{addOne @index}}</i><span>第{{addOne @index}}章</span>
+                  <a href="#" class="mooc-button" data-button="add"><i class="fa fa-plus"></i></a>
+              </li>
+              {{#each this}}
+                  <li data-toggle="select" data-id="{{_id}}">
+                      <span>{{addOne @index}}. {{title}}</span>
+                        <div class="btn-wrapper-l">
+                            <a href="#" class="mooc-button mooc-button-s pull-left" data-button="up"><i class="fa fa-arrow-up"></i></a>
+                            <a href="#" class="mooc-button mooc-button-s pull-left" data-button="down"><i class="fa fa-arrow-down"></i></a>
+                        </div>
+                      <div class="btn-wrapper-r">
+                          <a href="#" class="mooc-button" data-button="del"><i class="fa fa-times"></i></a>
+                          <a href="#" class="mooc-button" data-button="edit"><i class="fa fa-pencil"></i></a>
+                      </div>
+                  </li>
+              {{/each}}
+          {{/each}}
+      </div>
+      <div class="mooc-main">
+          <textarea class="textarea" id="moocContent" placeholder="文章内容" ></textarea>
+      </div>
+
+  </section>
+</div>
+
+
+<script src="/blog/common.js"></script>
+<script src="/blog/moocEdit.js"></script>

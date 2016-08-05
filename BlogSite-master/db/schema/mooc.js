@@ -38,3 +38,5 @@ moocSchema.pre('save', function (next) {
 })
 
 module.exports = mongoose.model('Mooc', moocSchema);
+
+

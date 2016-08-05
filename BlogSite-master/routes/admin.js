@@ -106,16 +106,14 @@ router.get('/moocList', function (req, res, next) {
 	console.log("渲染慕课");
 	dbHelper.findMooc(req, function (success, data) {
 		res.render('./admin/moocList',{
-			entries: data.result,
+			entries: data.results,
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,
-			count: data.count
-
+			count: data.count,
+			layout: 'admin'
 		});
-	})
-	
+	});
 });
-
 
 //渲染新建慕课页面
 router.get('/moocCreate', function (req, res, next) {
@@ -128,6 +126,108 @@ router.post('/moocCreate', function (req, res, next) {
 	})
 });
 
+//渲染编辑慕课页面
+router.get('/moocEdit/:id', function(req, res, next) {
 
+	var id = req.params.id;
+	dbHelper.findMoocOne(req, id, function (success, data) {
+		res.render('./admin/moocEdit',{
+			entries: data,
+			layout: 'admin'
+		})
+	});
+});
+
+router.post('/moocGetChapContent', function(req, res, next) {
+
+	var moocId    = req.body.moocId;
+	var chapId    = req.body.chapId;
+	var preChapId = req.body.preChapId;
+	var content   = req.body.content;
+
+	dbHelper.findMoocChapContent( moocId, chapId, preChapId, content, function (success, doc) {
+		res.send(doc);
+	});
+});
+
+router.post('/moocSetChapTitle', function(req, res, next) {
+
+	var moocId    = req.body.moocId;
+	var chapTitle = req.body.chapTitle;
+	var chapId    = req.body.chapId;
+
+	dbHelper.updateMoocChapTitle( moocId, chapId, chapTitle, function (success, doc) {
+		res.send(doc);
+	});
+});
+
+
+router.post('/moocGetChapTitle', function(req, res, next) {
+
+	var moocId    = req.body.moocId;
+	var chapId    = req.body.chapId;
+
+	dbHelper.queryMoocChapTitle( moocId, chapId, function (success, doc) {
+		res.send(doc);
+	});
+});
+
+router.post('/moocDeleteChap', function(req, res, next) {
+
+	var moocId    = req.body.moocId;
+	var chapId    = req.body.chapId;
+
+	dbHelper.deleteMoocChap( moocId, chapId, function (err, doc) {
+		if(err) {
+			return next(err);
+		}else{
+			res.send(doc);
+		}
+	});
+});
+
+
+router.post('/moocAddChap', function(req, res, next) {
+
+	var moocId    = req.body.moocId;
+	var chapId    = req.body.chapId;
+
+	dbHelper.addMoocChap( moocId, chapId, function (err, doc) {
+		if(err) {
+			return next(err);
+		}else{
+			res.send(doc);
+		}
+	});
+});
+
+
+router.post('/moocUpChap', function(req, res, next) {
+
+	var moocId    = req.body.moocId;
+	var chapId    = req.body.chapId;
+
+	dbHelper.upMoocChap( moocId, chapId, function (err, doc) {
+		if(err) {
+			return next(err);
+		}else{
+			res.send(doc);
+		}
+	});
+});
+
+router.post('/moocDownChap', function(req, res, next) {
+
+	var moocId    = req.body.moocId;
+	var chapId    = req.body.chapId;
+
+	dbHelper.MoocChap( moocId, chapId, function (err, doc) {
+		if(err) {
+			return next(err);
+		}else{
+			res.send(doc);
+		}
+	});
+});
 
 module.exports = router;

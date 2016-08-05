@@ -10,5 +10,38 @@
             <span><a href="#"><i class="fa fa-google-plus-square fa-4x"></i></a></span>
         </div>
     </div>
-    <div class="others">其他功能</div>
+    <div class="others">
+        <div class="panel-group" id="admin-box">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#admin-box" href="#admin-news">新闻管理</a>
+                    </h4>
+                </div>
+                <div id="admin-news" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <ul>
+                            <li><a href="/admin/newsList">文章列表</a></li>
+                            <li><a href="/admin/news">新建文章</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#admin-box" href="#admin-moocs">慕课管理</a>
+                    </h4>
+                </div>
+                <div id="admin-moocs" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <ul>
+                            <li><a href="/admin/moocList">慕课列表</a></li>
+                            <li><a href="/admin/moocCreate">新建慕课</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </aside>
