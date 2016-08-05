@@ -1,6 +1,604 @@
+#学习日志 【2016/8/5】
+
+Node与Express开发    读书笔记（持续更新）
+=========================
+
+# 第7章  Handlebars模板引擎
+
+理解模板引擎的关键在于`context`（上下文环境）。当你渲染一个模板时，便会传递给模板引擎一个对象，叫作`上下文对象`，它能让替换标识运行。  
+>例如:
+>
+* 如果上下文对象是 `{ name: 'Buttercup' } `，模板是` <p>Hello, {{name}}!</p> `  ,则`{{name}} `会被` Buttercup` 替换  
+* 如果上下文换成 `{ name: '<b>Buttercup</b>' } `，使用之前的模板得到的结果将是 `<p>Hello,&lt;b&gt;Buttercup&lt;b&gt;</p> `  。要想解决这个问题，用三个大括号代
+替两个就可以了： `{{{name}}} `。
+
+### 1.注释
+```js
+{{! super-secret comment }}
+<!-- not-so-secret comment -->
+```
+
+假设这是一个服务器端模板，上面的 `super-secret comment `将不会被传递到浏览器，然而
+如果用户查看 HTML 源文件，下面的 `not-so-secret comment `就会被看到。
+
+### 2.块级表达式（block）
+
+```js
+{
+    currency: {
+        name: 'United States dollars',
+            abbrev: 'USD',
+    },
+    tours: [
+        { name: 'Hood River', price: '$99.95' },
+        { name: 'Oregon Coast', price, '$159.95' },
+    ],
+        specialsUrl: '/january-specials',
+    currencies: [ 'USD', 'GBP', 'BTC' ],
+}
+```
+现在让我们将上下文对象传递到如下模板：
+```html
+<ul>
+{{#each tours}}
+{{! I'm in a new block...and the context has changed }}
+<li>
+{{name}} - {{price}}
+    {{#if ../currencies}}
+    ({{../../currency.abbrev}})
+    {{/if}}
+</li>
+    {{/each}}
+</ul>
+    {{#unless currencies}}
+<p>All prices in {{currency.name}}.</p>
+    {{/unless}}
+    {{#if specialsUrl}}
+    {{! I'm in a new block...but the context hasn't changed (sortof) }}
+<p>Check out our <a href="{{specialsUrl}}">specials!</p>
+    {{else}}
+<p>Please check back often for specials.</p>
+                               {{/if}}
+<p>
+    {{#each currencies}}
+<a href="#" class="currency">{{.}}</a>
+    {{else}}
+    Unfortunately, we currently only accept {{currency.name}}.
+    {{/each}}
+</p>
+```
+>说明：
+>
+* 它开始于 each 辅助方法，这使我们能够遍历一个数组。{{#each tours}} 和 {{/each tours}} 之间的东西很重要，这涉及上下文切换。
+* 第一次循环，上下文变成了 { name: 'Hood River', price: '$99.95' } ，第二次则变成了  {name: 'Oregon Coast', price: '$159.95' } 。所以在这个块里面，我们可以看到 {{name} }和 {{price}} 。然而，如果你想访问 currency 对象，就得使用 ../ 来访问上一级上下文。如果上下文属性本身就是一个对象，我们可以直截了当地访问它的属性，比如 {{currency.name}} 。
+* 在each 块中避免使用 if 块
+* 对于 each ，如果数组中没有任何元素， else块就会执行
+* 最后要注意的一点是在 {{#each currencies}} 块中使用 {{.}} 。 {{.}} 指向
+当前上下文，在这个例子中，当前上下文只是我们想打印出来的数组中的一个字符串。
+
+### 3.服务器端模板
+
+```js
+npm install --save express3-handlebars
+```
+```js
+var handlebars = require('express3-handlebars')
+    .create({ defaultLayout: 'main' });
+app.engine('handlebars', handlebars.engine);
+app.set('view engine', 'handlebars');
+```
+>可以在创建 express3-handlebats 实
+例 require('express3-handlebars').create({ extname: '.hbs' }) 的时候，
+将扩展名改成同样常见的 .hbs。
+
+### 4.视图和布局
+视图首先被渲染，之后是布局。
+```html
+<!doctype>
+<html>
+<head>
+        <title>Meadowlark Travel</title>
+        <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+            {{{body}}}
+</body>
+</html>
+```
+>请注意 <body> 标记内的文本：{{{body}}}。这样视图引擎就知道在哪里渲染你的内容了。
+一定要用三重大括号而不是两个，因为视图很可能包含 HTML，我们并不想让 Handlebars
+试图去转义它。
+
+### 5.   在Express中使用（或不使用）布局
+
+当我们创建视图引擎时，会指定一个默认的布局：
+```js
+var handlebars = require('express3-handlebars'）
+        .create({ defaultLayout: 'main' });
+```
+默认情况下，Express 会在 views 子目录中查找视图，在 views/layouts 下查找布局。所以如果有一个叫作 views/foo.handlebars 的视图，可以这样渲染它：
+```js
+app.get('/foo',function(req,res){
+        res.render('foo');
+});
+```
+如果你想使用一个不同的模板，可以指定模板名称：
+```js
+app.get('/foo', function(req, res){
+        res.render('foo', { layout: 'microsite' });
+});
+```
+如果你根本不想使用布局（这意味着在视图中你不得不拥有所有的样板文件），可以在上下文中指定` layout: null `：
+
+### 6.　局部文件
+如果有一个当前天气组件用来显示 Portland、Bend和 Manzanita 三地的天气条件。我们希望这个组件可以被重复使用,样就可以轻松地把它放在任何我们想让它出现的页面上，这就要用到局部文件。
+
+首先，创建一个局部文件，views/partials/weather.handlebars：
+```html
+<div class="weatherWidget">
+    {{#each partials.weather.locations}}
+        <div class="location">
+            <h3>{{name}}</h3>
+            <a href="{{forecastUrl}}">
+                <img src="{{iconUrl}}" alt="{{weather}}">
+                {{weather}}, {{temp}}
+            </a>
+        </div>
+    {{/each}}
+    <small>Source: <a href="http://www.wunderground.com">Weather
+        Underground</a></small>
+</div>
+```
+>请注意，我们使用 partials.weather 为开头来命名上下文。我们想在任何页面上使用局部文
+件，但上述做法实际上并不会将上下文传递给每一个视图，因此可以使用 res.locals（对于
+任何视图可用）。但是我们并不想让个别的视图干扰指定的上下文，于是将所有的局部文
+件上下文都放在 partials 对象中
+```js
+function getWeatherData(){
+    return {
+        locations: [
+            {
+                name: 'Portland',
+                forecastUrl: 'http://www.wunderground.com/US/OR/Portland.html',
+                iconUrl: 'http://icons-ak.wxug.com/i/c/k/cloudy.gif',
+                weather: 'Overcast',
+                temp: '54.1 F (12.3 C)',
+            },
+            {
+                name: 'Bend',
+                forecastUrl: 'http://www.wunderground.com/US/OR/Bend.html',
+                iconUrl: 'http://icons-ak.wxug.com/i/c/k/partlycloudy.gif',
+                weather: 'Partly Cloudy',
+                temp: '55.0 F (12.8 C)',
+            },
+            {
+                name: 'Manzanita',
+                forecastUrl: 'http://www.wunderground.com/US/OR/Manzanita.html',
+                iconUrl: 'http://icons-ak.wxug.com/i/c/k/rain.gif',
+                weather: 'Light Rain',
+                temp: '55.0 F (12.8 C)',
+            },
+        ],
+    };
+}
+```
+现在创建一个中间件给 res.locals.partials 对象添加这些数据
+```js
+app.use(function(req, res, next){
+    if(!res.locals.partials) res.locals.partials = {};
+    res.locals.partials.weather = getWeatherData();
+    next();
+});
+```
+```html
+<h2>Welcome to Meadowlark Travel!</h2>
+        {{> weather}}
+```
+>语法 {{> partial_name}} 可以让你在视图中包含一个局部文件。 express3-handlebars 会
+在 views/partials 中寻找一个叫作 partial_name.handle-bars 的视图（或是 weather.handlebars，
+如上例）
+
+>Tip： express3-handlebars 支持子目录，所以如果你有大量的局部文件，可以将它
+们组织在一起。例如，你有一些社交媒体局部文件，可以将它们放在 views/
+partials/social 目 录 下 面， 然 后 使 用 {{> social/facebook}} 、 {{> social/
+twitter}} 等来引入它们。
+
+### 7.   段落
+当我们实例化 Handlebars 对象时，会添加一个叫作
+section 的辅助方法
+```js
+var handlebars = require('express3-handlebars').create({
+    defaultLayout:'main',
+    helpers: {
+        section: function(name, options){
+            if(!this._sections) this._sections = {};
+            this._sections[name] = options.fn(this);
+            return null;
+        }
+    }
+});
+```
+
+# 第八章 表单处理
+
+### 1. 向服务器发送客户端数据
+
+大体上讲，向服务器发送客户端数据有两种方式：`查询字符串 get请求`和`请求正文  Post请求`。
+
+### 2. HTML表单
+
+```html
+<form action="/process" method="POST">
+    <input type="hidden" name="hush" val="hidden, but not secret!">
+    <div>
+        <label for="fieldColor">Your favorite color: </label>
+        <input type="text" id="fieldColor" name="color">
+    </div>
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</form>
+```
+>在`<form> `标记中提交方法被`明确地指定为 POST `：如果不这么做，默认进行 GET 提
+交。 `action 的值被指定为用于接收表单数据的 UR`。如果你忽略这个值，表单会提交到它
+被加载进来时的同一 URL。
+
+>` <input> `域中的 `name `属性，这样服务器才能识别字段  
+
+>注意隐藏域：它不会呈现在浏览器中。但是，你不能使用它存放秘密和敏感信息：用户只要查看页面源文件，隐藏域就会暴露出来。
+
+>当用户提交表单时，/process URL 被请求，字段值在请求正文中被传输到服务器。
+
+### 4　处理表单的不同方式
+
+1.如果你的表单使用的是`method="POST" `（推荐使用），那么展现表单和处理表单通常使用相
+同的路径：这样可以区分开来，因为前者是一个 GET 请求，而后者是一个 POST 请求。如果
+采用这种方法，就可以省略表单上的 action 属性
+
+* 运用flash消息重定向到原位置
+* 运用flash消息重定向到新位置
+
+### 5　Express表单处理
+
+使用 POST （推荐使用的），需要引入中间件来解析 URL 编码体。
+```js
+安装 body-parser中间件  
+npm install --save body-parser     
+
+然后引入      
+app.use(require('body-parser')());
+```
+```html
+ /views/newsletter.handlebars：
+
+ <h2>Sign up for our newsletter to receive news and specials!</h2>
+<form class="form-horizontal" role="form"
+      action="/process?form=newsletter" method="POST">
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+    <div class="form-group">
+        <label for="fieldName" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control"
+                   id="fieldName" name="name">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="fieldEmail" class="col-sm-2 control-label">Email</label>
+        <div class="col-sm-4">
+            <input type="email" class="form-control" required
+                   id="fieldName" name="email">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-4">
+            <button type="submit" class="btn btn-default">Register</button>
+        </div>
+    </div>
+</form>
+```
+应用程序文件
+```js
+app.use(require('body-parser')());
+
+
+app.get('/newsletter', function(req, res){
+// 我们会在后面学到 CSRF……目前，只提供一个虚拟值
+  res.render('newsletter', { csrf: 'CSRF token goes here' });
+});
+
+app.post('/process', function(req, res){
+  console.log('Form (from querystring): ' + req.query.form);
+  console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+  console.log('Name (from visible form field): ' + req.body.name);
+  console.log('Email (from visible form field): ' + req.body.email);
+  res.redirect(303, '/thank-you');
+});
+```
+>在处理程序中，我们将重定向到“thank you”视图。我们可以
+在此渲染视图，但是如果这样做，访问者的浏览器地址栏仍旧是 /process，这可能会令人
+困惑。发起一个重定向可以解决这个问题。
+
+>在这种情况下使用 303（或 302）重定向，而不是 301 重定向，这一点非常
+重要。301 重定向是“永久”的，意味着浏览器会缓存重定向目标。如果使
+用 301 重定向并且试图第二次提交表单，浏览器会绕过整个 /process 处理程
+序直接进入 /thank you 页面，因为它正确地认为重定向是永久性的。另一方
+面，303 重定向告诉浏览器“是的，你的请求有效，可以在这里找到响应”，
+并且不会缓存重定向目标。
+
+### 6     处理AJAX表单
+
+HTML 文件 （/views/newsletter.handlebars）
+```html
+<div class="formContainer">
+    <form class="form-horizontal newsletterForm" role="form"
+action="/process?form=newsletter" method="POST">
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+    <div class="form-group">
+    <label for="fieldName" class="col-sm-2 control-label">Name</label>
+    <div class="col-sm-4">
+    <input type="text" class="form-control"
+id="fieldName" name="name">
+    </div>
+    </div>
+    <div class="form-group">
+    <label for="fieldEmail" class="col-sm-2 control-label">Email</label>
+    <div class="col-sm-4">
+    <input type="email" class="form-control" required
+id="fieldName" name="email">
+    </div>
+    </div>
+    <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-4">
+    <button type="submit" class="btn btn-default">Register</button>
+    </div>
+</div>
+</form>
+</div>
+{{#section 'jquery'}}
+<script>
+$(document).ready(function(){
+  $('.newsletterForm').on('submit', function(evt){
+    evt.preventDefault();
+    var action = $(this).attr('action');
+    var $container = $(this).closest('.formContainer');
+    $.ajax({
+      url: action,
+      type: 'POST',
+      success: function(data){
+        if(data.success){
+          $container.html('<h2>Thank you!</h2>');
+        } else {
+          $container.html('There was a problem.');
+        }
+      },
+      error: function(){
+        $container.html('There was a problem.');
+      }
+    });
+  });
+});
+</script>
+{{/section}}
+```
+应用程序文件
+```js
+app.post('/process', function(req, res){
+  if(req.xhr || req.accepts('json,html')==='json'){
+// 如果发生错误，应该发送 { error: 'error description' }
+    res.send({ success: true });
+  } else {
+// 如果发生错误，应该重定向到错误页面
+    res.redirect(303, '/thank-you');
+  }
+});
+```
+>Express 提供了两个方便的属性： req.xhr 和 req.accepts 。如果是 AJAX 请求（XHR 是
+XML HTTP 请求的简称，AJAX 依赖于 XHR）， req.xhr 值为 true 。 req.accepts 试图确
+定返回的最合适的响应类型。在此例中， req.accepts('json,html') 询问最佳返回格式是
+JSON 还是 HTML：这可以根据 Accepts HTTP 头信息推断出来，它是浏览器提供的可读
+的、有序的响应类型列表。如果是一个 AJAX 请求，或者 User-Agent 明确要求 JSON 优先
+于 HTML，那么就会返回合适的 JSON 数据；否则，返回一个重定向。
+
+>在这个函数里可以做任何处理：通常会将数据保存到数据库。如果出现问题，则返回一个
+err 属性（而不是 success ）的 JSON 对象，或者重定向到一个错误页面（如果不是 AJAX
+请求）。
+
+### 7　文件上传
+
+Formidable 要稍微简单一些，因为它有一个方便的回调方法，能够提供包含字段和文件信
+息的对象。
+
+```html
+<div class="form-group">
+    <label for="fieldPhoto" class="col-sm-2 control-label">Vacation photo
+    </label>
+    <div class="col-sm-4">
+        <input type="file" class="form-control" required accept="image/*"
+               id="fieldPhoto" name="photo">
+    </div>
+</div>
+```
+>注意，我们必须指定 enctype="multipart/form-data" 来启用文件上传。
+
+安装 Formidable（ `npm install --save formidable `）并创建一下路由处理程序：
+```js
+var formidable = require('formidable');
+app.get('/contest/vacation-photo',function(req,res){
+  var now = new Date();
+  res.render('contest/vacation-photo',{
+    year: now.getFullYear(),month: now.getMont()
+  });
+});
+app.post('/contest/vacation-photo/:year/:month', function(req, res){
+  var form = new formidable.IncomingForm();
+  form.parse(req, function(err, fields, files){
+    if(err) return res.redirect(303, '/error');
+    console.log('received fields:');
+    console.log(fields);
+    console.log('received files:');
+    console.log(files);
+    res.redirect(303, '/thank-you');
+  });
+});
+```
+### 8　jQuery文件上传
+
+# 第9章   Cookie与会话
+
+cookie 的想法很简单：服务器发送一点信息，浏览器在一段可配置的时期内保存它。  
+
+* cookie对用户来说不是加密的
+* 用户可以删除或禁用cookie 
+* 一般的cookie可以被篡改
+* cookie可以用于攻击 
+* 如果你滥用cookie，用户会注意到 
+* 如果可以选择，会话要优于cookie 
+
+>cookie 不是魔法。当服务器希望客户端保存一个 cookie 时，它会发送一个响
+应头 `Set-Cookie `，其中包含名称 / 值对。当客户端向服务器发送含有 cookie
+的请求时，它会发送多个请求头 Cookie ，其中包含这些 cookie 的值。
+
+### 1　凭证的外化
+
+1. 为了保证 cookie 的安全，必须有一个 cookie 秘钥。cookie 秘钥是一个字符串，服务器知道
+它是什么，它会在 cookie 发送到客户端之前对 cookie 加密。  
+
+2. 外化第三方凭证是一种常见的做法，比如 cookie 秘钥、数据库密码和 API 令牌（Twitter、
+Facebook 等）。  
+```js
+/credentials.js
+
+moudle.exports = {
+        cookieSecret: '把你的cookie 秘钥放在这里',  
+};
+
+现在，为了防止我们不慎把这个文件添加到源码库中，在 .gitignore 文件中加上 credentials.
+js。将凭证引入程序只需要这样做：
+
+var credentials = require('./credentials.js');
+```
+### 2　Express中的Cookie
+
+在程序中开始设置和访问 cookie 之前，需要先引入中间件 cookie-parser 。
+```
+命令行     npm  install --save cookie-parser
+
+然后       app.use(require('cookie-parser')(credentials.cookieSecret));
+```
+完成这个之后，你就可以在任何能访问到响应对象的地方设置 cookie 或签名 cookie：
+```js
+res.cookie('monster', 'nom nom');
+res.cookie('signed_monster', 'nom nom', { signed: true });
+```
+>签名 cookie 的优先级高于未签名 cookie。如果你将签名 cookie 命名为
+signed_monster ，那就不能用这个名字再命名未签名 cookie（它返回时会变
+成 undefined ）。
+要获取客户端发送过来的 cookie 的值（如果有的话），只需访问请求对象的 cookie 或
+signedCookie 属性：
+```js
+var monster = req.cookies.monster;
+var signedMonster = req.signedCookies.monster;
+```
+删除cookie   `res.clearCookie('monster')`;
+
+### 3.   会话(内存存储)
+
+首 先 安 装 express-session （ `npm install --save express-session` ）。 然 后， 在 链 入cookie-parser 之后链入 express-session ：
+```js
+app.use(require('cookie-parser')(credentials.cookieSecret));
+app.use(require('express-session')());
+```
+中间件 express-session 接受带有如下选项的配置对象：
+
+* `key` •存放唯一会话标识的 cookie 名称。默认为 connect.sid 。
+Cookie 与会话 ｜ 93
+* `store` •会话存储的实例。默认为一个 MemoryStore 的实例，可以满足我们当前的要求。第 13
+章将会介绍如何使用数据库存储。
+* `cookie` •会话 cookie 的 cookie 设置 （ path 、 domain 、 secure 等）。适用于常规的 cookie 默认值。
+
+#### 使用会话
+使用请求对象的 session 变量的属性：
+```js
+req.session.userName = 'Anonymous';
+var colorScheme = req.session.colorScheme || 'dark';
+```
+它全都是在请求
+对象上操作的。（响应对象没有 session 属性。）要删除会话，可以用 JavaScript 的` delete`
+操作符：
+```js
+req.session.userName = null;  // 这会将 'userName' 设为 null
+// 但不会移除它
+delete req.session.colorScheme;  // 这会移除 'colorScheme'
+```
+### 5　用会话实现即显消息
+
+在你的模板文件里，找个醒目的地方（一般是直接放在网站的标题下
+面），添加下面的代码：
+```html
+{{#if flash}}
+    <div class="alert alert-dismissible alert-{{flash.type}}">
+        <button type="button" class="close"
+                data-dismiss="alert" aria-hidden="true">&times;<button>
+            <strong>{{flash.intro}}</strong> {{{flash.message}}}
+    </div>
+{{/if}}
+```
+接下来添加一些中间件，如果会话中有 flash
+对象，将它添加到上下文中。即显消息显示过一次之后，我们就要从会话中去掉它，以免
+它在下一次请求时再次显示。在路由之前添加下面这段代码：
+```js
+app.use(function(req, res, next){
+// 如果有即显消息，把它传到上下文中，然后清除它
+    res.locals.flash = req.session.flash;
+    delete req.session.flash;
+    next();
+});
+```
+接下来我们看一下如何使用即显消息。假设我们的用户订阅了简报，并且我们想在用户订
+阅后把他们重定向到简报归档页面去。我们的表单处理器可能是这样的
+```js
+app.post('/newsletter', function(req, res){
+    var name = req.body.name || '', email = req.body.email || '';
+// 输入验证
+    if(!email.match(VALID_EMAIL_REGEX)) {
+        if(req.xhr) return res.json({ error: 'Invalid name email address.' });
+        req.session.flash = {
+            type: 'danger',
+            intro: 'Validation error!',
+            message: 'The email address you entered was not valid.',
+        };
+        return res.redirect(303, '/newsletter/archive');
+    }
+    new NewsletterSignup({ name: name, email: email }).save(function(err){
+        if(err) {
+            if(req.xhr) return res.json({ error: 'Database error.' });
+            req.session.flash = {
+                type: 'danger',
+                intro: 'Database error!',
+                message: 'There was a database error; please try again later.',
+            }
+            return res.redirect(303, '/newsletter/archive');
+        }
+        if(req.xhr) return res.json({ success: true });
+        req.session.flash = {
+            type: 'success',
+            intro: 'Thank you!',
+            message: 'You have now been signed up for the newsletter.',
+        };
+        return res.redirect(303, '/newsletter/archive');
+    });
+});
+```
+>注意看如何用同一个处理器处理 AJAX 提交（因为我们检查了 req.xhr ），并且我们仔细地
+区分开了输入验证错误和数据库错误。记住，即便我们在前端做了输入验证（你应该这样
+做），在后台也应该再做一次，因为恶意用户能够绕过前端验证。
+
+
+
+
 # 学习日志【2016/8/2】
 
-nodejs开发指南读后感
+nodejs开发指南    读书笔记
 =========================
 
 # http服务器
