@@ -5,7 +5,9 @@
 	<section class="content">
 		{{#each entries}}
 			<div class="blog-list border-dash">
-                <p class="title">{{title}}</p>
+                <a href="/p/{{_id}}">
+                    <p class="title">{{title}}</p>
+                </a>
                 <p class="postdate">发布时间：{{timeFromNow meta.createAt}}({{formatDate meta.createAt}})
                     <span>作者：{{author.username}}</span>
                 </p>

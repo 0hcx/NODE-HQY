@@ -204,7 +204,7 @@ exports.findMooc = function(req, cb) {
 };
 
 //查找慕课
-exports.findMoocOne = function (req, id, cb) {
+exports.findMoocOne = function ( id, cb) {
     Mooc.findOne({_id: id}, function (err,docs) {
 
         console.log("查找单个mooc")

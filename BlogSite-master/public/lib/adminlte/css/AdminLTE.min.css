@@ -1,7 +1,37 @@
 html {
     max-height: 1000px;
 }
+/*icon*/
+@font-face {font-family: "iconfont";
+    src: url('/public/img/icon/iconfont.eot?t=1470388256'); /* IE9*/
+    src: url('/public/img/icon/iconfont.eot?t=1470388256#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('/public/img/icon/iconfont.woff?t=1470388256') format('woff'), /* chrome, firefox */
+    url('/public/img/icon/iconfont.ttf?t=1470388256') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+    url('/public/img/icon/iconfont.svg?t=1470388256#iconfont') format('svg'); /* iOS 4.1- */
+}
+.iconfont {
+    display: block;
+    font-family:"iconfont" !important;
+    font-size:16px;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
 
+.contacks .icon {
+    margin-top: -10px;
+    font-size: 4em;
+    line-height: 56px;
+    color: #515151;
+}
+.contacks span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70px;
+}
+.icon-QQ:before { content: "\e607"; }
 /*登录*/
 .login-page {
     display: flex;
@@ -140,30 +170,6 @@ html {
     font-family: "微软雅黑";
     text-align: center;
 }
-/*.item img {*/
-    /*width: 90%;*/
-    /*margin-left: 5%;*/
-/*}*/
-/*.shell-search-wrapper input[type="search"] {*/
-    /*float: left;*/
-    /*width: 244px;*/
-    /*height: 36px;*/
-    /*margin-top: -7px;*/
-    /*margin-left: 100px;*/
-    /*padding: 0 10px;*/
-    /*border: 1px solid #A9A9A9;*/
-    /*border-right: 0;*/
-/*}*/
-/*.shell-search-wrapper button {*/
-    /*position: static;*/
-    /*width: 36px;*/
-    /*height: 36px;*/
-    /*margin-top: -7px;*/
-    /*background-color: transparent;*/
-    /*border: 1px solid #A9A9A9;*/
-    /*border-left: none;*/
-/*}*/
-
 /*左侧布局*/
 .wrapper {
     display: flex;
@@ -195,6 +201,7 @@ html {
     display: flex;
     justify-content: space-around;
     width: 300px;
+    height: 70px;
 }
 .contacks a {
     color: #515151;
@@ -205,14 +212,6 @@ html {
     padding: 20px;
     background-color: #d4d4d4;
 }
-/*.header-modal {*/
-    /*height: 1100px;*/
-    /*max-height: 9999px !important;*/
-    /*margin-bottom: 0;*/
-    /*background: url("https://ss1.bdstatic.com/kvoZeXSm1A5BphGlnYG/skin/528.jpg?2");*/
-    /*background-size: cover;*/
-    /*background-attachment: fixed;*/
-/*}*/
 
 /*内容*/
 .content-wrapper {
@@ -430,94 +429,6 @@ html {
     border: 1px #ddd solid;
 }
 
-@media (max-width: 768px) {
-    .nav li {
-        margin-left: 0;
-    }
-    .main-header {
-        float: left;
-        width: auto;
-        height: 50px;
-        margin-top: 30px;
-    }
-    .header-modal,
-    .main-sidebar {
-        display: none;
-    }
-    .content-wrapper {
-        position: absolute;
-        top: 60px;
-        left: 0;
-        width: 400px;
-    }
-    .blog-list {
-        width: 400px;
-        margin-bottom: -10px;
-    }
-    .blog-list p img {
-        position: absolute;
-        left: -85px;
-        top: 0;
-        width; 100px;
-        height: 100px;
-    }
-    .blog-list ul {
-        width: 300px;
-    }
-    .blog-list .read-more a {
-        margin: 2px 15px 0 40px;
-    }
-    .blog-list .ctn-export a {
-        margin-top: 2px;
-    }
-    .postdate {
-        margin: -68px 0 0 140px;
-        font-size: 10px;
-    }
-    .blog-list h3 {
-        width: 100px;
-        margin-left: 20px;
-        font-size: 15px;
-    }
-    .blog-list-ctns {
-        width: 250px;
-        margin-left: 20px;
-    }
-    .blog-list-ctns p {
-        width: 150px;
-        margin-top: 10px;
-        overflow:hidden;
-        white-space:nowrap;
-        text-overflow: ellipsis;
-    }
-    .blog-scroll .postdate {
-        width: 150px;
-    }
-}
-
-@media (max-width: 400px) {
-    .content-wrapper {
-        width: 365px;
-    }
-    .blog-list {
-        width: 355px;
-        margin-bottom: -10px;
-    }
-    .box-footer {
-        width: 355px;
-    }
-    .blog-list-ctns {
-        width: 225px;
-    }
-    .blog-list ul {
-        width: 265px;
-    }
-    .postdate {
-        margin: -68px 0 0 135px;
-        font-size: 10px;
-    }
-}
-
 /*Mooc*/
 .img-thumbnail {
     width: 200px;
@@ -691,4 +602,174 @@ html {
     left: 50%;
     top: 50%;
     transform:translate(-50%,-50%);
+}
+
+
+@media (max-width: 769px) {
+    .nav li {
+        margin-left: 0;
+    }
+    .wrapper {
+        width: 90.5%;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    /*内容*/
+    .main-sidebar {
+        display: none;
+    }
+    .content-wrapper {
+        width: 400px;
+        min-height: 160px !important;
+        padding: 0;
+    }
+    .blog-list {
+        float: left;
+        width: 370px;
+        height: 80px;
+        margin: 10px;
+        padding: 10px;
+    }
+    .blog-list .title {
+        width: 350px;
+        line-height: 27px;
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-family: "Microsoft YaHei";
+        font-size: 25px;
+        font-weight: bolder;
+        color: #312424;
+    }
+    .blog-list .postdate {
+        width: 100%;
+        height: auto;
+        line-height: 20px;
+        color: #ccc;
+        font-size: 14px;
+        font-family: "微软雅黑";
+        font-weight: 500;
+    }
+    .blog-list .postdate span {
+        margin-left: 15px;
+    }
+    .blog-list dl {
+        display: none;
+    }
+    .content-wrapper {
+        width: 400px!important;
+        margin-left: 10%;
+        border: 1px solid #DADADA;
+        background-color: #fff;
+    }
+    .blog-one {
+        height: auto;
+    }
+    .blog-list-ctn {
+        width: 390px;
+        margin-left: -6%;
+    }
+    .blog-list-ctn img {
+        max-width: 360px!important;
+        height: auto;
+        border-radius: 5px;
+    }
+    .mobile-width {
+        width: 390px;
+    }
+    .mooc-bar  {
+        flex-basic: 180px;
+        min-width: 180px;
+    }
+    .mooc-main>p {
+        max-width: 168px;
+    }
+}
+
+@media (max-width: 400px) {
+    .navbar-brand {
+        font-size: 18px;
+    }
+    .nav li {
+        margin-left: 0;
+    }
+    .wrapper {
+        width: 90.5%;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    /*内容*/
+    .main-sidebar {
+        display: none;
+    }
+    .content-wrapper {
+        width: 320px;
+        min-height: 160px !important;
+        padding: 0;
+    }
+    .blog-list {
+        float: left;
+        width: 290px;
+        height: 80px;
+        margin: 10px;
+        padding: 10px;
+    }
+    .blog-list .title {
+        width: 280px;
+        line-height: 27px;
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-family: "Microsoft YaHei";
+        font-size: 25px;
+        font-weight: bolder;
+        color: #312424;
+    }
+    .blog-list .postdate {
+        width: 100%;
+        height: auto;
+        line-height: 15px;
+        color: #ccc;
+        font-size: 10px;
+        font-family: "微软雅黑";
+        font-weight: 400;
+    }
+    .blog-list .postdate span {
+        margin-left: 15px;
+    }
+    .blog-list dl {
+        display: none;
+    }
+    .content-wrapper {
+        width: 310px!important;
+        margin-left: 10%;
+        border: 1px solid #DADADA;
+        background-color: #fff;
+    }
+    .blog-one {
+        height: auto;
+    }
+    .blog-list-ctn {
+        width: 310px;
+        margin-left: -8%;
+    }
+    .blog-list-ctn img {
+        max-width: 280px!important;
+        height: auto;
+        border-radius: 5px;
+    }
+    .mobile-width {
+        width: 310px;
+    }
+    .mooc-bar  {
+        flex-basic: 180px;
+        min-width: 180px;
+    }
+    .mooc-main>p {
+        max-width: 168px;
+    }
 }

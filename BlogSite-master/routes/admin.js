@@ -130,7 +130,7 @@ router.post('/moocCreate', function (req, res, next) {
 router.get('/moocEdit/:id', function(req, res, next) {
 
 	var id = req.params.id;
-	dbHelper.findMoocOne(req, id, function (success, data) {
+	dbHelper.findMoocOne( id, function (success, data) {
 		res.render('./admin/moocEdit',{
 			entries: data,
 			layout: 'admin'

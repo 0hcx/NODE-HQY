@@ -30,15 +30,6 @@ router.get('/moocs', function(req, res, next) {
 	});
 });
 
-router.get('/mooc/:id', function(req, res, next) {
-	var id = req.params.id;
-	dbHelper.findMoocOne( req, id,  function (success, doc) {
-		res.render('mooc',{
-			entries: doc
-		});
-	});
-});
-
 router.get('/:id', function(req, res, next) {
 	var id = req.params.id;
 	dbHelper.findNewsOne(req, id, function (success, data) {
@@ -47,6 +38,16 @@ router.get('/:id', function(req, res, next) {
 		});
 	});
 });
+
+router.get('/mooc/:id', function(req, res, next) {
+	var id = req.params.id;
+	dbHelper.findMoocOne(  id,  function (success, doc) {
+		res.render('mooc',{
+			entries: doc
+		});
+	});
+});
+
 
 router.post('/moocGetChapContentOnly', function(req, res, next) {
 
