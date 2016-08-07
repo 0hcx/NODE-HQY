@@ -3813,7 +3813,83 @@ TestModel.remove(conditions, function(error){
 
     '/'将会利用路由跳转到相关静态文件
 
+#学习日志 【2016/8/6】
 
+# Windows下Git多账号配置，同一电脑多个ssh-key的管理
+
+>本文以配置github.com账号和git.oschina.net账号来逐步演示在Windows环境下配置Git多账号支持即在同一个电脑上管理多个ssh-key，对git多一分了解。
+
+### 1. 生成github.com对应的私钥公钥（本文中文件地址C:\Users\msi\ssh目录）
+```
+//执行命令 ssh-keygen -t rsa -C email 创建github对应的sshkey    密码 123456
+
+ssh-keygen -t rsa -C hqy14985127@hotmail.com    
+```
+![](http://images2015.cnblogs.com/blog/823551/201608/823551-20160802225245231-1157480176.png)
+
+### 2. 同样的方式生产github.com的私钥公钥（邮箱地址可以相同可以不同，本文相同）
+```
+执行命令ssh-keygen -t rsa -C email创建github对应的sshkey，命名为id_rsa_qq，密码 123456
+```
+### 3. 把上面得到的文件拷贝到git默认访问的.ssh目录(win10在用户目录下，本文C:\Users\popfisher.ssh)
+>
+除了秘钥文件之外，config文件是后面的步骤中手动生产的，known_hosts文件是后续自动生产的
+
+![](http://images2015.cnblogs.com/blog/823551/201608/823551-20160802225856481-1245177255.png)
+
+### 4. 把github对应的公钥和oschina对应的公钥上传到服务器
+ GitHub添加SSH key的方式如下图所示：
+
+ ![](http://images2015.cnblogs.com/blog/823551/201608/823551-20160802230012465-514854770.png)
+
+### 5. 在.ssh目录创建config文本文件并完成相关配置(最核心的地方)
+
+>每个账号单独配置一个Host，每个Host要取一个别名，每个Host主要配置HostName和IdentityFile两个属性即可  
+
+>Host的名字可以取为自己喜欢的名字，不过这个会影响git相关命令，例如：
+Host mygithub 这样定义的话，命令如下，即git@后面紧跟的名字改为mygithub
+git clone git@mygithub:PopFisher/AndroidRotateAnim.git  
+
+* `HostName`这个是真实的域名地址
+* `IdentityFile`这里是id_rsa的地址
+* `PreferredAuthentications`配置登录时用什么权限认证--可设为publickey,password publickey,keyboard-interactive等
+* `User` 配置使用用户名
+
+#### config文件配置如下：
+```
+# 配置github.com
+Host github.com                 
+    HostName github.com
+    IdentityFile C:\\Users\\popfisher\\.ssh\\id_rsa_github
+    PreferredAuthentications publickey
+    User username1
+
+# 配置git.oschina.net 
+Host git.oschina.net 
+    HostName git.oschina.net
+    IdentityFile C:\\Users\\popfisher\\.ssh\\id_rsa_oschina
+    PreferredAuthentications publickey
+    User username2
+```
+
+###  6. 打开Git Bash客户端（管理员身份运行）执行测试命令测试是否配置成功（会自动在.ssh目录生成known_hosts文件把私钥配置进去）
+
+![](http://images2015.cnblogs.com/blog/823551/201608/823551-20160802231733606-1986856038.png)
+
+### 7. 测试成功之后就可以在电脑上同时使用git多多账号同时操作，互不影响了
+>clone github上的项目AndroidRotateAnim
+>
+打开github上AndroidRotateAnim项目，复制其对应的clone命令如下所示
+
+```
+git init
+
+git clone git@github-work
+
+git remote add origin git@github-work:Company/testing.git
+
+git push origin master
+```
 
 
 
