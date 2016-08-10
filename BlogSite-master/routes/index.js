@@ -13,10 +13,19 @@ router.get('/blogs', function(req, res, next) {
 			entries: data.results,
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,
-			count: data.count
+			count: data.count,
+			user: req.session.user.username
 		});
 	})
 });
+
+// router.post('/addComment', function(req, res, next) {
+// 	//发表评论
+// 	console.log("发表评论1");
+// 	dbHelper.addComment(req.body, function (success, doc) {
+// 		res.send(doc);
+// 	})
+// });
 
 router.get('/moocs', function(req, res, next) {
 	dbHelper.findMooc(req, function (success, data) {
@@ -25,16 +34,23 @@ router.get('/moocs', function(req, res, next) {
 			entries: data.results,
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,
-			count: data.count
+			count: data.count,
+			user: req.session.user.username
 		});
 	});
 });
 
 router.get('/:id', function(req, res, next) {
 	var id = req.params.id;
+	// console.log("userhh: ");
+	// console.log(req.session.user.username);
 	dbHelper.findNewsOne(req, id, function (success, data) {
-		res.render('blog',{
-			entries: data,
+		dbHelper.findComment(id, function (success, comments) {
+			res.render('blog',{
+				entries: data,
+				comments: comments,
+				user: req.session.user.username
+			});
 		});
 	});
 });
@@ -43,7 +59,8 @@ router.get('/mooc/:id', function(req, res, next) {
 	var id = req.params.id;
 	dbHelper.findMoocOne(  id,  function (success, doc) {
 		res.render('mooc',{
-			entries: doc
+			entries: doc,
+			user: req.session.user.username
 		});
 	});
 });

@@ -49,7 +49,7 @@ config.site.path = path.join(__dirname, 'public');
 
 //加入session支持
 app.use(session({
-	name:'blogOfLiyang',
+	name:'blogOfHiQiyang',
 	maxAge: 30 * 1000,
 	secret: 'huqiyang-web-node-secret-key',
 	resave: false,

@@ -11,6 +11,7 @@ var User = require('./schema/user');
 var News = require('./schema/news');
 var Mooc = require('./schema/mooc');
 var Chapter = require('./schema/chapter');
+var Comment = require('./schema/comment');
 var _ = require('underscore');
 
 
@@ -157,6 +158,7 @@ exports.findNews = function(req, cb) {
 };
 
 exports.findNewsOne = function(req, id, cb) {
+    console.log("查找单篇新闻");
 	News.findOne({_id: id})
 		.populate('author')
 		.exec(function(err, docs) {
@@ -164,9 +166,7 @@ exports.findNewsOne = function(req, id, cb) {
             cb(true,docs);
 			// cb(true,docs.toObject());
 		});
-	console.log("查找一个");
 };
-
 
 //添加慕课
 exports.addMooc = function (data,cb) {
@@ -338,4 +338,61 @@ exports.queryMoocChapTitle = function( moocId, chapId, cb) {
 
         cb(err, doc);
     });
+};
+
+//发表评论
+exports.addComment = function(data, cb) {
+    //将markdown格式的新闻内容转换成html格式
+    data.content = md.render(data.content);
+
+    if(data.comment) {
+        Comment.findById(data.comment, function (err, comment) {
+            console.log(comment);
+            var reply = new Comment({
+                commentId: data.comment,
+                from: data.from,
+                to: data.to,
+                content: data.content
+            });
+            console.log("进入回复");
+            comment.reply.push(reply);
+            comment.save(function (err, doc) {
+                if (err) {
+                    console.log("reply-error");
+                    cb(false,err);
+                }else{
+                    cb(true,err);
+                }
+            })
+        });
+    }
+    else {
+        var comment = new Comment({
+            news: data.news,
+            from: data.from,
+            to: data.to,
+            content: data.content
+        });
+        comment.save(function(err,doc){
+            if (err) {
+                console.log("db-error");
+                cb(false,err);
+            }else{
+                console.log("reply-success");
+                cb(true,err);
+            }
+        })
+    }
+
+};
+
+//查找评论
+exports.findComment = function (id, cb) {
+    Comment.find({news: id})
+        .populate('from', 'username')
+        .populate('reply.from reply.to', 'username')
+        .exec(function (err, docs) {
+            // var docs = (docs !== null) ? docs.toObject() : '';
+            cb(true,docs);
+        })
 };

@@ -148,6 +148,12 @@ html {
     font-size: 23px;
     color: #dddddd!important;
 }
+/*.nav-user {*/
+    /*margin-top: 10px!important;*/
+    /*font-family: "Microsoft JhengHei";*/
+    /*font-size: 17px!important;*/
+    /*color: #fcfcfc !important;*/
+/*}*/
 .header-link a {
     margin: -15px 0 0 0;
     font-family: "Microsoft JhengHei";
@@ -772,4 +778,31 @@ html {
     .mooc-main>p {
         max-width: 168px;
     }
+}
+
+
+/*Comment*/
+
+.res-body textarea {
+    width: 80%;
+    max-width: 600px;
+    max-height: 150px;
+    margin-left: 9%;
+    border-radius: 7px;
+}
+.comment-list li a {
+    text-decoration: none;
+}
+.comment-list img {
+    width: 50px;
+    height:50px;
+}
+
+.comment-body {
+    display: inline-block;
+    margin-left: 10px;
+}
+.comment-body h4 {
+    font-family: "Microsoft YaHei";
+    font-size: 20px;
 }

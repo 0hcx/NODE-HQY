@@ -4,6 +4,14 @@ var dbHelper = require('../db/dbHelper');
 var formidable = require('formidable');
 var entries = require('../db/jsonRes');
 
+router.post('/addComment', function(req, res, next) {
+	//发表评论
+	console.log("发表评论1");
+	dbHelper.addComment(req.body, function (success, doc) {
+		res.send(doc);
+	})
+});
+
 /* GET users listing. */
 router.get('/news', function(req, res, next) {
   res.render('./admin/news', { title: 'Express', layout: 'admin' });
