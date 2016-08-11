@@ -14,7 +14,7 @@ router.get('/blogs', function(req, res, next) {
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,
 			count: data.count,
-			user: req.session.user.username
+			user: req.session.user
 		});
 	})
 });
@@ -35,7 +35,7 @@ router.get('/moocs', function(req, res, next) {
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,
 			count: data.count,
-			user: req.session.user.username
+			user: req.session.user
 		});
 	});
 });
@@ -49,7 +49,7 @@ router.get('/:id', function(req, res, next) {
 			res.render('blog',{
 				entries: data,
 				comments: comments,
-				user: req.session.user.username
+				user: req.session.user
 			});
 		});
 	});
@@ -60,7 +60,7 @@ router.get('/mooc/:id', function(req, res, next) {
 	dbHelper.findMoocOne(  id,  function (success, doc) {
 		res.render('mooc',{
 			entries: doc,
-			user: req.session.user.username
+			user: req.session.user
 		});
 	});
 });

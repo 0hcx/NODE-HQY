@@ -9,43 +9,48 @@
         </div>
         <!--<div class="menu-block read-back"><a href="/p/blogs" class="btn btn-primary btn-sm pull-left">返回</a></div>-->
 	</section>
-    <section class="comments">
-        <h2>评论区</h2>
-        <ul class="comment-list">
-            {{#each comments}}
-            <li>
-                <a href="#respond" data-toggle="select" data-cid="{{_id}}" data-tid="{{from._id}}">
-                    <img src="/img/user.png">
-                </a>
-                <div class="comment-body">
-                    <h4>{{from.username}}</h4>
-                    <p>{{{content}}}</p>
-                </div>
-                <ul>
-                    {{#if reply}}
-                        {{#each reply}}
-                            <li>
-                                <a href="#respond" data-toggle="select" data-cid="{{commentId}}" data-tid="{{from._id}}">
-                                    <img src="/img/user.png">
-                                </a>
-                                <div class="comment-body">
-                                    <h4>{{from.username}}回复{{to.username}}</h4>
-                                    <p>{{{content}}}</p>
-                                </div>
-                            </li>
-                        {{/each}}
-                    {{/if}}
-                </ul>
+    <section class="comments panel panel-default">
+        <div class="panel-heading">
+            <h2 class="comments-title">评论区</h2>
+        </div>
+        <div class="panel-body">
+            <ul class="comment-list media-list">
+                {{#each comments}}
+                    <li class="media comment-big">
+                        <a class="pull-left" href="#respond" data-toggle="select" data-cid="{{_id}}" data-tid="{{from._id}}">
+                                <img src="{{from.userImg}}">
+                        </a>
+                        <div class="media-body comment-ctn">
+                            <h4 class="media-heading">{{from.username}}</h4>
+                            <span class="pull-right">第{{addOne @index}}楼</span>
+                            <p>{{{content}}}</p>
+                            <ul class="media-list">
+                                {{#if reply}}
+                                    {{#each reply}}
+                                        <li class="media">
+                                            <a class="pull-left" href="#respond" data-toggle="select" data-cid="{{commentId}}" data-tid="{{from._id}}">
+                                                <img src="{{from.userImg}}">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">{{from.username}}回复{{to.username}}</h4>
+                                                <p>{{{content}}}</p>
+                                            </div>
+                                        </li>
+                                    {{/each}}
+                                {{/if}}
+                            </ul>
+                        </div>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
 
-            </li>
-            {{/each}}
-        </ul>
 
         <div id="respond" class="comment-respond">
             <form id="commentForm" action="">
                 <div class="res-body">
                     <input type="hidden" id="news" value="{{entries._id}}">
-                    <textarea class="textarea" id="resContent" placeholder="评论内容" style="width: 100%; height: 300px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" required></textarea>
+                    <textarea class="textarea" id="resContent" placeholder="评论内容" style="height: 300px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" required></textarea>
                     <button type="submit" class="btn btn-primary" id="respondBtn">发表</button>
                 </div>
             </form>

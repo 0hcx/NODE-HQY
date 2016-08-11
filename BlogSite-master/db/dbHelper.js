@@ -327,6 +327,19 @@ exports.updateMoocChapTitle = function( moocId, chapId, chapTitle, cb) {
     });
 };
 
+exports.updateUser = function ( data, cb) {
+
+    User.update({"_id": data.userId}, {$set: {
+        email: data.newEmail,
+        address:  data.newAddress,
+        userImg: data.newUserImg
+    }
+    },function (err, result) {
+        cb(err, result);
+    });
+};
+
+
 exports.queryMoocChapTitle = function( moocId, chapId, cb) {
 
     Mooc.findOne({"_id": moocId, "children._id": chapId },function(err,result){
@@ -389,8 +402,8 @@ exports.addComment = function(data, cb) {
 //查找评论
 exports.findComment = function (id, cb) {
     Comment.find({news: id})
-        .populate('from', 'username')
-        .populate('reply.from reply.to', 'username')
+        .populate('from', 'username userImg')
+        .populate('reply.from reply.to', 'username userImg')
         .exec(function (err, docs) {
             // var docs = (docs !== null) ? docs.toObject() : '';
             cb(true,docs);

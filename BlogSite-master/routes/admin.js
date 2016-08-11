@@ -14,7 +14,7 @@ router.post('/addComment', function(req, res, next) {
 
 /* GET users listing. */
 router.get('/news', function(req, res, next) {
-  res.render('./admin/news', { title: 'Express', layout: 'admin' });
+  res.render('./admin/news', { user: req.session.user,title: 'Express', layout: 'admin' });
 });
 
 router.post('/news', function(req, res, next) {
@@ -23,6 +23,18 @@ router.post('/news', function(req, res, next) {
   })
 });
 
+router.get('/userEdit', function (req, res, next) {
+	res.render('./admin/userEdit', {
+		user: req.session.user,
+		title:'Express',
+		layout: 'admin'
+	});
+});
+router.post('/userEdit', function(req, res, next) {
+	dbHelper.updateUser(req.body, function (success, doc) {
+		res.send(doc);
+	})
+});
 // router.get('/newsList', function(req, res, next) {
 // 	res.render('./admin/newsList', { title: 'Express', layout: 'admin' });
 // });
@@ -40,6 +52,7 @@ router.get('/newsList', function(req, res, next) {
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,
 			count: data.count,
+			user: req.session.user,
 			layout: 'admin',
 			message: msg
 		});
@@ -118,6 +131,7 @@ router.get('/moocList', function (req, res, next) {
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,
 			count: data.count,
+			user: req.session.user,
 			layout: 'admin'
 		});
 	});
@@ -125,7 +139,7 @@ router.get('/moocList', function (req, res, next) {
 
 //渲染新建慕课页面
 router.get('/moocCreate', function (req, res, next) {
-	res.render('./admin/moocCreate',{ layout: 'admin'});
+	res.render('./admin/moocCreate',{ user: req.session.user, layout: 'admin'});
 });
 
 router.post('/moocCreate', function (req, res, next) {
@@ -140,6 +154,7 @@ router.get('/moocEdit/:id', function(req, res, next) {
 	var id = req.params.id;
 	dbHelper.findMoocOne( id, function (success, data) {
 		res.render('./admin/moocEdit',{
+			user: req.session.user,
 			entries: data,
 			layout: 'admin'
 		})
