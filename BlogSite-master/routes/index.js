@@ -19,14 +19,21 @@ router.get('/blogs', function(req, res, next) {
 	})
 });
 
-// router.post('/addComment', function(req, res, next) {
-// 	//发表评论
-// 	console.log("发表评论1");
-// 	dbHelper.addComment(req.body, function (success, doc) {
-// 		res.send(doc);
-// 	})
-// });
+//search
+router.get('/search', function (req, res, next) {
+	dbHelper.search(req, req.query.keyword, function (success, data) {
+		res.render('searchResults', {
+			title: req.query.keyword,
+			entries: data.results,
+			pageCount: data.pageCount,
+			pageNumber: data.pageNumber,
+			count: data.count,
+			user: req.session.user
+		});
+	})
+});
 
+//moocs
 router.get('/moocs', function(req, res, next) {
 	dbHelper.findMooc(req, function (success, data) {
 
