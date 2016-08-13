@@ -64,10 +64,11 @@ function doAddNews() {
 	  contentType: "application/json",
 	  dataType: "json",
 	  data: JSON.stringify({
-      'title': $("#newsTitle").val(),
-      'content': $("#newsContent").val(),
-      'id': $.cookie('id'),
-      'newThumb': $("#newThumb").attr("src")
+		  'title': $("#newsTitle").val(),
+		  'content': $("#newsContent").val(),
+		  'id': $.cookie('id'),
+		  'newThumb': $("#newThumb").attr("src"),
+		  'category': $('input[name="categoryName"]:checked').val()
 	  }),
 	  success: function(result) {
 		  if (result.code == 99) {

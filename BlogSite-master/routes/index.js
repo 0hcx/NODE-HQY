@@ -8,8 +8,52 @@ var config = require('../config');
 
 
 router.get('/blogs', function(req, res, next) {
+	var nameKey = "最新文章";
 	dbHelper.findNews(req, function (success, data) {
 		res.render('blogs', {
+			title: nameKey,
+			entries: data.results,
+			pageCount: data.pageCount,
+			pageNumber: data.pageNumber,
+			count: data.count,
+			user: req.session.user
+		});
+	})
+});
+
+router.get('/learningLogs', function(req, res, next) {
+	var nameKey = "学习日志";
+	dbHelper.findVariousNews(req, nameKey, function (success, data) {
+		res.render('blogs', {
+			title: nameKey,
+			entries: data.results,
+			pageCount: data.pageCount,
+			pageNumber: data.pageNumber,
+			count: data.count,
+			user: req.session.user
+		});
+	})
+});
+
+router.get('/word', function(req, res, next) {
+	var nameKey = "不知所言";
+	dbHelper.findVariousNews(req, nameKey, function (success, data) {
+		res.render('blogs', {
+			title: nameKey,
+			entries: data.results,
+			pageCount: data.pageCount,
+			pageNumber: data.pageNumber,
+			count: data.count,
+			user: req.session.user
+		});
+	})
+});
+
+router.get('/studyAndThink', function(req, res, next) {
+	var nameKey = "学有所思系列";
+	dbHelper.findVariousNews(req, nameKey, function (success, data) {
+		res.render('blogs', {
+			title: nameKey,
 			entries: data.results,
 			pageCount: data.pageCount,
 			pageNumber: data.pageNumber,

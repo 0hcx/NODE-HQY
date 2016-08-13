@@ -12,9 +12,16 @@ router.post('/addComment', function(req, res, next) {
 	})
 });
 
-/* GET users listing. */
+// 新建文章
 router.get('/news', function(req, res, next) {
-  res.render('./admin/news', { user: req.session.user,title: 'Express', layout: 'admin' });
+	dbHelper.findCategory(req, function (success, data) {
+		res.render('./admin/news', {
+			category: data,
+			user: req.session.user,
+			title: 'Express',
+			layout: 'admin'
+		})
+	});
 });
 
 router.post('/news', function(req, res, next) {
@@ -23,6 +30,7 @@ router.post('/news', function(req, res, next) {
   })
 });
 
+// 修改用户信息
 router.get('/userEdit', function (req, res, next) {
 	res.render('./admin/userEdit', {
 		user: req.session.user,
@@ -35,9 +43,17 @@ router.post('/userEdit', function(req, res, next) {
 		res.send(doc);
 	})
 });
-// router.get('/newsList', function(req, res, next) {
-// 	res.render('./admin/newsList', { title: 'Express', layout: 'admin' });
-// });
+
+//添加文章类别
+router.get('/categoryCreate', function(req, res, next) {
+	res.render('./admin/categoryCreate', { user: req.session.user,title: 'Express', layout: 'admin' });
+});
+
+router.post('/categoryCreate', function(req, res, next) {
+	dbHelper.addCategory(req.body, function (success, doc) {
+		res.send(doc);
+	})
+});
 
 //渲染新闻列表页面
 router.get('/newsList', function(req, res, next) {

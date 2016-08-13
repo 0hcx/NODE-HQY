@@ -12,6 +12,7 @@ var News = require('./schema/news');
 var Mooc = require('./schema/mooc');
 var Chapter = require('./schema/chapter');
 var Comment = require('./schema/comment');
+var Category = require('./schema/category');
 var _ = require('underscore');
 
 
@@ -20,6 +21,7 @@ var config = require('../config');
 var async = require('async');
 var md = webHelper.Remarkable();
 
+var Schema = mongoose.Schema;
 var PAGE_SIZE = 5;
 
 exports.findUsr = function(data, cb) {
@@ -87,12 +89,14 @@ exports.addNews = function(data, cb) {
 	
 	//将markdown格式的新闻内容转换成html格式
 	data.content = md.render(data.content);
-	
+    var categoryId = data.category;
+
     var news = new News({
         title: data.title,
         content: data.content,
         author:data.id,
-        newThumb: data.newThumb
+        newThumb: data.newThumb,
+        category: data.category
     });
 
     news.save(function(err,doc){
@@ -102,6 +106,15 @@ exports.addNews = function(data, cb) {
 	        entries.msg = err;
 	        cb(false,entries);
         }else{
+            //将news的id放到对应的category下
+            Category.findById(categoryId, function (err, category) {
+                category.news.push(doc._id);
+                category.save(function (err, doc) {
+                    if(err) {
+                        console.log(err);
+                    }
+                })
+            });
             // cb(true,entries);
 	        entries.code = 0;
 	        entries.msg = '发布新闻成功！';
@@ -146,7 +159,7 @@ exports.findNews = function(req, cb) {
 	// 		cb(true,newsList);
 	// 	});
     var page = req.query.page || 1 ;
-    this.pageQuery(page, PAGE_SIZE, News, 'author', {}, {
+    this.pageQuery(page, PAGE_SIZE, News, 'author category', {}, {
         created_time: 'desc'
     }, function(error, data){
         if(error){
@@ -157,8 +170,31 @@ exports.findNews = function(req, cb) {
     });
 };
 
+exports.findVariousNews = function(req, nameKey, cb) {
+    // var name = nameKey;
+    var page = req.query.page || 1 ;
+    var findThis = this;
+
+    Category.findOne({ name: nameKey }, function(err, docs) {
+        console.log("分类");
+        console.log(docs._id);
+        findThis.pageQuery(page, PAGE_SIZE, News, 'author category', { category: docs._id}, {
+            created_time: 'desc'
+        }, function(error, docs){
+            if(error){
+                console.log("失败");
+                next(error);
+            }else{
+                // console.log(docs);
+                cb(true,docs);
+            }
+        });
+    });
+    
+};
+
 exports.search = function (req, keyword, cb) {
-    console.log("搜索")
+    console.log("搜索");
     var page = req.query.page || 1 ;
     var pattern = new RegExp(keyword, "i");
     this.pageQuery(page, PAGE_SIZE, News, 'author', { title: pattern }, {
@@ -426,3 +462,25 @@ exports.findComment = function (id, cb) {
             cb(true,docs);
         })
 };
+
+//添加文章类别
+exports.addCategory = function (data,cb) {
+    var category = new Category({
+        name: data.name
+    });
+    category.save(function (err,doc) {
+        cb(err,doc);
+    })
+};
+
+//查询类别
+exports.findCategory = function (req, cb) {
+    Category.find({}, function (err, data) {
+        var categoryList = new Array();
+        for(var i=0; i < data.length; i++) {
+            categoryList.push(data[i].toObject());
+        }
+        cb(true, categoryList);
+    })
+};
+

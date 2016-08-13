@@ -17,6 +17,12 @@
 					<div class="box-header">
 						<input type="text" class="form-control" id="newsTitle" placeholder="文章标题" required>
 					</div>
+                    <div class="news-category">
+                        {{#each category}}
+                        <input type="radio" name="categoryName" value="{{_id}}">{{name}}
+                        {{/each}}
+                    </div>
+
                     <div class="form-thumb">
                         <img  class="img-thumbnail" id="newThumb">
                     </div>
