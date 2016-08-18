@@ -145,7 +145,7 @@ html {
 }
 .navbar-brand {
     font-family: 楷体;
-    font-size: 23px;
+    font-size: 25px;
     color: #dddddd!important;
 }
 /*.nav-user {*/
@@ -326,6 +326,9 @@ html {
     width: 738px;
     height: auto;
     /*overflow-y: scroll;*/
+}
+.blog-one pre {
+    background-color: #fdf6e3;
 }
 .blog-one img {
     max-width: 670px;
@@ -776,6 +779,9 @@ html {
 
 /*Comment*/
 
+.comments .panel-heading {
+    background-color: #fff;
+}
 .comments-title {
     font-family: "Microsoft YaHei";
     font-size: 25px;

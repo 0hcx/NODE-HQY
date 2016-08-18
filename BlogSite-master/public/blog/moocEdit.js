@@ -142,7 +142,6 @@ function getChapContent( chapId, content ) {
     'content': content
   });
   preChapId = chapId;
-
   postData(urlMoocGetChapCont, jsonData, cbSetChapContent);
 }
 

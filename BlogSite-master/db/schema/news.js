@@ -7,6 +7,10 @@ var newsSchema = new Schema({
     title: String,
     newThumb: String,
     content: String,
+    pv: {
+        type: Number,
+        default: 0
+    },
     meta: {
         updateAt: {type:Date, default: Date.now()},
         createAt: {type:Date, default: Date.now()}

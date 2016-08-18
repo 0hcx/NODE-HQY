@@ -212,6 +212,11 @@ exports.search = function (req, keyword, cb) {
 
 exports.findNewsOne = function(req, id, cb) {
     console.log("查找单篇新闻");
+    News.update({_id: id}, {$inc: {pv: 1}}, function (err) {
+        if(err) {
+            console.log(err);
+        }
+    });
 	News.findOne({_id: id})
 		.populate('author')
 		.exec(function(err, docs) {
@@ -334,7 +339,6 @@ exports.findMoocChapContent = function(moocId, chapId, preChapId, content, cb) {
     //         console.log(data);
     //     }
     // })
-
 
 
     async.waterfall([
@@ -484,3 +488,275 @@ exports.findCategory = function (req, cb) {
     })
 };
 
+
+
+//Mooc操作
+exports.deleteMoocChap = function( moocId, chapId, cb) {
+
+
+    Mooc.findOne({"_id": moocId, "children._id": chapId },function(err,doc){
+        var week,chap,index,count = 0,pos = 0;
+
+
+        for( var i =0;i<doc.children.length;i++) {
+            var item = doc.children[i];
+            if(item._id.toString() == chapId){
+                week = item.week;
+                chap = item.chapter;
+                break;
+            }
+        }
+
+
+        //计算当前chap的位置pos  以及该chap的总章节数量count
+        for(var i =0;i<doc.children.length;i++) {
+            var item = doc.children[i];
+            if ( parseInt(item.week) == week ) {
+                count++;
+                if ( parseInt(item.chapter) > chap) {
+                    pos++;
+                }
+            }
+        }
+
+        //如果该week只有1个chap，将后续week的week减一
+        if (count == 1) {
+            for(var i = 0 ;i<doc.children.length;i++) {
+                var item = doc.children[i];
+                if(parseInt(item.week) > week) {
+                    doc.children[i].week--;
+                }
+            }
+        }
+
+        //如果该chap有后续chap，将后续chap减一
+        if( pos >0 ) {
+            for(var i = 0 ;i<doc.children.length;i++) {
+                var item = doc.children[i];
+                if (( parseInt(item.week) == week )&&( parseInt(item.chapter) > chap)) {
+                    doc.children[i].chapter--;
+                }
+            }
+        }
+
+        //删除选中chap
+        doc.children = _.filter(doc.children, function (item) {
+            return item._id.toString() !== chapId;
+        })
+
+        // console.log("index:" + index + " subling:" +count + " sIndex:" + pos);
+
+        doc.save(function(err) {
+            cb(err, doc);
+        });
+    })
+};
+
+
+exports.addMoocChap = function( moocId, chapId, cb) {
+
+    Mooc.findOne({"_id": moocId },function(err,doc){
+        var week,chap,index,chapCount=0;
+    
+        //计算当前chap的位置index
+        for( index =0;index<doc.children.length;index++) {
+            var item = doc.children[index];
+            if(item._id.toString() == chapId){
+                week = item.week;
+                chap = item.chapter;
+                break;
+            }
+        }
+        
+        console.log("在第"+week+"章添加");
+        //计算当前chap的位置pos  以及该chap的总章节数量count
+        for(var i =0;i<doc.children.length;i++) {
+            var item = doc.children[i];
+            if ( parseInt(item.week) == week ) {
+                chapCount++;
+            }
+        }
+        
+        Mooc.update({"_id": moocId},{$push :{
+            "children": {
+                title: "XXXX",
+                week: week,
+                chapter: chapCount,
+                content: " "
+            },
+            "$position": index
+        }},function(err,result){
+            cb(err, result);
+        })
+    
+    })
+};
+
+
+exports.upMoocChap = function( moocId, chapId, cb) {
+
+    Mooc.findOne({"_id": moocId, "children._id": chapId },function(err,doc){
+        var week,chap,index,chapCount = 0,pos = 0;
+
+        //计算当前chap的位置index
+        for( index =0;index<doc.children.length;index++) {
+            var item = doc.children[index];
+            if(item._id.toString() == chapId){
+                week = item.week;
+                chap = item.chapter;
+                break;
+            }
+        }
+
+        //计算当前chap的位置pos  以及该chap的总章节数量count
+        for(var i =0;i<doc.children.length;i++) {
+            var item = doc.children[i];
+            if ( parseInt(item.week) == week ) {
+                chapCount++;
+            }
+        }
+
+        var preWeek = _.filter(doc.children , function (item) {
+            if ( parseInt(item.week) === week-1 )
+                return item;
+        });
+
+        // console.log(preWeek.length);
+
+        if (( parseInt(chap) === 0 )&&( parseInt(week) !== 0 )) {  //头节点
+
+            if( chapCount > 1 ) { //有后续兄弟节点
+                for(var i =0;i<doc.children.length;i++) {
+                    var item = doc.children[i];
+                    if (( parseInt(item.week) == week )&&( parseInt(item.chapter) > chap )) {
+                        doc.children[i].chapter--;
+                    }
+                }
+            }else{
+                for(var i =0;i<doc.children.length;i++) {
+                    var item = doc.children[i];
+                    if ( parseInt(item.week) > week ) {
+                        doc.children[i].week--;
+                    }
+                }
+            }
+
+            doc.children[index].week = week-1;
+            doc.children[index].chapter = preWeek.length;
+        }else{
+
+            var preIndex;
+
+            var curChap = (chap-1>0)?(chap-1):0;
+
+            for(var i =0;i<doc.children.length;i++) {
+                var item = doc.children[i];
+                if (( parseInt(item.week) === week )&&( parseInt(item.chapter) === curChap )) {
+                    preIndex = i;
+                }
+            }
+
+            doc.children[preIndex].chapter++;
+            doc.children[index].chapter--;
+        }
+
+
+
+
+
+        // console.log("index:" + index + " subling:" +count + " sIndex:" + pos);
+
+        doc.save(function(err) {
+            cb(err, doc);
+        });
+    })
+};
+
+
+
+
+exports.downMoocChap = function( moocId, chapId, cb) {
+
+    Mooc.findOne({"_id": moocId, "children._id": chapId },function(err,doc){
+        var week,chap,index,chapCount = 0,pos = 0, lastWeek=0;
+
+        //计算当前chap的位置index
+        for( index =0;index<doc.children.length;index++) {
+            var item = doc.children[index];
+            if(item._id.toString() == chapId){
+                week = item.week;
+                chap = item.chapter;
+                break;
+            }
+        }
+
+        //计算当前chap的位置pos  最后week的index
+        for(var i =0;i<doc.children.length;i++) {
+            var item = doc.children[i];
+            if ( parseInt(item.week) == week ) {
+                chapCount++;
+            }
+            if( parseInt(item.week) > lastWeek ) {
+                lastWeek = parseInt(item.week);
+            }
+        }
+
+        var nextWeek = _.filter(doc.children , function (item) {
+            if ( parseInt(item.week) === week+1 )
+                return item;
+        });
+
+        // console.log(preWeek.length);
+
+        if (( parseInt(chap) === chapCount-1 )&&( parseInt(week) !== lastWeek )) {  //头节点
+
+            if( chapCount > 1 ) { //有q前续兄弟节点
+                for(var i =0;i<doc.children.length;i++) {
+                    var item = doc.children[i];
+                    if ( parseInt(item.week) == week+1 ) {
+                        doc.children[i].chapter++;
+                    }
+                }
+                doc.children[index].week = week+1;
+                doc.children[index].chapter = 0;
+
+            }else{
+                for(var i =0;i<doc.children.length;i++) {
+                    var item = doc.children[i];
+                    if  ( parseInt(item.week) > week ) {
+                        doc.children[i].week--;
+                    }
+                    if ( parseInt(item.week) == week+1 ) {
+                        doc.children[i].chapter++;
+                    }
+                }
+                doc.children[index].chapter = 0;
+            }
+        }else{
+
+            var nextIndex;
+
+            var curChap = (chap+1>chapCount)?chapCount:(chap+1);
+
+            for(var i =0;i<doc.children.length;i++) {
+                var item = doc.children[i];
+                if (( parseInt(item.week) === week )&&( parseInt(item.chapter) === curChap )) {
+                    nextIndex = i;
+                }
+            }
+
+            doc.children[nextIndex].chapter--;
+            doc.children[index].chapter++;
+        }
+
+
+
+
+
+        // console.log("index:" + index + " subling:" +count + " sIndex:" + pos);
+
+        doc.save(function(err) {
+            cb(err, doc);
+        });
+    })
+};

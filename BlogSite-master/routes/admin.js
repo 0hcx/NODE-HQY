@@ -201,15 +201,15 @@ router.post('/moocSetChapTitle', function(req, res, next) {
 });
 
 
-router.post('/moocGetChapTitle', function(req, res, next) {
-
-	var moocId    = req.body.moocId;
-	var chapId    = req.body.chapId;
-
-	dbHelper.queryMoocChapTitle( moocId, chapId, function (success, doc) {
-		res.send(doc);
-	});
-});
+// router.post('/moocGetChapTitle', function(req, res, next) {
+//
+// 	var moocId    = req.body.moocId;
+// 	var chapId    = req.body.chapId;
+//
+// 	dbHelper.queryMoocChapTitle( moocId, chapId, function (success, doc) {
+// 		res.send(doc);
+// 	});
+// });
 
 router.post('/moocDeleteChap', function(req, res, next) {
 
@@ -260,7 +260,7 @@ router.post('/moocDownChap', function(req, res, next) {
 	var moocId    = req.body.moocId;
 	var chapId    = req.body.chapId;
 
-	dbHelper.MoocChap( moocId, chapId, function (err, doc) {
+	dbHelper.downMoocChap( moocId, chapId, function (err, doc) {
 		if(err) {
 			return next(err);
 		}else{

@@ -4,6 +4,7 @@
             <h3 class="b-title">{{entries.title}}</h3>
             <p class="postdate">发布时间：{{timeFromNow entries.meta.createAt}}({{formatDate entries.meta.createAt}})
                 <span>作者：{{entries.author.username}}</span>
+                <span>阅读：{{entries.pv}}</span>
             </p>
             <div class="blog-list-ctn">{{{entries.content}}}</div>
         </div>
