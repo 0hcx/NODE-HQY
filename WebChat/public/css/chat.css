@@ -1,0 +1,284 @@
+/*登录*/
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end!important;
+    height: 600px;
+    background-color: rgba(52, 54, 66, 0.9);
+}
+.login-wrap {
+    width: 420px;
+    height: 390px;
+    background: #ffffff;
+    border-radius: 5px;
+}
+.login-box {
+    /*position: relative;*/
+    width: 420px;
+    height: 390px;
+    /*margin: 100px auto;*/
+    border: 1px solid #777;
+    border-radius: 5px;
+    background: #ffffff;
+}
+.reg-height {
+    height: 450px!important;
+}
+.login-box-msg {
+    position: absolute;
+    width: 420px;
+    color: red;
+    font-family: "Microsoft YaHei UI";
+    text-align: center;
+}
+.login-img img {
+    width: 418px;
+    height: 150px;
+    border-radius: 5px 5px 0 0;
+}
+.lgn-header {
+    margin-top: 60px;
+    text-align:center;
+    font-family: "微软雅黑";
+}
+.login-form {
+    padding: 25px 40px 30px;
+}
+.input-prepend {
+    display: flex;
+    width: 100%;
+    height: 36px;
+    margin-bottom: 20px;
+    border: 1px #ddd solid;
+}
+.input-field {
+    flex: 4;
+}
+.input-icon {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 36px;
+    background-color: rgba(0,0,0,0);
+}
+.input-prepend input {
+    width: 308px!important;
+    height: 36px;
+    padding: 2px 0 0 30px;
+}
+.lgn-btn {
+    margin-top: 20px;
+    text-align: center;
+}
+.lgn-btn input {
+    width: 340px;
+    height: 38px;
+    border: 1px solid #00a1d6;
+    background-color: #00a1d6;
+    border-radius: 4px;
+    color: #fff;
+    font-family: "微软雅黑";
+}
+.login-box .reg {
+    height: 34px;
+    padding-left: 10px;
+    line-height: 34px;
+    border-top: 1px #ddd solid;
+    font-size: 17px;
+    font-family: "Microsoft YaHei";
+}
+.login-box .reg a {
+    color: #a49d8c;
+}
+.login-box .reg a:hover {
+    color: #000;
+    text-decoration: none;
+}
+/*主页*/
+.wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #00B7FF;
+}
+.chat-room {
+    width: 500px;
+    height: 800px;
+}
+.chat-top {
+    width: 500px;
+    height: 70px;
+    display: flex;
+    padding: 20px;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #666666;
+}
+.chat-ctn {
+    width: 500px;
+    height: 660px;
+    overflow-y: auto;
+    background-color: #eeeeee;
+}
+.send-box {
+    width: 500px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #999999;
+}
+.username-to {
+    color: #ffffff;
+    font-family: "Microsoft JhengHei";
+    font-size: 35px;
+    font-weight: bolder;
+}
+.msg-input {
+    width: 360px;
+    height: 45px;
+    margin-right: 25px;
+    background-color: #ffffff;
+}
+.input-ctn {
+    width: 360px;
+    height: 45px;
+    font-family: "Microsoft JhengHei";
+    font-size: 20px;
+    font-weight: bolder;
+}
+.sidebar-wrapper {
+    position: relative;
+    height: 100%;
+    overflow: auto;
+}
+#chat-sidebar {
+    background-color: #084887;
+}
+#chat-sidebar .nav {
+    line-height: 40px;
+    list-style-type: none;
+}
+#chat-sidebar .nav a {
+    display: block;
+    padding: 0 20px;
+    color: #fff;
+    text-decoration: none;
+}
+#chat-sidebar .nav a:hover {
+    background-color: #0883fd;
+}
+[data-simplersidebar='active'] {
+    box-shadow: 3px 0px 3px 0px rgba(0, 0, 0, 0.5);
+}
+.chat-home {
+    width: 500px;
+    height: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #3c763d;
+    background: url("../images/mb1.png");
+    background-size: cover;
+}
+.user-img {
+    width: 250px;
+    height: 250px;
+    margin-top: 30px;
+}
+.user-img img {
+    width: 250px;
+    height: 250px;
+    border-radius: 250px;
+    cursor: pointer;
+}
+.panel-default,
+.panel-heading {
+    color: #fff!important;
+    background-color: #084887!important;
+}
+.users-list {
+    display: flex!important;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Microsoft JhengHei";
+    font-size: 20px;
+}
+.username {
+    margin-left: 20px;
+}
+.users-list-r {
+    width: 100px;
+    height: 40px;
+    background-color: #00B7FF;
+    display: none;
+}
+.add-user {
+    width: 100px;
+    height: 40px;
+}
+/*form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }*/
+/*form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }*/
+/*form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }*/
+#messages { list-style-type: none; margin: 0; padding: 0; }
+#messages li { padding: 5px 10px; }
+#messages li:nth-child(odd) { background: #eee; }
+
+.chat-box-l {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+}
+.chat-box-r {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+}
+.chat-p {
+    position: relative;
+    max-width: 72%;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    word-wrap: break-word;
+    font-family: "Microsoft JhengHei";
+    font-size: 20px;
+    font-weight: 600;
+    background-color: #badaf8;
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+}
+.chat-user-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+}
+.chat-box-r .chat-p {
+    background-color: #4EC69A;
+}
+.chat-box-r .chat-p:after {
+    position: absolute;
+    right: -7px;
+    top: 18px;
+    width: 14px;
+    height: 14px;
+    background: #4ec69a;
+    content: "";
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+.chat-box-l .chat-p:after {
+    position: absolute;
+    left: -7px;
+    top: 18px;
+    width: 14px;
+    height: 14px;
+    background: #badaf8;
+    content: "";
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}

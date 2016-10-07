@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{>head}}
+  </head>
+  <script>
+      var socket = io();
+  </script>
+  <body>
+  <div class="wrapper">
+      {{>sidebar}}
+      {{{body}}}
+  </div>
+  </body>
+</html>

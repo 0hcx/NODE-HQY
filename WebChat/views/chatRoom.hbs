@@ -1,0 +1,24 @@
+<div class="wrapper">
+    <div class="chat-room" data-id="{{user._id}}">
+        <div class="chat-top">
+            <div class="username-to" data-id="{{friend._id}}">{{friend.username}}</div>
+            <div class="back-btn">
+                <a href="/p/index" class="btn btn-primary btn-md">返回</a>
+            </div>
+        </div>
+        <div class="chat-ctn">
+            <ul id="messages"></ul>
+        </div>
+        <form action="">
+            <div class="send-box">
+                <div class="msg-input">
+                    <input id="m" autocomplete="off" class="input-ctn" placeholder="请输入...">
+                </div>
+                <div class="send-btn">
+                    <button type="submit" class="btn btn-primary pull-right">发送</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/chat/chatRoom.js"></script>

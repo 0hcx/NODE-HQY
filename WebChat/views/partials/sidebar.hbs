@@ -1,0 +1,49 @@
+<div class="sidebar" id="chat-sidebar">
+    <div class="sidebar-wrapper" id="sidebar-wrapper">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#admin-box" href="#friend">好友列表</a>
+                    </h4>
+                </div>
+                <div id="friend" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <ul class="nav">
+                            {{#if user.friends}}
+                                {{#each user.friends}}
+                                    <li class="users-list">
+                                        <div class="username">
+                                            <a href="/p/chatRoom/{{_id}}">{{username}}</a>
+                                        </div>
+                                    </li>
+                                {{/each}}
+                            {{/if}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#admin-box" href="#stranger">用户列表</a>
+                    </h4>
+                </div>
+                <div id="stranger" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <ul class="nav">
+                            {{#each entries}}
+                                    <li data-toggle="select" data-id="{{_id}}" class="users-list">
+                                        <div class="username">{{username}}</div>
+                                        <div class="users-list-r">
+                                            <a href="#" class="add-user"><i class="fa fa-plus"></i>添加</a>
+                                        </div>
+                                    </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
