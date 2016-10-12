@@ -91,18 +91,45 @@ function onListening() {
 
 var io = require('socket.io').listen(server);
 var userId = {};
-
+var toChat = {};
 io.on('connection', function(socket){
   socket.on('add user', function (data) {
+    socket.name = data.from;
+    toChat[data.from] = data.to;//保存用户聊天对象
     userId[data.from] = socket;//每次进入都要socket.id都要变一次
   });
   socket.on('chat message', function(msg){
-    if(userId[msg.to]) {
-      userId[msg.to].emit('chat message', msg.content);
+    if(toChat[toChat[socket.name]] == socket.name && userId[msg.to]) {
+      var data = {
+        msg: msg.content,
+        ctn: msg.content,
+        status: 1
+      };
+      userId[msg.to].emit('chat message', data);
+    } else if(userId[msg.to] && toChat[toChat[socket.name]] != socket.name) {
+      var data = {
+        msg: "系统：你收到其他用户的聊天信息！",
+        _msg: "对方正在和其他人聊天！",
+        ctn: msg.content,
+        status: 2
+      };
+      userId[msg.from].emit('chat busy', data);
+      userId[msg.to].emit('chat message', data);
     } else {
-      userId[msg.from].emit('chat message', "抱歉，当前用户不在线！");
+      var data = {
+        msg: "抱歉，当前用户不在线！",
+        ctn: msg.content,
+        status: 0
+      };
+      userId[msg.from].emit('chat message', data);
     }
-
   });
-
+  socket.on('disconnect', function () {
+    //用户退出提醒对方
+    if(userId[toChat[socket.name]] && toChat[toChat[socket.name]] == socket.name) {//判断对方聊天的对象是否是自己
+      userId[toChat[socket.name]].emit('user left', "对方退出！");
+    }
+    delete userId[socket.name];
+    delete toChat[socket.name];
+  });
 });

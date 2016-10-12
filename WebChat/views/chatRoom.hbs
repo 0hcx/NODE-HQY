@@ -7,7 +7,13 @@
             </div>
         </div>
         <div class="chat-ctn">
-            <ul id="messages"></ul>
+            <ul id="messages">
+
+                    {{#each message}}
+                        <li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">{{content}}</p></li>
+                    {{/each}}
+
+            </ul>
         </div>
         <form action="">
             <div class="send-box">

@@ -16,7 +16,11 @@ function init() {
         e.preventDefault();
         var $this = $(this);
         var friendId = $this.data('id');
-        doAddFriend(friendId);
+        if(friendId == $.cookie('id')) {
+            alert("不能添加自己！");
+        } else {
+            doAddFriend(friendId);
+        }
     });
 }
 

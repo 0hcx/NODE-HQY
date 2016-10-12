@@ -7,6 +7,7 @@ var messageSchema = new Schema({
     from: {type: ObjectId, ref: 'User'},
     to: {type: ObjectId, ref: 'User'},
     content: String,
+    status: String,
     meta: {
         updateAt: {type:Date, default: Date.now()},
         createAt: {type:Date, default: Date.now()}

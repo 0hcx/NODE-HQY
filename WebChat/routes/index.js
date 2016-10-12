@@ -6,21 +6,14 @@ var dbHelper = require('../db/dbHelper');
 /* GET home page. */
 router.get('/index', function(req, res, next) {
     var id = req.session.user._id;
-    dbHelper.searchFriend(req, function (success, data) {
+    dbHelper.searchAllUsers(req, function (success, data) {
+        dbHelper.matchUser(id, function (success, doc) {
+            // console.log(doc.friends);
             res.render('index', {
-                entries: data,
-                user: req.session.user
+                entries: data.results,
+                userCount: data.count,
+                user: doc
             });
-    });
-});
-
-router.get('/chatRoom/:id', function(req, res, next) {
-    var id = req.params.id;
-    dbHelper.matchUser(req, id, function (success, data) {
-        res.render('chatRoom', {
-            title: 'Express' ,
-            user: req.session.user,
-            friend: data
         });
     });
 });
@@ -38,6 +31,28 @@ router.post('/addMessage', function(req, res, next) {
     console.log("添加新消息");
     dbHelper.addMessage(req.body, function (success, doc) {
         res.send(doc);
+    });
+});
+router.post('/updateMsgStatus', function (req, res, next) {
+   //标记消息已阅读
+    console.log("标记消息已阅读");
+    dbHelper.updateMsgStatus(req.body, function (success, doc) {
+        res.send(doc);
+    });
+});
+
+router.get('/chatRoom/:id', function(req, res, next) {
+    var userId = req.session.user._id;
+    var friendId = req.params.id;
+    dbHelper.findFriend(userId, friendId, function (success, data) {
+        // console.log(data.results);
+        res.render('chatRoom', {
+            title: 'Express' ,
+            user: req.session.user,
+            // friend: data
+            friend: data.friend,
+            message: data.results
+        });
     });
 });
 

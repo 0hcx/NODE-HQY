@@ -10,8 +10,8 @@ var userSchema = new Schema({
     address:  String,
     userImg: String,
     friends: [{
-        type: ObjectId,
-        ref: 'User'
+        friendId: {type: ObjectId, ref: 'User'},
+        unread: {type: Number, default: 0}
     }],
     meta: {
         updateAt: {type:Date, default: Date.now()},
