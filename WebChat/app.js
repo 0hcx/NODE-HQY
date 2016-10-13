@@ -9,6 +9,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var session     = require('express-session');
 var authority = require('./db/authority');
+var hbsHelper = require('./lib/hbsHelper');
 
 var mongoose = require('mongoose');
 var config = require('./config');
@@ -25,7 +26,8 @@ var hbs = exphbs.create({
   partialsDir: 'views/partials',
   layoutsDir: "views/layouts/",
   defaultLayout: 'layout',
-  extname: '.hbs'
+  extname: '.hbs',
+  helpers: hbsHelper
 });
 app.engine('hbs', hbs.engine);
 

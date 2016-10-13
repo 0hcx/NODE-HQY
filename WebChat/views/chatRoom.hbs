@@ -3,16 +3,14 @@
         <div class="chat-top">
             <div class="username-to" data-id="{{friend._id}}">{{friend.username}}</div>
             <div class="back-btn">
-                <a href="/p/index" class="btn btn-primary btn-md">返回</a>
+                <a href="/p/historyMessages/{{friend._id}}" class="btn btn-primary btn-md">查看聊天记录</a>
             </div>
         </div>
         <div class="chat-ctn">
             <ul id="messages">
-
-                    {{#each message}}
-                        <li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">{{content}}</p></li>
-                    {{/each}}
-
+                {{#each message}}
+                    <li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">{{content}}</p></li>
+                {{/each}}
             </ul>
         </div>
         <form action="">

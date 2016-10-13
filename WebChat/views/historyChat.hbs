@@ -1,0 +1,18 @@
+<div class="wrapper">
+    <div class="chat-room" data-id="{{user._id}}">
+        <div class="chat-top">
+            <div class="username-to">与{{name}}的聊天记录</div>
+            <div class="back-btn">
+                <!--<a href="/p/historyMessages/{{friend._id}}" class="btn btn-primary btn-md">查看聊天记录</a>-->
+            </div>
+        </div>
+        <div class="chat-ctn">
+            <ul id="messages">
+                {{#each historyMsg}}
+                    <!--<li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">{{content}}</p></li>-->
+                    <li class="chat-box-l">{{from.username}}：{{content}} {{formatDate meta.createAt}}</li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</div>

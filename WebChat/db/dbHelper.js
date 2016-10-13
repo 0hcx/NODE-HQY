@@ -239,3 +239,22 @@ exports.updateMsgStatus = function (data, cb) {
         })
     })
 };
+
+//查看历史消息记录
+exports.findHistoryMsg = function (from, to, cb) {
+    Message.find({"from": from, "to": to})
+        .populate("from to", "username username")
+        .exec(function (err, data) {
+            var $message = {};
+            var messageList = new Array();
+            for(var i =0; i < data.length; i++) {
+                messageList.push(data[i].toObject());
+            }
+            // console.log(messageList);
+            var name = messageList[0].from.username;
+            $message.results = messageList;
+            $message.name = name;
+            cb(true, $message);
+        })
+};
+
