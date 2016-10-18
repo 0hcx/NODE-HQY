@@ -1,8 +1,8 @@
-$(init);
-
-function init() {
-    $('#m').val('');
-}
+// $(init);
+//
+// function init() {
+//     $('#m').val('');
+// }
 var socket = io();
 //传递给服务器用户Id
 

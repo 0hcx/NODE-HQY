@@ -75,6 +75,7 @@ function onError(error) {
     default:
       throw error;
   }
+  
 }
 
 /**
@@ -94,15 +95,19 @@ var userId = {};
 var toChat = {};
 io.on('connection', function(socket){
   socket.on('add user', function (data) {
+    console.log(socket.id);
     socket.name = data.from;
     toChat[data.from] = data.to;//保存用户聊天对象
     userId[data.from] = socket;//每次进入都要socket.id都要变一次
   });
   socket.on('chat message', function(msg){
+    // console.log(msg);
     if(toChat[toChat[socket.name]] == socket.name && userId[msg.to]) {
       var data = {
         msg: msg.content,
         ctn: msg.content,
+        from: msg.from,
+        to: msg.to,
         status: 1
       };
       userId[msg.to].emit('chat message', data);
@@ -111,14 +116,18 @@ io.on('connection', function(socket){
         msg: "系统：你收到其他用户的聊天信息！",
         _msg: "对方正在和其他人聊天！",
         ctn: msg.content,
+        from: msg.from,
+        to: msg.to,
         status: 2
       };
-      userId[msg.from].emit('chat busy', data);
+      // userId[msg.from].emit('chat busy', data);
       userId[msg.to].emit('chat message', data);
     } else {
       var data = {
         msg: "抱歉，当前用户不在线！",
         ctn: msg.content,
+        from: msg.from,
+        to: msg.to,
         status: 0
       };
       userId[msg.from].emit('chat message', data);

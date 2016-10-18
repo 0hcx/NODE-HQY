@@ -1,10 +1,10 @@
 /*登录*/
-body {
-    padding: 0;
-    background-color: rgba(52, 54, 66, 0.9) !important;
-    /*background: url("../images/mb1.jpg") no-repeat;*/
-    /*background-size: cover;*/
-}
+/*body {*/
+    /*padding: 0;*/
+    /*background-color: rgba(52, 54, 66, 0.9) !important;*/
+    /*!*background: url("../images/mb1.jpg") no-repeat;*!*/
+    /*!*background-size: cover;*!*/
+/*}*/
 .login-page {
     display: flex;
     justify-content: center;
@@ -103,139 +103,46 @@ body {
     text-decoration: none;
 }
 /*主页*/
-.wrapper {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /*background-color: #00B7FF;*/
-}
-.chat-room {
-    width: 500px;
-    height: 800px;
-}
-.chat-top {
-    width: 500px;
-    height: 70px;
-    display: flex;
-    padding: 20px;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #666666;
-}
-.chat-ctn {
-    width: 500px;
-    height: 660px;
-    overflow-y: auto;
-    background-color: #eeeeee;
-}
-.send-box {
-    width: 500px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #999999;
-}
-.username-to {
-    color: #ffffff;
-    font-family: "Microsoft JhengHei";
-    font-size: 35px;
-    font-weight: bolder;
-}
-.msg-input {
-    width: 360px;
-    height: 45px;
-    margin-right: 25px;
-    background-color: #ffffff;
-}
-.input-ctn {
-    width: 360px;
-    height: 45px;
-    font-family: "Microsoft JhengHei";
-    font-size: 20px;
-    font-weight: bolder;
-}
-.sidebar-wrapper {
-    position: relative;
-    height: 100%;
-    overflow: auto;
-}
-#chat-sidebar {
-    background-color: #084887;
-}
-#chat-sidebar .nav {
-    line-height: 40px;
-    list-style-type: none;
-}
-#chat-sidebar .nav a {
-    display: block;
-    padding: 0 20px;
-    color: #fff;
-    text-decoration: none;
-}
-#chat-sidebar .nav a:hover {
-    background-color: #0883fd;
-}
-[data-simplersidebar='active'] {
-    box-shadow: 3px 0px 3px 0px rgba(0, 0, 0, 0.5);
-}
-.chat-home {
-    width: 100%;
-    height: 800px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /*background-color: #3c763d;*/
-    /*background: url("../images/mb1.jpg");*/
-    /*background-size: cover;*/
-}
-.chat-home-username {
-    font-family: "Microsoft JhengHei";
-    font-size: 50px;
-    font-weight: bolder;
-    color: #dddddd;
-}
-.user-img {
-    width: 250px;
-    height: 250px;
-    margin-top: 30px;
-}
-.user-img img {
-    width: 250px;
-    height: 250px;
-    border-radius: 250px;
-    cursor: pointer;
-}
-.panel-default,
-.panel-heading {
-    color: #fff!important;
-    background-color: #084887!important;
-}
+.friends-list,
 .users-list {
     display: flex!important;
-    justify-content: space-between;
     align-items: center;
+    height: 50px;
+    padding: 18px;
     font-family: "Microsoft JhengHei";
     font-size: 20px;
+}
+.friends-list {
+    cursor: pointer;
+}
+.users-list:hover,
+.friends-list:hover {
+    background-color: #3B4047;
 }
 .username {
     margin-left: 20px;
 }
 .users-list-r {
-    width: 100px;
-    height: 40px;
-    background-color: #00B7FF;
+    width: 60px;
+    height: 30px;
+    margin-left: 60px;
     display: none;
+    background-color: #3CAF36;
+    border-radius: 3px;
 }
 .add-user {
-    width: 100px;
-    height: 40px;
+    width: 60px;
+    height: 30px;
+    font-family: "Microsoft JhengHei";
+    color: #fff!important;
 }
-#messages { list-style-type: none; margin: 0; padding: 0; }
-#messages li { padding: 5px 10px; }
-#messages li:nth-child(odd) { background: #eee; }
+a:hover {
+    text-decoration: none!important;
+}
+
+.messages { list-style-type: none; margin: 0; padding: 0; }
+.messages li { padding: 5px 10px; }
+.messages li:nth-child(odd) { background: #eee; }
 
 .chat-box-l {
     display: flex;
@@ -291,38 +198,169 @@ body {
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
 }
-@media (max-width: 440px) {
-    .login-page {
-        height: 500px;
-    }
-    .login-wrap,
-    .login-box,
-    .login-box-msg {
-        width: 358px;
-    }
-    .login-img img {
-        width: 356px;
-    }
-    .lgn-btn input {
-        width: 275px;
-    }
-    .chat-home {
-        height: 640px;
+/*新的布局*/
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    text-align: center;
+}
+.chat-room {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-basis: 1000px;
+    height: 760px;
+    margin-top: 100px;
+}
+.chat-sidebar {
+    flex-basis: 280px;
+    min-width: 140px;
+    height: 760px;
+    /*flex: 1;*/
+    background-color: #2E3238;
+}
+.wrapper {
+    width: 100%;
+}
+.mobile-sidebar {
+    width: 40px;
+    height: 100%;
+    display: none;
+    background-color: #2E3238;
+}
+@media (max-width: 720px) {
+    .chat-room {
+        margin-top: 0;
     }
 }
-@media (max-width: 320px) {
-    .login-wrap,
-    .login-box,
-    .login-box-msg {
-        width: 318px;
+@media (max-width: 450px) {
+    .mobile-sidebar {
+        display: block;
     }
-    .login-img img {
-        width: 316px;
+    .chat-sidebar {
+        display: none;
     }
-    .lgn-btn input {
-        width: 234px;
-    }
-    .chat-home {
-        height: 560px;
-    }
+}
+.chat-box {
+    flex-basis: 720px;
+    height: 760px;
+    background-color: #EEEEEE;
+}
+.sidebar-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-basis: 280px;
+    height: 76px;
+    padding: 18px;
+    border-bottom: #26292E solid 1px;
+}
+.avatar .img {
+    flex-basis: 44px;
+    height: 44px;
+    border-radius: 2px;
+}
+.user-info {
+    flex-basis: 190px;
+    height: 31px;
+    margin-left: 10px;
+    color: #fff
+}
+.nickname {
+    height: 33px;
+    margin: 0;
+    padding: 0;
+    font-family: "Microsoft JhengHei";
+    font-weight: 600;
+    font-size: 24px;
+}
+.sidebar-tab {
+    width: 137px;
+}
+.tab-content {
+    color: #fff;
+}
+.nav-tabs {
+    background-color: #2E3238!important;
+    border: #2E3238 solid 1px!important;
+}
+.fa-comment,
+.fa-th-list {
+    color: #fff;
+}
+.nav-tabs>li>a:hover,
+.nav-tabs>li>a:hover i,
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:focus i,
+.nav-tabs>li.active>a:hover i {
+    color: #3CAF36!important;
+    background-color: #2E3238!important;
+}
+.nav-tabs>li>a,
+.nav-tabs>li>a:hover,
+.nav-tabs>li.active>a:focus,
+.nav-tabs>li.active>a:hover {
+    border: #2E3238 solid 1px!important;
+    border-bottom: #26292E solid 1px!important;
+}
+.chat-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+}
+.chat-default {
+    font-family: "Microsoft JhengHei";
+    font-size: 30px;
+    font-weight: 900;
+    color: #E1E1E1;
+}
+.chat-area {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+.box-hd {
+    display: flex;;
+    justify-content: center;;
+    align-items: center;
+    width: 100%;
+    height: 51px;
+    border-bottom: #D6D6D6 solid 1px;
+}
+.box-bd {
+    width: 100%;
+    height: 528px;
+    border-bottom: #D6D6D6 solid 1px;
+    overflow-y: auto;
+}
+.box-send {
+    align-self: flex-end;
+    width: 100%;
+    height: 181px;
+    display: none;
+}
+.info-friend {
+    font-family: "Microsoft JhengHei";
+    font-size: 20px;
+    font-weight: 600;
+}
+.input-ctn {
+    flex-basis: 718px;
+    height: 180px;
+}
+.unread {
+    display: none;
+    width: 28px;
+    height: 28px;
+    margin-left: 30px;
+    background-color: #3CAF36;
+    border-radius: 14px;
+    color: #2E3238;
+    font-family: "Microsoft JhengHei";
+    font-weight: 900;
 }
