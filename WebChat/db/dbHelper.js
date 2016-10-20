@@ -4,6 +4,7 @@ var User = require('./schema/user');
 var Message = require('./schema/message');
 var Friend = require('./schema/friend');
 var async = require('async');
+var _ = require('underscore');
 var Schema = mongoose.Schema;
 
 exports.findUsr = function(data, cb) {
@@ -133,43 +134,6 @@ exports.matchUser = function (id, cb) {
   }).populate('friends.friendId', 'username');
 };
 
-// exports.findFriend = function (userId, friendId, cb) {
-//     User.findOne({"_id": userId, "friends._id": friendId})
-//         .populate('friends.friendId', 'username')
-//         .exec(function (err, data) {
-//             var user = (data !== null) ? data.toObject() : '';
-//             for(var i =0; i < data.friends.length; i++) {
-//                 var item = data.friends[i];
-//                 if(item._id.toString() == friendId){
-//                     user = item;
-//                     break;
-//                 }
-//             }
-//             // console.log(user.friendId);
-//             var $unreadMsg = {};
-//             var messageList = new Array();
-//             $unreadMsg.results = messageList;
-//             $unreadMsg.friend = user.friendId;
-//             if(user.unread != 0) {
-//                 // var $unreadMsg = {};
-//                 Message.find({"from": user.friendId._id, "to": userId, "status": 0}, function (err, data) {
-//                     // var messageList = new Array();
-//                     for (var i = 0; i < data.length; i++) {
-//                         messageList.push(data[i].toObject());
-//                     }
-//                     $unreadMsg.results = messageList;
-//                     // $unreadMsg.friend = user.friendId;
-//                     // console.log(messageList);
-//                 })
-//             }
-//             cb(true, $unreadMsg);
-//             // console.log($unreadMsg);
-//             // else {
-//             //     cb(true, user.friendId);
-//             // }
-//         })
-// };
-
 exports.addMessage = function (data, cb) {
     console.log(data);
     var message= new Message({
@@ -216,20 +180,37 @@ exports.updateMsgStatus = function (data, cb) {
 };
 
 //查看历史消息记录
-exports.findHistoryMsg = function (from, to, cb) {
-    Message.find({"from": from, "to": to})
-        .populate("from to", "username username")
-        .exec(function (err, data) {
-            var $message = {};
-            var messageList = new Array();
-            for(var i =0; i < data.length; i++) {
-                messageList.push(data[i].toObject());
-            }
-            // console.log(messageList);
-            var name = messageList[0].from.username;
-            $message.results = messageList;
-            $message.name = name;
-            cb(true, $message);
-        })
+exports.findHistoryMsg = function (data, cb) {
+    var conditions1 = {"from": data.from, "to": data.to};
+    var conditions2 = {"from": data.to, "to": data.from};
+    
+    async.waterfall([
+        function (cb) {
+            Message.find(conditions1, function (err, data) {
+                var messageList = new Array();
+                for(var i =0; i < data.length; i++) {
+                    messageList.push(data[i].toObject());
+                }
+                cb(err, messageList);
+            });
+        },
+        function (doc, cb) {
+            Message.find(conditions2, function (err, data) {
+                // var messageList = new Array();
+                for(var i = 0; i < data.length; i++) {
+                    doc.push(data[i].toObject());
+                }
+                var result = _.sortBy(doc, function (item) {
+                    return item.meta.createAt;
+                });
+                cb(err, result);
+            });
+        }
+    ], function (err, result) {
+        cb(true, result);
+        console.log(result);
+    });
+
 };
+
 

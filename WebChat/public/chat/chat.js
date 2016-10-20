@@ -1,26 +1,29 @@
-var urlGetUnreadMsg  = "/p/getUnreadMsg";
-var urlUpdateMsgStatus = "/p/updateMsgStatus";
-var urlAddMsg =  "/p/addMessage";
 var socket = io();//传递给服务器用户Id
 var chatSession = [];
 var uid = $.cookie('id');
 var fid;
+var name;
 
 $(init);
 
 function init() {
 
-    $('[data-toggle="sidebar-on"]').on('click', function (e) {
-        e.preventDefault();
-        $('.mobile-sidebar').hide("fast");
-        $('.chat-sidebar').show("fast");
-    });
+    if($(window).width() <= 450) {
+        $('[data-toggle="sidebar-on"]').on('click', function (e) {
+            e.preventDefault();
+            $('.mobile-sidebar').hide("fast");
+            $('.chat-sidebar').show("fast");
+        });
 
-    $('[data-toggle="sidebar-off"]').on('click', function (e) {
-        e.preventDefault();
-        $('.chat-sidebar').hide("fast");
-        $('.mobile-sidebar').show("fast");
-    });
+        $('[data-toggle="sidebar-off"]').on('click', function (e) {
+            e.preventDefault();
+            $('.chat-sidebar').hide("fast");
+            $('.mobile-sidebar').show("fast");
+        });
+    }
+
+    $('body').on('click', '.history-msg' , toggleHistoryView);
+    $('body').on('click', '.history-back' , toggleChatView);
 
     $('[data-toggle="select"]').on('mouseover', function (e) {
         e.preventDefault();
@@ -47,8 +50,8 @@ function init() {
         e.preventDefault();
         var $this = $(this);
         fid = $this.data('id');
-        var name = $this.children('.username').html();
-        createChat(fid, name);
+        name = $this.children('.username').html();
+        createChat();
         $(".chat-default").hide();
         $(".box-send").show();
     });
@@ -56,7 +59,7 @@ function init() {
     $('form').submit(function(){
         var ctn = $('#m').val();
         if(ctn != '') {
-            var html = '<li class="chat-box-r"><p class="chat-p">'+ ctn +'</p><img class="chat-user-img" src="/images/mb2.jpg"></li>';
+            var html = $.format(TO_MSG, ctn);
             $("#m"+fid).append(html);
             var msg = {
                 from: uid,
@@ -64,7 +67,6 @@ function init() {
                 content: ctn
             };
             socket.emit('chat message', msg);
-            // doAddMsg();
         }
         $('#m').val('');
         return false;
@@ -76,7 +78,7 @@ function init() {
             $("#r"+data.from).show();
             doAddMsg(0, data.ctn, data.from, data.to);
         } else if(data.status == 1) {
-            var html = '<li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">' + data.msg +'</p></li>';
+            var html = $.format(FROM_MSG, data.msg);
             $("#m"+fid).append(html);
             doAddMsg(1, data.ctn, data.from, data.to);
         } else if(data.status == 0) {
@@ -89,7 +91,7 @@ function init() {
     });
 }
 
-function createChat(fid, name) {
+function createChat() {
     if (chatSession.indexOf(fid) === -1) {
         chatSession.push(fid);
     }
@@ -98,22 +100,38 @@ function createChat(fid, name) {
         to: fid
     };
     socket.emit('add user', data);
-    toggleChatView(fid, name);
+    toggleChatView();
 }
 
 //切换聊天窗口
-function toggleChatView(fid, name) {
+function toggleChatView() {
     if ($("#t"+fid).length == 0 && $("#c"+fid).length == 0) {
-        $(".chat-area").prepend('<div class="box-hd" id="t'+fid+'"> <div class="info-friend">'+name+'</div> </div><div class="box-bd" id="c'+fid+'"><ul class="messages" id="m'+fid+'"></ul></div>');
+        $(".chat-area").prepend('<div class="box-hd" id="t'+fid+'"> <div class="info-friend">'+name+'</div><div class="history-msg">聊天记录</div></div><div class="box-bd" id="c'+fid+'"><ul class="messages" id="m'+fid+'"></ul></div>');
     }
+    $(".box-bd").css("height", "528px");
     getUnreadMsg(fid);
     updateMsgStatus(fid);
     $(".box-hd").hide();
     $(".box-bd").hide();
+    $(".box-send").show();
     $("#t"+fid).show();
     $("#c"+fid).show();
 }
 
+//切换聊天记录窗口
+function toggleHistoryView() {
+    $("#mh"+fid).html('');
+    if ($("#th"+fid).length == 0 && $("#ch"+fid).length == 0) {
+        $(".chat-area").prepend('<div class="box-hd" id="th'+fid+'"> <div class="info-friend">与'+name+'的聊天记录</div><div class="history-back">返回</div> </div><div class="box-bd" id="ch'+fid+'"><ul class="messages" id="mh'+fid+'"></ul></div>');
+    }
+    getHistoryMsg();
+    $(".box-hd").hide();
+    $(".box-bd").hide();
+    $(".box-send").hide();
+    $(".box-bd").css("height", "709px");
+    $("#th"+fid).show();
+    $("#ch"+fid).show();
+}
 
 function doAddFriend(friendId) {
     $.ajax({
@@ -137,8 +155,6 @@ function doAddFriend(friendId) {
         }
     })
 }
-
-
 
 function postData(url, data, cb) {
     var promise = $.ajax({
@@ -177,6 +193,14 @@ function updateMsgStatus(fid) {
     postData(urlUpdateMsgStatus, jsonData, cbSetOffMsgCount);
 }
 
+function getHistoryMsg() {
+    var jsonData = JSON.stringify({
+        'from': fid,
+        'to': uid
+    });
+    postData(urlGetHistoryMsg, jsonData, cbShowHistoryMsg);
+}
+
 function cbShowMsg(result) {
     if(result.length != 0) {
         for(var i =0; i < result.length; i++) {
@@ -194,5 +218,17 @@ function cbAddMsg(result) {
     var msg = result.code;
     if(msg == 99) {
         alert("消息保存失败!");
+    }
+}
+function cbShowHistoryMsg(result) {
+    if(result.length != 0) {
+        for(var i =0; i < result.length; i++) {
+            if(result[i].from == uid) {
+                var html = $.format(TO_MSG, result[i].content);
+            } else {
+                var html = $.format(FROM_MSG, result[i].content);
+            }
+            $("#mh"+fid).append(html);
+        }
     }
 }
