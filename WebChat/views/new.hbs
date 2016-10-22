@@ -56,13 +56,17 @@
         <h3 class="chat-default">未选择聊天</h3>
         <div class="chat-area">
             <div class="box-send">
+                <!--qq表情-->
+                <div class="emotion"></div>
                 <form action="">
                     <div class="send-bd">
-                        <textarea class="textarea" id="m" placeholder="请输入..." style="width: 100%; max-width: 720px; height: 135px; max-height: 135px;font-size: 14px; line-height: 18px; border: 1px solid #EEEEEE; padding: 10px; background-color: #EEEEEE" required></textarea>
-                        <button type="submit" class="btn btn-primary pull-right">发送</button>
+                        <textarea class="textarea" id="msg" name="msg" style="width: 100%; max-width: 720px; height: 110px; max-height: 110px;font-size: 14px; line-height: 18px; border: 1px solid #EEEEEE; padding: 10px; background-color: #EEEEEE" required></textarea>
+                        <button type="submit" class="btn btn-primary pull-right" id="sendBtn">发送</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+<script src="/chat/chat.js"></script>
+<script src="/lib/jquery/jquery.qqFace.js"></script>

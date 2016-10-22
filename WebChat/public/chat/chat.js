@@ -8,22 +8,33 @@ $(init);
 
 function init() {
 
+    // qq表情
+    $('.emotion').qqFace({
+        id : 'facebox',
+        assign:'msg',
+        path:'/images/face/'	//表情存放的路径
+    });
+
     if($(window).width() <= 450) {
+        $('.chat-room').css("height", $(window).height());
+        $('.chat-sidebar').css("height", $(window).height());
+        $('.chat-box').css("height", $(window).height());
         $('[data-toggle="sidebar-on"]').on('click', function (e) {
             e.preventDefault();
-            $('.mobile-sidebar').hide("fast");
-            $('.chat-sidebar').show("fast");
+            $('.mobile-sidebar').hide();
+            $('.chat-sidebar').show();
         });
 
         $('[data-toggle="sidebar-off"]').on('click', function (e) {
             e.preventDefault();
-            $('.chat-sidebar').hide("fast");
-            $('.mobile-sidebar').show("fast");
+            $('.chat-sidebar').hide();
+            $('.mobile-sidebar').show();
         });
     }
 
     $('body').on('click', '.history-msg' , toggleHistoryView);
     $('body').on('click', '.history-back' , toggleChatView);
+    $("body").on('click', '#sendBtn', doSend);
 
     $('[data-toggle="select"]').on('mouseover', function (e) {
         e.preventDefault();
@@ -56,21 +67,6 @@ function init() {
         $(".box-send").show();
     });
 
-    $('form').submit(function(){
-        var ctn = $('#m').val();
-        if(ctn != '') {
-            var html = $.format(TO_MSG, ctn);
-            $("#m"+fid).append(html);
-            var msg = {
-                from: uid,
-                to: fid,
-                content: ctn
-            };
-            socket.emit('chat message', msg);
-        }
-        $('#m').val('');
-        return false;
-    });
     socket.on('chat message', function(data){
         if(data.status == 2) {
             var unread = parseInt($("#r"+data.from).html())+1;
@@ -78,12 +74,13 @@ function init() {
             $("#r"+data.from).show();
             doAddMsg(0, data.ctn, data.from, data.to);
         } else if(data.status == 1) {
-            var html = $.format(FROM_MSG, data.msg);
+            var html = $.format(FROM_MSG, replace_em(data.msg));
             $("#m"+fid).append(html);
             doAddMsg(1, data.ctn, data.from, data.to);
         } else if(data.status == 0) {
             doAddMsg(0, data.ctn, data.from, data.to);
         }
+        toBottom();
     });
     socket.on('user left', function (msg) {
         var html = '<li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">' + msg +'</p></li>';
@@ -108,7 +105,7 @@ function toggleChatView() {
     if ($("#t"+fid).length == 0 && $("#c"+fid).length == 0) {
         $(".chat-area").prepend('<div class="box-hd" id="t'+fid+'"> <div class="info-friend">'+name+'</div><div class="history-msg">聊天记录</div></div><div class="box-bd" id="c'+fid+'"><ul class="messages" id="m'+fid+'"></ul></div>');
     }
-    $(".box-bd").css("height", "528px");
+    $(".box-bd").css("height", "508px");
     getUnreadMsg(fid);
     updateMsgStatus(fid);
     $(".box-hd").hide();
@@ -131,6 +128,27 @@ function toggleHistoryView() {
     $(".box-bd").css("height", "709px");
     $("#th"+fid).show();
     $("#ch"+fid).show();
+}
+//发送消息
+function doSend() {
+    var ctn = $('#msg').val();
+    if(ctn != '') {
+        var html = $.format(TO_MSG, replace_em(ctn));
+        $("#m"+fid).append(html);
+        var msg = {
+            from: uid,
+            to: fid,
+            content: ctn
+        };
+        socket.emit('chat message', msg);
+        toBottom();
+    }
+    $('#msg').val('');
+}
+
+//接收新消息时，聊天框自动滚到最下方
+function toBottom(){
+    $("#c"+fid).scrollTop($("#c"+fid)[0].scrollHeight);
 }
 
 function doAddFriend(friendId) {
@@ -204,7 +222,7 @@ function getHistoryMsg() {
 function cbShowMsg(result) {
     if(result.length != 0) {
         for(var i =0; i < result.length; i++) {
-            var html = '<li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">' + result[i].content +'</p></li>';
+            var html = '<li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">' + replace_em(result[i].content) +'</p></li>';
             $("#m"+fid).append(html);
         }
     }
@@ -224,11 +242,19 @@ function cbShowHistoryMsg(result) {
     if(result.length != 0) {
         for(var i =0; i < result.length; i++) {
             if(result[i].from == uid) {
-                var html = $.format(TO_MSG, result[i].content);
+                var html = $.format(TO_MSG, replace_em(result[i].content));
             } else {
-                var html = $.format(FROM_MSG, result[i].content);
+                var html = $.format(FROM_MSG, replace_em(result[i].content));
             }
             $("#mh"+fid).append(html);
         }
     }
+}
+// qq表情
+function replace_em(str){
+    str = str.replace(/\</g,'&lt;');
+    str = str.replace(/\>/g,'&gt;');
+    str = str.replace(/\n/g,'<br/>');
+    str = str.replace(/\[em_([0-9]*)\]/g,'<img src="/images/face/$1.gif" border="0" />');
+    return str;
 }
