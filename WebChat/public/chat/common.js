@@ -3,8 +3,11 @@ var urlUpdateMsgStatus = "/p/updateMsgStatus";
 var urlAddMsg =  "/p/addMessage";
 var urlGetHistoryMsg = "/p/getHistoryMsg";
 
-var TO_MSG = "<li class='chat-box-r'><p class='chat-p'>{0}</p><img class='chat-user-img' src='/images/mb2.jpg'></li>";
+var TO_MSG = "<li class='chat-box-r'><p class='chat-p'>{0}</p><img class='chat-user-img' src='/images/mb3.jpg'></li>";
 var FROM_MSG = "<li class='chat-box-l'><img class='chat-user-img' src='/images/mb2.jpg'><p class='chat-p'>{0}</p></li>";
+var TO_MSG_IMG = "<li class='chat-box-r'><p class='chat-p'><img class='img-msg' src='{0}'></p><img class='chat-user-img' src='/images/mb3.jpg'></li>";
+var FROM_MSG_IMG = "<li class='chat-box-l'><img class='chat-user-img' src='/images/mb2.jpg'><p class='chat-p'><img class='img-msg' src='{0}'></p></li>";
+
 
 (function($){
     $.fn.autoTextarea = function(options) {

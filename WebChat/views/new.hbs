@@ -57,7 +57,14 @@
         <div class="chat-area">
             <div class="box-send">
                 <!--qq表情-->
-                <div class="emotion"></div>
+                <div class="send-head">
+                    <div class="emotion"></div>
+                    <div class="img-send">
+                        <input type="file" id="uploadFile" multiple="multiple"  accept="image/*">
+                        <a class="btn btn-primary"><i class="fa fa-camera fa-fw"></i></a>
+                        <a class="btn btn-primary" id="UploadBtn"><i class="fa fa-upload fa-fw"></i> 上传</a>
+                    </div>
+                </div>
                 <form action="">
                     <div class="send-bd">
                         <textarea class="textarea" id="msg" name="msg" style="width: 100%; max-width: 720px; height: 110px; max-height: 110px;font-size: 14px; line-height: 18px; border: 1px solid #EEEEEE; padding: 10px; background-color: #EEEEEE" required></textarea>

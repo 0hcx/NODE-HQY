@@ -35,6 +35,7 @@ function init() {
     $('body').on('click', '.history-msg' , toggleHistoryView);
     $('body').on('click', '.history-back' , toggleChatView);
     $("body").on('click', '#sendBtn', doSend);
+    $("body").on('click', '#UploadBtn', doUpload);
 
     $('[data-toggle="select"]').on('mouseover', function (e) {
         e.preventDefault();
@@ -250,11 +251,42 @@ function cbShowHistoryMsg(result) {
         }
     }
 }
-// qq表情
+// qq表情及图片判断
 function replace_em(str){
     str = str.replace(/\</g,'&lt;');
     str = str.replace(/\>/g,'&gt;');
     str = str.replace(/\n/g,'<br/>');
     str = str.replace(/\[em_([0-9]*)\]/g,'<img src="/images/face/$1.gif" border="0" />');
+    str = str.replace(/[\\]public[\\]uploadFile[\\]upload_[\w]+[\.]jpg/g,"<img class='img-msg' src=" + str + " />");
     return str;
+}
+//发送图片
+function doUpload() {
+
+    var file = $("#uploadFile")[0].files[0];
+    var form = new FormData();
+    form.append("file", file);
+
+    $.ajax({
+        url: "/p/uploadImg",
+        type: "POST",
+        data: form,
+        async: true,
+        processData: false,
+        contentType: false,
+        success: function(result) {
+            startReq = false;
+            if (result.code == 0) {
+                var html = $.format(TO_MSG_IMG, result.data);
+                $("#m"+fid).append(html);
+                var msg = {
+                    from: uid,
+                    to: fid,
+                    content: result.data
+                };
+                socket.emit('chat message', msg);
+                toBottom();
+            }
+        }
+    });
 }

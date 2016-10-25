@@ -180,6 +180,9 @@ a:hover {
     height: 50px;
     border-radius: 50px;
 }
+.img-msg {
+    max-width: 100%;
+}
 .chat-box-r .chat-p {
     background-color: #4EC69A;
 }
@@ -415,4 +418,17 @@ body {
 }
 .qqFace table td img:hover {
     border: 1px #0066cc solid;
+}
+.send-head {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.send-head #uploadFile {
+    opacity: 0;
+    width: 44px;
+    height: 34px;
+    float: left;
+    position: absolute;
+    cursor: pointer;
 }
