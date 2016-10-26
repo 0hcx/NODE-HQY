@@ -432,3 +432,15 @@ body {
     position: absolute;
     cursor: pointer;
 }
+.screen-shot {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    display: none;
+}
+.screen-shot img {
+    max-width: 200px;
+    height: auto!important;
+}

@@ -4,6 +4,7 @@ var config = require('../config');
 var dbHelper = require('../db/dbHelper');
 var formidable = require('formidable');
 var entries = require('../db/jsonRes');
+var fs = require('fs');
 
 /* GET home page. */
 router.get('/index', function(req, res, next) {
@@ -99,6 +100,26 @@ router.post('/uploadImg', function(req, res, next) {
         res.end(callback);
     });
 
+});
+//上传截图
+router.post('/upload', function(req, res, next){
+    //接收前台POST过来的base64
+    var imgData = req.body.img;
+    //过滤data:URL
+    var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+    var dataBuffer = new Buffer(base64Data, 'base64');
+    var fileName = req.body.fileName;
+
+    fs.writeFile("./public/uploadFile/upload_" + fileName +".jpg", dataBuffer, function(err) {
+        if(err){
+            res.send(err);
+        }else{
+            var path = "\\public\\uploadFile\\upload_" + fileName +".jpg";
+            entries.code = 0;
+            entries.data = path;
+            res.end(JSON.stringify(entries));
+        }
+    });
 });
 
 module.exports = router;

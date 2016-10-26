@@ -14,6 +14,11 @@ function init() {
         assign:'msg',
         path:'/images/face/'	//表情存放的路径
     });
+    //屏幕截图
+    $('#msg').screenshotPaste({
+        imgContainer: '#imgPreview',
+        uploadBtn: '#UploadBtn-screen'
+    });
 
     if($(window).width() <= 450) {
         $('.chat-room').css("height", $(window).height());
@@ -32,11 +37,14 @@ function init() {
         });
     }
 
+
     $('body').on('click', '.history-msg' , toggleHistoryView);
     $('body').on('click', '.history-back' , toggleChatView);
     $("body").on('click', '#sendBtn', doSend);
     $("body").on('click', '#UploadBtn', doUpload);
-
+    $("body").on('click', '#UploadBtn-screen', doUploadScreen);
+    $("body").on('change', '#uploadFile', preUpload);
+    
     $('[data-toggle="select"]').on('mouseover', function (e) {
         e.preventDefault();
         var $this = $(this);
@@ -87,6 +95,10 @@ function init() {
         var html = '<li class="chat-box-l"><img class="chat-user-img" src="/images/mb2.jpg"><p class="chat-p">' + msg +'</p></li>';
         $("#m"+fid).append(html);
     });
+}
+
+function preUpload() {
+    $("#UploadBtn").removeClass('disabled');
 }
 
 function createChat() {
@@ -289,4 +301,55 @@ function doUpload() {
             }
         }
     });
+}
+
+// randomWord 产生任意长度随机字母数字组合
+// randomFlag 是否任意长度
+// min 任意长度最小位[固定位数]
+// max 任意长度最大位
+function randomWord(randomFlag, min, max){
+    var str = "",
+        range = min,
+        arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+    // 随机产生
+    if(randomFlag){
+        range = Math.round(Math.random() * (max-min)) + min;
+    }
+    for(var i=0; i<range; i++){
+        pos = Math.round(Math.random() * (arr.length-1));
+        str += arr[pos];
+    }
+    return str;
+}
+//发送截图
+function doUploadScreen() {
+    var imgData = $('#imgPreview').screenshotPaste('getImgData');
+    var fileName = randomWord(false, 32);   //随机字符串组成的图片名
+
+    $.ajax({
+        type: "POST",
+        url: "/p/upload",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({
+            'img': imgData,
+            'fileName': fileName
+        }),
+        success: function(result) {
+            $('#imgPreview').hide();
+            $('#UploadBtn-screen').addClass('disabled');
+            if (result.code == 0) {
+                var html = $.format(TO_MSG_IMG, result.data);
+                $("#m"+fid).append(html);
+                var msg = {
+                    from: uid,
+                    to: fid,
+                    content: result.data
+                };
+                socket.emit('chat message', msg);
+                toBottom();
+            }
+        }
+    })
 }
