@@ -17,7 +17,8 @@ function init() {
     //屏幕截图
     $('#msg').screenshotPaste({
         imgContainer: '#imgPreview',
-        uploadBtn: '#UploadBtn-screen'
+        uploadBtn: '#UploadBtn-screen',
+        cancelBtn: '#cancelSend'
     });
 
     if($(window).width() <= 450) {
@@ -43,6 +44,7 @@ function init() {
     $("body").on('click', '#sendBtn', doSend);
     $("body").on('click', '#UploadBtn', doUpload);
     $("body").on('click', '#UploadBtn-screen', doUploadScreen);
+    $("body").on('click', '#cancelSend', doCancelSend);
     $("body").on('change', '#uploadFile', preUpload);
     
     $('[data-toggle="select"]').on('mouseover', function (e) {
@@ -326,7 +328,7 @@ function randomWord(randomFlag, min, max){
 function doUploadScreen() {
     var imgData = $('#imgPreview').screenshotPaste('getImgData');
     var fileName = randomWord(false, 32);   //随机字符串组成的图片名
-
+    
     $.ajax({
         type: "POST",
         url: "/p/upload",
@@ -339,6 +341,7 @@ function doUploadScreen() {
         success: function(result) {
             $('#imgPreview').hide();
             $('#UploadBtn-screen').addClass('disabled');
+            $('#cancelSend').addClass('disabled');
             if (result.code == 0) {
                 var html = $.format(TO_MSG_IMG, result.data);
                 $("#m"+fid).append(html);
@@ -352,4 +355,9 @@ function doUploadScreen() {
             }
         }
     })
+}
+function doCancelSend() {
+    $('#imgPreview').html('').hide();
+    $('#UploadBtn-screen').addClass('disabled');
+    $('#cancelSend').addClass('disabled');
 }

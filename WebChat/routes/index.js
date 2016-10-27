@@ -109,6 +109,7 @@ router.post('/upload', function(req, res, next){
     var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
     var dataBuffer = new Buffer(base64Data, 'base64');
     var fileName = req.body.fileName;
+    console.log(dataBuffer);
 
     fs.writeFile("./public/uploadFile/upload_" + fileName +".jpg", dataBuffer, function(err) {
         if(err){

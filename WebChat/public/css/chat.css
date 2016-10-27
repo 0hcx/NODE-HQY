@@ -435,12 +435,13 @@ body {
 .screen-shot {
     position: absolute;
     top: 30%;
-    left: 50%;
-    width: 200px;
-    height: 200px;
+    left: 45%;
     display: none;
+    align-items: center;
+    border: 1px solid #2E3238;
 }
 .screen-shot img {
-    max-width: 200px;
+    max-width: 400px;
     height: auto!important;
+    max-height: 400px;
 }

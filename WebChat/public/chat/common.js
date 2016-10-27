@@ -25,6 +25,7 @@ var TO_MSG_IMG = "<li class='chat-box-r'><p class='chat-p'><img class='img-msg' 
         var defaults = {
             imgContainer: '',   //预览图片的容器,
             uploadBtn: '',      //上传按钮，
+            cancelBtn: '',      //取消按钮,
             imgHeight: 200       //预览图片的默认高度
         };
 
@@ -46,6 +47,7 @@ var TO_MSG_IMG = "<li class='chat-box-r'><p class='chat-p'><img class='img-msg' 
                     .show()
                     .append(img);
                 $(document).find(options.uploadBtn).removeClass('disabled');
+                $(document).find(options.cancelBtn).removeClass('disabled');
             };
         };
         //事件注册
