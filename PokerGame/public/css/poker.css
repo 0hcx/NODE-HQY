@@ -1,0 +1,113 @@
+body {
+    background-color: #3C4252!important;
+}
+.login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login button {
+    width: 200px;
+    height: 40px;
+    font-family: "Microsoft JhengHei";
+    font-size: 30px;
+    font-weight: 900;
+    color: #9d9d9d;
+}
+.hide {
+    display: none;
+}
+.hide-block {
+    visibility: hidden!important;
+}
+.waiting,
+.wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 89vh;
+    background-color: #3C4252;
+}
+.waiting h3 {
+    font-family: "Microsoft JhengHei";
+    font-size: 40px;
+    font-weight: 900;
+    color: #9d9d9d;
+}
+.box-upper {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    width: 1260px;
+    height: 200px;
+    padding-top: 30px;
+    background-color: #3C4252;
+}
+.box-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 1260px;
+    height: 100px;
+    flex-grow: 1;
+    background-color: #3C4252;
+}
+.box-below {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    width: 1260px;
+    height: 200px;
+    background-color: #3C4252;
+}
+.poker {
+    flex-shrink: 0;
+    margin-left: -45px;
+    width: 90px;
+    height: 120px;
+    background: url("../img/poker.png") no-repeat;
+    background-position: -1080px -480px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+    transition: all .1s linear;
+    cursor: pointer;
+}
+.poker:first-child {
+    margin-left: 0;
+}
+.click-up {
+    margin-top: -20px;
+}
+.discard,
+.abandon {
+    width: 140px;
+    height: 40px;
+    border-radius: 5px;
+}
+.preview-above,
+.preview-below {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: flex-end;
+    width: 1260px;
+    height: 150px;
+    background-color: #3C4252;
+}
+.message {
+    width: 1260px;
+    height: 10px;
+    flex-grow: 1;
+}
+.button-turn {
+    display: flex;
+    justify-content: center;
+    width: 1260px;
+    height: 80px;
+    padding-top: 10px;
+    background-color: #3C4252;
+}
+.button-turn button:first-child {
+    margin-right: 20px;
+}

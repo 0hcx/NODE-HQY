@@ -1,0 +1,224 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('pokergame:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+//从一个给定的数组arr中,随机返回num个不重复项
+function getArrItems(arr, num) {
+  var temp = new Array();
+  var result = new Array();
+
+  for (var index in arr) {
+    temp.push(arr[index]);
+  }
+  for (var i = 0; i < num; i++) {
+    if (temp.length > 0) {
+      var arrIndex = Math.floor(Math.random() * temp.length);
+      result[i] = temp[arrIndex];
+      temp.splice(arrIndex, 1);
+    } else {
+      break;
+    }
+  }
+  return result;
+}
+//数组相减
+function getArrSubtract(arr, sub) {
+  var temp1 = new Array();
+  var temp2 = new Array();
+  for (var index in arr) {
+    temp1.push(arr[index]);
+  }
+  for (var index in sub) {
+    temp2.push(sub[index]);
+  }
+  for (var i = temp1.length - 1; i >= 0; i--) {
+    a = temp1[i];
+    for (var j = temp2.length - 1; j >= 0; j--) {
+      b = temp2[j];
+      if (a == b) {
+        temp1.splice(i, 1);
+        temp2.splice(j, 1);
+        break;
+      }
+    }
+  }
+  return temp1;
+}
+
+function getPoker() {
+  var list = new Array();
+  var result = {};
+  for(var i = 0; i < 54; i++) {
+    list[i] = i + 1;
+  }
+  var poker1 = getArrItems(list, 27);
+  var poker2 = getArrSubtract(list, poker1);
+
+  result = {
+    poker1: poker1,
+    poker2: poker2
+  };
+  
+  return result;
+}
+
+//poker
+var io = require('socket.io').listen(server);
+var count = 0;
+var user = {};
+var first;
+var second;
+io.on('connection', function(socket){
+
+  //用户登录
+  socket.on('add user', function (id) {
+
+    console.log("user login");
+    count++;
+    user[id] = socket;
+    socket.name = id;
+    
+    if(count == 1) {
+      first = id;
+      user[first].emit("waiting");
+
+    } else if(count == 2) {
+      second = id;
+      var result = getPoker();
+      var data1 = {
+        to: second,
+        pokerList: result.poker1,
+        before: false
+      };
+      var data2 = {
+        to: first,
+        pokerList: result.poker2,
+        before: false
+      };
+      //判断谁拥有黑桃3
+      if(result.poker1.indexOf(29) != -1) {
+        data1.before = true;
+      } else {
+        data2.before = true;
+      }
+      user[first].emit("start poker", data1);
+      user[second].emit("start poker", data2);
+    } else if(count > 2) {
+      user[id].emit("crowded");
+      count  = 2;
+      delete user[id];
+    }
+  });
+  //用户退出
+  socket.on('disconnect', function () {
+    //其中一方退出则全部回到起始页面
+   if(count == 1) {
+     delete user[socket.name];
+   } else if(count == 2){
+     var person = (socket.name == first) ? second : first;
+     user[person].emit("exit");
+     delete user[first];
+     delete user[second];
+   }
+    count = 0;
+  });
+  //用户出牌
+  socket.on('discard', function (data) {
+    var result = {
+      discard: data.discard,
+      num: data.num
+    };
+    user[data.to].emit("receive discard" , result);
+  });
+  socket.on("abandon", function (data) {
+    user[data].emit("receive abandon");
+  });
+});
+
