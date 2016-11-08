@@ -1,39 +1,83 @@
 var socket = io();  //传递给服务器用户Id
-var to; //对方id
 var wrapper = ".wrapper";
 var htmlLogin = "<div class='login'><button type='button' id='login'>登录</button> </div>";
 var htmlWait = "<div class='waiting'> <h3>请等待另一位玩家加入。。。</h3> </div>";
 var htmlPoker = "<div class='wrap'> <div class='box-upper'></div> <div class='box-center'> <div class='preview-above' id='preview-above'></div> <div class='preview-below' id='preview-below'></div> </div> <div class='button-turn hide-block'> <button class='discard' id='discard'>出牌</button> <button class='abandon' id='abandon'>放弃</button> </div> <div class='box-below' id='box-below'></div></div>";
-var before = false;
+var htmlWin = "<div class='mask'><div class='content'>WIN</div> <button type='button' id='reload'>确定</button></div>";
+var htmlDefeat = "<div class='mask'><div class='content'>Defeat</div> <button type='button' id='reload'>确定</button></div>";
+
+var INIT = "INIT";
+var WAIT = "WAIT";
+var DISCARD = "DISCARD";
+var GAMEOVER = "GAMEOVER";
+var RESTART = "RESTART";
 
 $(init);
 
 function init() {
-
     //绑定点击事件
-    $("body").on("click", function(e){
-        clickEvent($(e.target).attr("id"), $(e.target));
-    });
+    $("body").on("click", clickEvent);
     //初始化socket
-    socketInit();
-
+    pkObj.init();
 }
+//点击事件
+function clickEvent(e) {
+    var target = e.target;
+    var that = $(target);
+
+    switch (pkObj.data.status) {
+        case INIT:  //未登录状态
+            doInit();
+            break;
+        case DISCARD:   //出牌状态
+            doDiscard(that);
+            break;
+        case GAMEOVER:  //游戏结束状态
+            doRestart();
+            break;
+        default:
+            break;
+    }
+}
+//pkObj
+var pkObj = {
+    data: {
+        type: 0,    //出牌类型
+        discardList: 0, //出牌数组
+        remain: 27,    //我方牌的剩余量
+        from: 0,    //我方id
+        to: 0,  //对方id
+        before: false,  //先出牌或对方放弃
+        status: INIT    //状态：INIT初始化， DISCARD出牌，GAMEOVER游戏结束
+    },
+    init: function () {
+        //初始化socket
+        socketInit();
+        //加载登录界面
+        $(wrapper).append(htmlLogin);
+    }
+
+};
+//初始化socket
 function socketInit() {
-    //监听服务器消息
     //等待状态
     socket.on("waiting", function () {
         $(wrapper).html("");
         $(wrapper).append(htmlWait);
+        pkObj.data.status = WAIT;
     });
     //进入打牌界面
     socket.on("start poker", function (data) {
-        to = data.to;
+        pkObj.data.to = data.to;
         $(wrapper).html("");
         $(wrapper).append(htmlPoker);
         if(data.before == true) {
-            before = true;
+            pkObj.data.before = true;
             $(".button-turn").removeClass("hide-block");
             $("#abandon").attr('disabled',"true");
+            pkObj.data.status = DISCARD;
+        } else {
+            pkObj.data.status = WAIT;
         }
         poker(data.pokerList, 27);
     });
@@ -45,6 +89,7 @@ function socketInit() {
     socket.on("exit", function () {
         $(wrapper).html("");
         $(wrapper).append(htmlLogin);
+        pkObj.data.status = RESTART;
     });
     //接受对方的牌
     socket.on("receive discard", function (data) {
@@ -59,15 +104,29 @@ function socketInit() {
         // $(".opposite:eq(" + i + ")").remove();
         $(".box-upper").html("");
         oppositePoker(length - num);
-
+        pkObj.data.status = DISCARD;
     });
     //对方放弃出牌
     socket.on("receive abandon", function () {
-        before = true;
+        pkObj.data.before = true;
         $("#abandon").attr('disabled',"true");
         $("#preview-above").html("");
         $(".button-turn").removeClass("hide-block");
+        pkObj.data.status = DISCARD;
     });
+    //比赛结果
+    socket.on("receive result", function (data) {
+        pkObj.data.status = GAMEOVER;
+        if(data == pkObj.data.from) {
+            $(wrapper).append(htmlWin);
+        } else {
+            $(wrapper).append(htmlDefeat);
+        }
+    });
+}
+//游戏结束
+function doRestart() {
+    location.reload();
 }
 //初始化扑克牌
 function poker(list, n) {
@@ -131,20 +190,20 @@ function getPos(index) {
     var html = "<div class='poker p" + index +"' id='p" + index + "' style='background-position: " + left + "px " + top + "px;'></div>";
     $(".box-below").append(html);
 }
-//点击事件
-function clickEvent(element, n) {
+//登录状态
+function doInit() {
+    //获得唯一的id
+    window.id = new Date().getTime()+""+Math.floor(Math.random()*899+100);
+    pkObj.data.from = id;
+    socket.emit("add user", id);
+}
+//出牌状态
+function doDiscard(that) {
+    var element = that.attr("id");
     var temp = element.replace(/[p]([0-9]+)/g, "p");
-
-    switch(temp) {
-        //登录
-        case "login":
-            //获得唯一的id
-            window.id = new Date().getTime()+""+Math.floor(Math.random()*899+100);
-            socket.emit("add user", id);
-            break;
-        //选牌
+    switch (temp) {
+        //p表示点击了选择的牌
         case "p":
-            var that = n;
             if(that.parent().attr("id") == "box-below") {
                 if(that.hasClass("click-up")) {
                     that.removeClass("click-up");
@@ -153,7 +212,7 @@ function clickEvent(element, n) {
                 }
             }
             break;
-        //出牌
+        //点击出牌按钮
         case "discard":
             if($(".box-below").find(".click-up").length == 0) {
                 alert("请选择要出的牌，若没有请点击放弃");
@@ -179,7 +238,7 @@ function clickEvent(element, n) {
                     k++;
                 });
                 //先对选中的牌进行比较
-                if(compare(aboveList, belowList) || (before && checkPokerType(belowList) != 0)) {
+                if(compare(aboveList, belowList) || (pkObj.data.before && checkPokerType(belowList) != 0)) {
                     $("#preview-above").html("");
                     $("#preview-below").html("");
                     $(".click-up").each(function () {
@@ -189,33 +248,37 @@ function clickEvent(element, n) {
                         $(this).remove();
                         i++;
                     });
+                    pkObj.data.remain-=list.length;
                     var data = {
                         discard: list,
-                        to: to,
-                        num: list.length
+                        from: pkObj.data.from,
+                        to: pkObj.data.to,
+                        num: list.length,
+                        remain: pkObj.data.remain
                     };
-                    before = false;
+                    pkObj.data.before = false;
                     $("#abandon").removeAttr("disabled");
                     socket.emit("discard", data);
                     $(".button-turn").addClass("hide-block");
+                    pkObj.data.status = WAIT;
                 } else {
                     alert("出牌不符合规则！");
                 }
             }
             break;
-        //放弃
+        //点击放弃按钮
         case "abandon":
             $(".click-up").each(function () {
                 $(this).removeClass("click-up");
             });
-            socket.emit("abandon", to);
+            socket.emit("abandon", pkObj.data.to);
             $(".button-turn").addClass("hide-block");
+            pkObj.data.status = WAIT;
             break;
         default:
             break;
     }
 }
-
 //检查和确定出牌的类型
 function checkPokerType(pokerList) {
     var length = (pokerList.length > 4) ? 5 : pokerList.length; //长度大于4则为顺子
@@ -230,8 +293,8 @@ function checkPokerType(pokerList) {
         case 2:
             if(pokerList[0] == pokerList[1]) {
                 type = 2;
-            } else if(pokerList[0] == 54 && pokerList[1] == 53) {   //大小王天王炸无敌
-                type = 999;
+            } else if(pokerList[0] == 17 && pokerList[1] == 16) {   //大小王天王炸无敌
+                type = 9999;
             } else {
                 type = 0;
             }
@@ -318,7 +381,6 @@ function checkPokerType(pokerList) {
     //返回牌的类型
     return type;
 }
-
 //将选择出的牌和对方出的牌进行比较
 function compare(list1, list2) {
     var check = false;
@@ -328,7 +390,7 @@ function compare(list1, list2) {
     //1.类型相同的情况下再比较数组第一个元素大小;
     //2.4表示炸，对方不是炸，我出炸则check为true
     //3.天王炸
-    if((type1 == type2 && list2[0] > list1[0]) || (type1 != 4 && type2 == 4) || (type2 == 999)) {
+    if((type1 == type2 && list2[0] > list1[0]) || (type1 != 4 && type2 == 4) || (type2 == 9999)) {
         check = true;
     }
 
@@ -343,8 +405,7 @@ function getPokerFace(n) {
         result = 17;
     } else if(n == 54) {
         result = 16;
-    }
-    if(temp >= 3 && temp <= 12) {
+    } else if (temp >= 3 && temp <= 12) {
         result = temp;
     } else if(temp == 0) {
         result = 13;

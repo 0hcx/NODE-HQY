@@ -151,7 +151,7 @@ function getPoker() {
 
 //poker
 var io = require('socket.io').listen(server);
-var count = 0;
+var userCount = 0;
 var user = {};
 var first;
 var second;
@@ -162,15 +162,15 @@ io.on('connection', function(socket){
   socket.on('add user', function (id) {
 
     console.log("user login");
-    count++;
+    userCount++;
     user[id] = socket;
     socket.name = id;
     
-    if(count == 1) {
+    if(userCount == 1) {
       first = id;
       user[first].emit("waiting");
 
-    } else if(count == 2) {
+    } else if(userCount == 2) {
       second = id;
       var result = getPoker();
       var data1 = {
@@ -191,9 +191,9 @@ io.on('connection', function(socket){
       }
       user[first].emit("start poker", data1);
       user[second].emit("start poker", data2);
-    } else if(count > 2) {
+    } else if(userCount > 2) {
       user[id].emit("crowded");
-      count = 2;
+      userCount = 2;
       socket.name = 0; //将超过2人的socket.name设置为0
       delete user[id];
     }
@@ -201,15 +201,15 @@ io.on('connection', function(socket){
   //用户退出
   socket.on('disconnect', function () {
     //其中一方退出则全部回到起始页面
-   if(count == 1) {
+   if(userCount == 1) {
      delete user[socket.name];
-     count = 0;
-   } else if(count == 2 && socket.name > 0){  //增加判断socket.name是否是第三者
+     userCount = 0;
+   } else if(userCount == 2 && socket.name > 0){  //增加判断socket.name是否是第三者
      var person = (socket.name == first) ? second : first;
      user[person].emit("exit");
      delete user[first];
      delete user[second];
-     count = 0;
+     userCount = 0;
    }
   });
   //用户出牌
@@ -218,7 +218,12 @@ io.on('connection', function(socket){
       discard: data.discard,
       num: data.num
     };
-    user[data.to].emit("receive discard" , result);
+    if(data.remain == 0) {
+      user[data.to].emit("receive result", data.from);
+      user[data.from].emit("receive result", data.from);
+    } else {
+      user[data.to].emit("receive discard" , result);
+    }
   });
   socket.on("abandon", function (data) {
     user[data].emit("receive abandon");
