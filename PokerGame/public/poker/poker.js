@@ -4,6 +4,7 @@ var wrapper = ".wrapper";
 var htmlLogin = "<div class='login'><button type='button' id='login'>登录</button> </div>";
 var htmlWait = "<div class='waiting'> <h3>请等待另一位玩家加入。。。</h3> </div>";
 var htmlPoker = "<div class='wrap'> <div class='box-upper'></div> <div class='box-center'> <div class='preview-above' id='preview-above'></div> <div class='preview-below' id='preview-below'></div> </div> <div class='button-turn hide-block'> <button class='discard' id='discard'>出牌</button> <button class='abandon' id='abandon'>放弃</button> </div> <div class='box-below' id='box-below'></div></div>";
+var before = false;
 
 $(init);
 
@@ -30,7 +31,9 @@ function socketInit() {
         $(wrapper).html("");
         $(wrapper).append(htmlPoker);
         if(data.before == true) {
+            before = true;
             $(".button-turn").removeClass("hide-block");
+            $("#abandon").attr('disabled',"true");
         }
         poker(data.pokerList, 27);
     });
@@ -60,6 +63,8 @@ function socketInit() {
     });
     //对方放弃出牌
     socket.on("receive abandon", function () {
+        before = true;
+        $("#abandon").attr('disabled',"true");
         $("#preview-above").html("");
         $(".button-turn").removeClass("hide-block");
     });
@@ -153,24 +158,49 @@ function clickEvent(element, n) {
             if($(".box-below").find(".click-up").length == 0) {
                 alert("请选择要出的牌，若没有请点击放弃");
             } else {
-                var list = new Array();
+                var list = new Array();         //list中保存选中牌的整个div代码
+                var aboveList =  new Array();   //aboveList 对方的牌
+                var belowList = new Array();    //belowList 我选中的牌
                 var i = 0;
-                $("#preview-above").html("");
-                $("#preview-below").html("");
-                $(".click-up").each(function () {
-                    list[i] = $(this).prop("outerHTML");
-                    $(this).removeClass("click-up");
-                    $("#preview-below").append(list[i]);
-                    $(this).remove();
-                    i++;
+                var j = 0;
+                var k = 0;
+                // $("#preview-above").html("");
+                // $("#preview-below").html("");
+                $("#preview-above").find(".poker").each(function () {
+                    var pokerId = $(this).attr("id");
+                    pokerId = pokerId.replace(/[p]([0-9]+)/g, "$1"); //获取选中的牌的id(删掉首字母p)
+                    aboveList[j] = getPokerFace(pokerId);
+                    j++;
                 });
-                var data = {
-                    discard: list,
-                    to: to,
-                    num: list.length
-                };
-                socket.emit("discard", data);
-                $(".button-turn").addClass("hide-block");
+                $("#box-below").find(".click-up").each(function () {
+                    var pokerId = $(this).attr("id");
+                    pokerId = pokerId.replace(/[p]([0-9]+)/g, "$1"); //获取选中的牌的id(删掉首字母p)
+                    belowList[k] = getPokerFace(pokerId);
+                    k++;
+                });
+                //先对选中的牌进行比较
+                if(compare(aboveList, belowList) || (before && checkPokerType(belowList) != 0)) {
+                    $("#preview-above").html("");
+                    $("#preview-below").html("");
+                    $(".click-up").each(function () {
+                        list[i] = $(this).prop("outerHTML");    //获取选中的牌的整个div代码
+                        $(this).removeClass("click-up");
+                        $("#preview-below").append(list[i]);
+                        $(this).remove();
+                        i++;
+                    });
+                    var data = {
+                        discard: list,
+                        to: to,
+                        num: list.length
+                    };
+                    before = false;
+                    $("#abandon").removeAttr("disabled");
+                    socket.emit("discard", data);
+                    $(".button-turn").addClass("hide-block");
+                } else {
+                    alert("出牌不符合规则！");
+                }
             }
             break;
         //放弃
@@ -184,4 +214,144 @@ function clickEvent(element, n) {
         default:
             break;
     }
+}
+
+//检查和确定出牌的类型
+function checkPokerType(pokerList) {
+    var length = (pokerList.length > 4) ? 5 : pokerList.length; //长度大于4则为顺子
+    var type = 0;
+
+    switch (length) {
+        //一张单
+        case 1:
+            type = 1;
+            break;
+        //对
+        case 2:
+            if(pokerList[0] == pokerList[1]) {
+                type = 2;
+            } else if(pokerList[0] == 54 && pokerList[1] == 53) {   //大小王天王炸无敌
+                type = 999;
+            } else {
+                type = 0;
+            }
+            break;
+        //三张
+        case 3:
+            if(pokerList[0] == pokerList[1] && pokerList[1] == pokerList[2]) {
+                type = 3;
+            } else {
+                type = 0;
+            }
+            break;
+        //四张炸弹或者2张姐妹对连接2次
+        case 4:
+            if(pokerList[0] == pokerList[1] && pokerList[1] == pokerList[2] && pokerList[2] == pokerList[3]) {
+                type = 4;
+            } else if((pokerList[0] == pokerList[1]) && (pokerList[0] == pokerList[2] + 1) && pokerList[2] == pokerList[3]) {
+                type = 44;
+            } else {
+                type = 0;
+            }
+            break;
+        //五张及以上表示顺子或连对(2或3)
+        case 5:
+            if(pokerList.length % 2 == 0) {     //数组长度大于4且为偶数，表示连续的2张或3张
+                var twoSeries = true;
+                var threeSeries = true;
+                //连续两张的情况
+                for(var j = 0; j < pokerList.length; j+=2) {
+                    //连续2张必须是a[i]==a[i+1]
+                    if(pokerList[j] != pokerList[j+1]) {
+                        twoSeries = false;
+                        break;
+                    }
+                    //连续2张必须是a[i]==a[i+2]+1
+                    if((j < pokerList.length - 2) && (pokerList[j] != pokerList[j+2] + 1)) {
+                        twoSeries = false;
+                        break;
+                    }
+                }
+                //连续三张的情况
+                if(!twoSeries) {
+                    for(var k = 0; k < pokerList.length; k+=3) {
+                        //连续3张必须是a[i]==a[i+1]==a[i+2]
+                        if(pokerList[k] != pokerList[k+1] || pokerList[k+1] != pokerList[k+2]) {
+                            threeSeries = false;
+                            break;
+                        }
+                        //连续3张必须是a[i]==a[i+3]+1
+                        if((k < pokerList.length - 3) && (pokerList[k] != pokerList[k+3] + 1)) {
+                            threeSeries = false;
+                            break;
+                        }
+                    }
+                }
+                if(twoSeries) {
+                    type = 99;
+                } else if(threeSeries) {
+                    type = 999;
+                } else {
+                    type = 0;
+                }
+
+            } else {    //数组长度不是偶数则表示牌列顺子
+                var series = true;
+                for(var i = 1; i < pokerList.length; i++) {
+                    if(pokerList[i] != pokerList[i - 1] - 1) {
+                        series = false;
+                        break;
+                    }
+                }
+                if(series) {
+                    type = pokerList.length;
+                } else {
+                    type = 0;
+                }
+            }
+            break;
+
+        default:
+            type = 0;
+            break;
+    }
+    //返回牌的类型
+    return type;
+}
+
+//将选择出的牌和对方出的牌进行比较
+function compare(list1, list2) {
+    var check = false;
+    var type1 = checkPokerType(list1); //对方的牌类型
+    var type2 = checkPokerType(list2);  //我的牌类型
+
+    //1.类型相同的情况下再比较数组第一个元素大小;
+    //2.4表示炸，对方不是炸，我出炸则check为true
+    //3.天王炸
+    if((type1 == type2 && list2[0] > list1[0]) || (type1 != 4 && type2 == 4) || (type2 == 999)) {
+        check = true;
+    }
+
+    //check为true可出牌，否则不能出牌
+    return check;
+}
+//返回每张牌的面值
+function getPokerFace(n) {
+    var temp = n % 13;
+    var result;
+    if(n == 53) {
+        result = 17;
+    } else if(n == 54) {
+        result = 16;
+    }
+    if(temp >= 3 && temp <= 12) {
+        result = temp;
+    } else if(temp == 0) {
+        result = 13;
+    } else if(temp == 1) {
+        result = 14;
+    } else if(temp == 2) {
+        result = 15;
+    }
+    return result;
 }

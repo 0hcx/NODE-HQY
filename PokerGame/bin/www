@@ -155,6 +155,7 @@ var count = 0;
 var user = {};
 var first;
 var second;
+var third = false;  //超出两人则为 true
 io.on('connection', function(socket){
 
   //用户登录
@@ -192,7 +193,8 @@ io.on('connection', function(socket){
       user[second].emit("start poker", data2);
     } else if(count > 2) {
       user[id].emit("crowded");
-      count  = 2;
+      count = 2;
+      socket.name = 0; //将超过2人的socket.name设置为0
       delete user[id];
     }
   });
@@ -201,13 +203,14 @@ io.on('connection', function(socket){
     //其中一方退出则全部回到起始页面
    if(count == 1) {
      delete user[socket.name];
-   } else if(count == 2){
+     count = 0;
+   } else if(count == 2 && socket.name > 0){  //增加判断socket.name是否是第三者
      var person = (socket.name == first) ? second : first;
      user[person].emit("exit");
      delete user[first];
      delete user[second];
+     count = 0;
    }
-    count = 0;
   });
   //用户出牌
   socket.on('discard', function (data) {
