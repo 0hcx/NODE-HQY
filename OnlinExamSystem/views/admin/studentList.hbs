@@ -1,0 +1,28 @@
+<div class="right-wrapper">
+    <section class="content-header">
+        <h1>学生管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 学生管理</a></li>
+            <li class="active">学生列表</li>
+        </ol>
+    </section>
+    <section class="content">
+        <div class="studentList">
+            <table class="table table-hover">
+                <tbody>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                </tr>
+                {{#each entries}}
+                    <tr>
+                        <td>{{userId}}</td>
+                        <td>{{username}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+

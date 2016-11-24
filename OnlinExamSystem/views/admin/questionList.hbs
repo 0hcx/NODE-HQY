@@ -1,0 +1,29 @@
+<div class="right-wrapper">
+    <section class="content-header">
+        <h1>题目管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 题目管理</a></li>
+            <li class="active">题目列表</li>
+        </ol>
+    </section>
+    <section class="content">
+        <div class="questionList">
+            <div class="item-number">
+                {{#each entries}}
+                    <div class="question-item" data-toggle="select" data-id="{{_id}}">{{addOne @index}}</div>
+                {{/each}}
+            </div>
+            <div class="item-ctn hide" id="item-ctn">
+                <div class="question-head" id="question-head"></div>
+                <label>分值</label>
+                <input type="number" class="form-control" id="que-score" required>
+                <label>题目内容</label>
+                <textarea class="textarea" id="questionContent" placeholder="题目内容"></textarea>
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary pull-right hide" id="updateQueBtn">确定修改</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="/onlineExamSystem/addQuestion.js"></script>

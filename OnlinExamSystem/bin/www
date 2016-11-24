@@ -1,0 +1,134 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('onlinexamsystem:server');
+var http = require('http');
+var dbHelper = require('../db/dbHelper');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+var io = require('socket.io').listen(server);
+var user = {};
+var teacherId = 0;
+io.on('connection', function(socket){
+  //用户登录
+  socket.on('login', function (data) {
+    socket.name = data.userId;
+    user[data.userId] = socket;
+    var data2 = {
+      userId: socket.name,
+      status: "LOGIN"
+    };
+    dbHelper.updateStatus(data2, function (success, doc) {});
+    //用户类型-老师
+    if(data.userCategory === "TEACHER") {
+      teacherId = data.userId;
+    }
+    //向老师的客户端发送重新加载命令
+    if(teacherId !== 0) {
+      user[teacherId].emit("reload");
+    }
+  });
+  socket.on('update status', function () {
+    if(teacherId !== 0) {
+      user[teacherId].emit("reload");
+    }
+  });
+  //用户退出
+  socket.on('disconnect', function () {
+    var data = {
+      userId: socket.name,
+      status: "INIT"
+    };
+    dbHelper.updateStatus(data, function (success, doc) {});
+    if(socket.name === teacherId) {
+      teacherId = 0;
+    } else if(teacherId !== 0){
+      user[teacherId].emit("reload");
+    }
+    delete user[socket.name];
+  });
+});

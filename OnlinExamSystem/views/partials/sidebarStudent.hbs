@@ -1,0 +1,23 @@
+<aside class="main-sidebar">
+    <div class="main-function">
+        <section class="content">
+            <div class="user-info">
+                <label>欢迎登录:  {{user.username}}</label>
+                <input id="userId" value="{{user._id}}" hidden>
+                <input id="userStatus" value="{{user.status}}" hidden>
+            </div>
+            <div class="questionList">
+                <label>题号</label>
+                <div class="item-number">
+                    {{#each entries}}
+                        <div class="question-item" data-toggle="select" data-id="{{_id}}">{{addOne @index}}</div>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="time-area">
+                <div id="time-title"></div>
+                <div id="time-ctn"></div>
+            </div>
+        </section>
+    </div>
+</aside>

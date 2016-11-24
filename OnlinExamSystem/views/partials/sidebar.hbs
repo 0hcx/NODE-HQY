@@ -1,0 +1,57 @@
+<aside class="main-sidebar">
+    <div class="sidebar-head">
+        <label>欢迎登录:  {{user.username}}</label>
+        <input id="userId" value="{{user._id}}" hidden>
+        <input id="userCategory" value="{{user.category}}" hidden>
+    </div>
+    <div class="main-function">
+        <div class="panel-group" id="admin-box">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#admin-box" href="#admin-news">学生管理</a>
+                    </h4>
+                </div>
+                <div id="admin-news" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <ul>
+                            <li><a href="/p/studentList">学生列表</a></li>
+                            <li><a href="/p/addStudent">添加学生</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#admin-box" href="#admin-questions">题目编辑</a>
+                    </h4>
+                </div>
+                <div id="admin-questions" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <ul>
+                            <li><a href="/p/questionList">题目列表</a></li>
+                            <li><a href="/p/addQuestion">添加题目</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#admin-box" href="#admin-user">考试情况</a>
+                    </h4>
+                </div>
+                <div id="admin-user" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <ul>
+                            <li><a href="/p/studentStatus">学生考试状态</a></li>
+                            <li><a href="#">批改学生考卷</a></li>
+                            <li><a href="#">学生考试成绩</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
