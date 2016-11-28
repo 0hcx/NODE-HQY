@@ -33,11 +33,16 @@ router.get('/indexStudent', function(req, res, next) {
 router.get('/studentList', function(req, res, next) {
   dbHelper.getAllStudents(req, function (success, data) {
       res.render('admin/studentList', {
-          user: req.session.user,
-          entries: data.results,
-          userCount: data.count
+          user: req.session.user
       });
     });
+});
+//删除学生
+router.get('/studentDelete/:id', function(req, res, next) {
+    var id = req.params.id;
+    dbHelper.deleteStudent(id, function (success, data) {
+        res.redirect("/p/studentList");
+    })
 });
 //获取题目列表
 router.get('/questionList', function(req, res, next) {
@@ -55,6 +60,12 @@ router.get('/studentStatus', function(req, res, next) {
         user: req.session.user
     });
 });
+//设置考试时间
+router.get('/setExamTime', function(req, res, next) {
+    res.render('admin/setExamTime', {
+        user: req.session.user
+    });
+});
 //阅卷
 router.get('/markPaper/:id', function(req, res, next) {
     var id = req.params.id;
@@ -65,7 +76,6 @@ router.get('/markPaper/:id', function(req, res, next) {
         });
     });
 });
-
 
 
 
@@ -86,6 +96,12 @@ router.post('/updateStatus', function (req, res, next) {
     dbHelper.updateStatus(req.body, function (success, doc) {
         res.send(doc);
     })
+});
+//获取考试时间
+router.post('/getExamTime', function (req, res, next) {
+   dbHelper.getExamTime(req.body, function (success, doc) {
+       res.send(doc);
+   })
 });
 
 module.exports = router;

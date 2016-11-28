@@ -2,6 +2,7 @@ $(init);
 
 function init() {
     $("body").on('click', '#registerBtn', doRegister);
+    // $("body").on('click', '#exportBtn', doExport);
 }
 
 function doRegister() {
@@ -36,7 +37,6 @@ function doRegister() {
         }
     })
 }
-
 function postData(url, data, cb) {
     var promise = $.ajax({
         type: "post",
@@ -47,6 +47,7 @@ function postData(url, data, cb) {
     });
     promise.done(cb);
 }
+//添加学生
 function doAddStudent() {
     var jsonData = JSON.stringify({
         'usrId': usrId,

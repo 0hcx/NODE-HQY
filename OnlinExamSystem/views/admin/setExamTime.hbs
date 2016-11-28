@@ -1,0 +1,38 @@
+<div class="right-wrapper">
+    <section class="content-header">
+        <h1>考试管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 考试管理</a></li>
+            <li class="active">设置考试时间</li>
+        </ol>
+    </section>
+    <section class="content mobile-width">
+        <div class="box">
+            <form id="defaultForm" action="">
+                <div class="box-body pad">
+                    <label id="subjectName"></label><br>
+                    <label>考试开始时间：</label>
+                    <div class="form-group setTimeArea">
+                        <input type="number" class="form-control" name="startTime" required>年
+                        <input type="number" class="form-control" name="startTime" required>月
+                        <input type="number" class="form-control" name="startTime" required>日
+                        <input type="number" class="form-control" name="startTime" required>时
+                        <input type="number" class="form-control" name="startTime" required>分
+                    </div>
+                    <label>考试结束时间：</label>
+                    <div class="form-group setTimeArea">
+                        <input type="number" class="form-control" name="endTime" required>年
+                        <input type="number" class="form-control" name="endTime" required>月
+                        <input type="number" class="form-control" name="endTime" required>日
+                        <input type="number" class="form-control" name="endTime" required>时
+                        <input type="number" class="form-control" name="endTime" required>分
+                    </div>
+                </div>
+                <div class="box-footer user-edit">
+                    <button type="submit" class="btn btn-primary pull-right" id="setTimeBtn">设置时间</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+<script src="/onlineExamSystem/setExamTime.js"></script>

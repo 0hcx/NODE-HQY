@@ -19,8 +19,8 @@ function saveMark() {
     postData(urlSaveScore, jsonData, cbSaveScore);
 }
 function cbSaveScore(result) {
-    if(result.code != 99) {
-        alert("批改成功");
+    if(result.code == 99) {
+        alert("批改失败");
     }
 }
 //显示题目内容和学生答题内容
@@ -32,9 +32,6 @@ function showContent(e) {
     $("#question-head").text("第" + $(this).text() + "题");
     getQuestionCtn();
     getAnswerOne();
-    if(questionId != 0) {
-        saveMark();
-    }
 }
 function postData(url, data, cb) {
     var promise = $.ajax({

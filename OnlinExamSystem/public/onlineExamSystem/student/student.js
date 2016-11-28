@@ -4,6 +4,11 @@ var question = {
     id: 0, //选中的题目Id
     ctn: ""
 };
+var examTime = {
+    subject: "",
+    startTime: [],
+    endTime: []
+};
 var userId = $("#userId").val();
 var userStatus = $("#userStatus").val();
 var userCategory = $("#userCategory").val();
@@ -21,14 +26,16 @@ function init() {
     $(window).on('beforeunload',function(){
         return '您输入的内容尚未保存，确定离开此页面吗？';
     });
+    getExamTime();
     timeBefore();
     socketInit();
     $("body").on('click', clickEvent);
     $("body").on('click', "[data-toggle='select']", showQuestion);
 }
-function getTimeDifference(y, n, M, h, m) {
+function getTimeDifference(timeList) {
+    var tL = timeList;
     var now = new Date();
-    var startTime =  new Date(y, n, M, h, m);
+    var startTime =  new Date(parseInt(tL[0]), parseInt(tL[1]-1), parseInt(tL[2]), parseInt(tL[3]), parseInt(tL[4]));
     var timeDifference = startTime.getTime() - now.getTime();
     var second = parseInt(timeDifference / 1000);
     var time = {
@@ -42,7 +49,7 @@ function getTimeDifference(y, n, M, h, m) {
 //考试开始时间
 function timeBefore() {
     var timer = setInterval(function() {
-        var time = getTimeDifference(2016, 10, 24, 18, 56);
+        var time = getTimeDifference(examTime.startTime);
         $('#time-title').text("距离考试开始");
         $('#time-ctn').text(time.hour + " : " + time.minute + " : " + time.second);
         if(time.remain <= 0) {
@@ -55,7 +62,7 @@ function timeBefore() {
 //考试结束倒计时
 function showExamTime() {
     var timer = setInterval(function() {
-        var time = getTimeDifference(2016, 10, 24, 23, 59);
+        var time = getTimeDifference(examTime.endTime);
         $('#time-title').text("距离考试结束");
         $('#time-ctn').text(time.hour + " : " + time.minute + " : " + time.second);
         if(time.remain <= 0) {
@@ -179,4 +186,16 @@ function cbUpdateStatus(result) {
         $(".default-welcome").removeClass("hide");
         $(".answer-section").addClass("hide");
     }
+}
+//获得考试科目和时间
+function getExamTime() {
+    var jsonData = JSON.stringify({
+        "subject": "WEB"
+    });
+    postData(urlGetExamTime, jsonData, cbGetExamTime);
+}
+function cbGetExamTime(result) {
+    examTime.subject = result.subject;
+    examTime.startTime = result.startTime;
+    examTime.endTime = result.endTime;
 }

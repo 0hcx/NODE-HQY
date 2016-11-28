@@ -3,10 +3,12 @@ var entries = require('./jsonRes');
 var User = require('./schema/user');
 var Question = require('./schema/question');
 var Answer = require('./schema/answer');
+var ExamTime = require('./schema/examTime');
+var async = require('async');
+var _ = require('underscore');
 var Schema = mongoose.Schema;
 
 exports.findUsr = function(data, cb) {
-
     User.findOne({
         userId: data.usr
     }, function(err, doc) {
@@ -68,7 +70,9 @@ exports.getAllStudents = function (req, cb) {
         for (var i = 0; i < data.length; i++) {
             studentList.push(data[i].toObject());
         }
-        $student.results = studentList;
+        $student.results = _.sortBy(studentList, function (item) {
+            return parseInt(item.userId);
+        });
         $student.count = studentList.length;
         cb(true, $student);
     })
@@ -203,4 +207,121 @@ exports.saveScore = function (data, cb) {
         cb(true, entries);
     })
 };
-
+//删除学生
+exports.deleteStudent = function(id, cb) {
+    //删除用户表
+    User.findById(id, function (err, doc) {
+        if (doc) {
+            doc.remove(function (err, doc) {
+                if (err) {
+                    entries.msg = err;
+                    cb(false, entries);
+                } else {
+                    entries.msg = '删除新闻成功！';
+                    cb(true, entries);
+                }
+            });
+        }
+    });
+    //删除学生答题表
+    Answer.findById(id, function (err, doc) {
+        if (doc) {
+            doc.remove(function (err, doc) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
+    });
+};
+//删除题目
+exports.deleteQuestion = function(id, cb) {
+    Question.findById(id, function (err, doc) {
+        if (doc) {
+            doc.remove(function (err, doc) {
+                if (err) {
+                    entries.msg = err;
+                    cb(false, entries);
+                } else {
+                    entries.msg = '删除新闻成功！';
+                    cb(true, entries);
+                }
+            });
+        } else {
+            next(err);
+        }
+    });
+};
+//批量添加学生
+exports.batchAddStudent = function (data, cb) {
+    async.waterfall([
+        function (cb) {
+            User.remove({"category": "STUDENT"}, function (err, doc) {
+                cb(err, entries);
+            });
+        },
+        function (result, cb) {
+            for(var i = 1; i < data.length; i++) {
+                var user = new User({
+                    userId: data[i][0],
+                    username: data[i][1],
+                    password: 123456,
+                    category: "STUDENT",
+                    status: "INIT"  //状态设置为初始化
+                });
+                user.save(function(err, doc) {
+                    if (err) {
+                        entries.code = 99;
+                        console.log("批量添加失败");
+                        cb(err, entries);
+                    }
+                });
+            }
+            cb(null, entries);
+        }
+    ], function (err, result) {
+        cb(true, result);
+    });
+};
+//设置考试时间
+exports.setExamTime =function (data, cb) {
+    ExamTime.findOne({"subject": data.subject}, function (err, doc) {
+        if(doc === null) {
+            var examTime = new ExamTime({
+                subject: data.subject,
+                startTime: data.startTime,
+                endTime: data.endTime
+            });
+            examTime.save(function(err, doc) {
+                if (err) {
+                    entries.code = 99;
+                    console.log("设置失败");
+                }
+                cb(true, entries);
+            });
+        } else {
+            ExamTime.update({"subject": data.subject}, {$set: {
+                    startTime: data.startTime,
+                    endTime: data.endTime
+            }},
+            function (err, result) {
+                if(err) {
+                    entries.codev = 99;
+                    console.log("更新时间失败");
+                }
+                cb(true, entries);
+            })
+        }
+    });
+};
+//获取考试时间
+exports.getExamTime = function (data, cb) {
+    ExamTime.findOne({"subject": data.subject}, function (err, doc) {
+        if(err) {
+            console.log(err);
+        } else {
+            var time = (doc !== null) ? doc.toObject() : '';
+            cb(true, time);
+        }
+    })
+};

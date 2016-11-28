@@ -1,4 +1,4 @@
-<div class="right-wrapper">
+<div class="right-wrapper studentList-page">
     <section class="content-header">
         <h1>学生管理</h1>
         <ol class="breadcrumb">
@@ -9,20 +9,21 @@
     <section class="content">
         <div class="studentList">
             <table class="table table-hover">
-                <tbody>
+                <tbody id="student-table">
                 <tr>
+                    <th>序号</th>
                     <th>学号</th>
                     <th>姓名</th>
+                    <th>功能</th>
                 </tr>
-                {{#each entries}}
-                    <tr>
-                        <td>{{userId}}</td>
-                        <td>{{username}}</td>
-                    </tr>
-                {{/each}}
                 </tbody>
             </table>
         </div>
+        <div class="box-footer footer-btn">
+            <button type="submit" class="btn btn-primary pull-left" id="importBtn">导入学生数据</button>
+            <button type="submit" class="btn btn-primary pull-right" id="exportBtn">导出EXCEL文件</button>
+        </div>
     </section>
 </div>
+<script src="/onlineExamSystem/studentList.js"></script>
 
