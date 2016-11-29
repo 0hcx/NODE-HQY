@@ -46,6 +46,12 @@ router.post('/setExamTime', function (req, res, next) {
         res.send(doc);
     });
 });
+//statistic
+router.post('/statistic', function (req, res, next) {
+    dbHelper.statisticScore(req.body, function (success, doc) {
+        res.send(doc);
+    });
+});
 //导出EXCEL文件
 router.post('/exportExcel', function(req, res, next){
     var id = req.body.idList;

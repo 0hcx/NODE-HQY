@@ -10,6 +10,7 @@ var urlExportExcel = "/admin/exportExcel";
 var urlImportExcel = "/admin/importExcel";
 var urlSetExamTime = "/admin/setExamTime";
 var urlGetExamTime = "/p/getExamTime";
+var urlStatistic = "/admin/statistic";
 
 var STUDENT_LIST = "<tr><td>{0}</td> <td>{1}</td> <td>{2}</td> <td><a href='/p/studentDelete/{3}' class='btn btn-block btn-primary btn-xs' data-toggle='confirm' data-message='确认要删除此学生吗'>删除</a></td></tr>";
 var STUDENT_BLOCK = "<div class='{0}' data-toggle='select' data-id='{1}'><div>{2}</div><div class='info-studentId'>{3}</div></div>";

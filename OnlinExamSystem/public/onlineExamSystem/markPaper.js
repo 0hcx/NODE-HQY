@@ -63,7 +63,7 @@ function getQuestionCtn() {
     postData(urlGetQuestionCtn, jsonData, cbShowQuestionCtn);
 }
 function cbShowQuestionCtn(result) {
-    $("#que-score").text("分值：" + result.score);
+    $("#que-score").text("(" + result.score + "分)");
     $("#questionContent").text(result.content);
 }
 //获得学生答案

@@ -2,12 +2,10 @@ var mongoose = require('../db');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
 
-/* 回答内容定义 */
-var answerSchema = new Schema({
+/* 学生成绩定义 */
+var gradeSchema = new Schema({
     userId: {type: ObjectId, ref: 'User'},
-    questionId: {type: ObjectId, ref: 'Question'},
     subject: String,
-    answerCtn: String,
     score: Number,
     meta: {
         updateAt: {type:Date, default: Date.now()},
@@ -15,7 +13,7 @@ var answerSchema = new Schema({
     }
 });
 
-answerSchema.pre('save', function (next) {
+gradeSchema.pre('save', function (next) {
     if(this.isNew) {
         this.meta.createAt = this.meta.updateAt = Date.now();
     }else{
@@ -24,4 +22,4 @@ answerSchema.pre('save', function (next) {
     next();
 });
 
-module.exports = mongoose.model('Answer', answerSchema);
+module.exports = mongoose.model('Grade', gradeSchema);

@@ -4,6 +4,7 @@ var User = require('./schema/user');
 var Question = require('./schema/question');
 var Answer = require('./schema/answer');
 var ExamTime = require('./schema/examTime');
+var Grade = require('./schema/grade');
 var async = require('async');
 var _ = require('underscore');
 var Schema = mongoose.Schema;
@@ -152,7 +153,8 @@ exports.saveAnswer = function (data, cb) {
             var answer = new Answer({
                 userId: data.userId,
                 questionId: data.questionId,
-                answerCtn: data.answerCtn
+                answerCtn: data.answerCtn,
+                subject: "WEB"
             });
             answer.save(function (err, doc) {
                 if(err) {
@@ -256,7 +258,7 @@ exports.deleteQuestion = function(id, cb) {
 exports.batchAddStudent = function (data, cb) {
     async.waterfall([
         function (cb) {
-            User.remove({"category": "STUDENT"}, function (err, doc) {
+            User.remove({"category": "STUDENT", "subject": "WEB"}, function (err, doc) {
                 cb(err, entries);
             });
         },
@@ -324,4 +326,41 @@ exports.getExamTime = function (data, cb) {
             cb(true, time);
         }
     })
+};
+//统计成绩
+exports.statisticScore = function (data, cb) {
+    async.waterfall([
+        function (cb) {
+            Answer.aggregate([
+                { $match: { subject: "WEB" }},
+                { $group: { _id: "$userId", totalScore: { $sum: "$score" }}}
+            ], function (err, docs) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log(docs);
+                    cb(err, docs);
+                }
+            });
+        },
+        function (result, cb) {
+            for(var i = 0; i < result.length; i++) {
+                var grade = new Grade({
+                    userId: result[i]._id,
+                    subject: "WEB",
+                    score: result[i].totalScore
+                });
+                grade.save(function (err, doc) {
+                    if(err) {
+                        console.log(err);
+                        entries.code = 99;
+                    }
+                });
+            }
+            cb(null, entries);
+        }
+    ], function (err, result) {
+        cb(true, result);
+    });
+    console.log("done");
 };
