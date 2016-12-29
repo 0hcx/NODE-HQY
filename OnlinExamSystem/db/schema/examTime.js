@@ -4,8 +4,8 @@ var Schema = mongoose.Schema;
 /* 用户定义 */
 var examTimeSchema = new Schema({
     subject: String,
-    startTime: Array,
-    endTime: Array,
+    startTime: String,
+    endTime: String,
     meta: {
         updateAt: {type:Date, default: Date.now()},
         createAt: {type:Date, default: Date.now()}

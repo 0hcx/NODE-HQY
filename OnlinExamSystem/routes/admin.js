@@ -28,6 +28,12 @@ router.post('/getAllStudents', function(req, res, next) {
         res.send(doc);
     })
 });
+//获取学生成绩列表
+router.post('/getStuGrades', function(req, res, next) {
+    dbHelper.getStudentGrade(req.body, function (success, doc) {
+        res.send(doc);
+    })
+});
 //获取题目列表
 router.post('/getQuestionList', function (req, res, next) {
     dbHelper.getAllQuestions(req, function (success, doc) {
@@ -56,13 +62,27 @@ router.post('/statistic', function (req, res, next) {
 router.post('/exportExcel', function(req, res, next){
     var id = req.body.idList;
     var name = req.body.nameList;
+    var type = req.body.type;
     var data = [];
-    data[0] = ["学生学号", "学生姓名"];
-    for(var i = 0; i < id.length; i++) {
-        data[i + 1] = [id[i], name[i]];
+    var i = 0;
+    if(type == "STUDENTS") {
+        data[0] = ["学生学号", "学生姓名"];
+        for(i = 0; i < id.length; i++) {
+            data[i + 1] = [id[i], name[i]];
+        }
+        var buffer1 = xlsx.build([{name: "studentList", data: data}]);
+        fs.writeFileSync('./public/exportFile/test_scores.xlsx', buffer1, 'binary');
+    } else if (type == "GRADE"){
+        var grade = req.body.gradeList;
+        data[0] = ["序号", "学生学号", "学生姓名", "成绩"];
+        for(i = 0; i < id.length; i++) {
+            data[i + 1] = [i+1, id[i], name[i], grade[i]];
+        }
+        var buffer2 = xlsx.build([{name: "studentList", data: data}]);
+        fs.writeFileSync('./public/exportFile/grades.xlsx', buffer2, 'binary');
     }
-    var buffer = xlsx.build([{name: "studentList", data: data}]);
-    fs.writeFileSync('./public/exportFile/test_scores.xlsx', buffer, 'binary');
+
+
     res.send('export successfully!');
 });
 //导入学生信息EXCEL文件

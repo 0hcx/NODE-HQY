@@ -258,9 +258,22 @@ exports.deleteQuestion = function(id, cb) {
 exports.batchAddStudent = function (data, cb) {
     async.waterfall([
         function (cb) {
-            User.remove({"category": "STUDENT", "subject": "WEB"}, function (err, doc) {
-                cb(err, entries);
+            // User.remove({"category": "STUDENT", "subject": "WEB"}, function (err, doc) {
+            //     cb(err, entries);
+            // });
+            User.remove({"category": "STUDENT"}, function (err, doc) {
+                if(err)
+                    console.log(err);
             });
+            Answer.remove({"subject": "WEB"}, function (err, doc) {
+                if(err)
+                    console.log(err);
+            });
+            Grade.remove({"subject": "WEB"}, function (err, doc) {
+                if(err)
+                    console.log(err);
+            });
+            cb(null, entries);
         },
         function (result, cb) {
             for(var i = 1; i < data.length; i++) {
@@ -331,6 +344,11 @@ exports.getExamTime = function (data, cb) {
 exports.statisticScore = function (data, cb) {
     async.waterfall([
         function (cb) {
+            Grade.remove({"subject": "WEB"}, function (err, doc) {
+                cb(null, doc);
+            });
+        },
+        function (doc, cb) {
             Answer.aggregate([
                 { $match: { subject: "WEB" }},
                 { $group: { _id: "$userId", totalScore: { $sum: "$score" }}}
@@ -363,4 +381,20 @@ exports.statisticScore = function (data, cb) {
         cb(true, result);
     });
     console.log("done");
+};
+//获得学生最终成绩
+exports.getStudentGrade = function (data, cb) {
+  Grade.find({"subject": data.subject})
+      .populate("userId")
+      .exec(function (err, docs) {
+      if(err) {
+          console.log("get grade fail !");
+      } else {
+          var list = new Array();
+          for (var i = 0; i < docs.length; i++) {
+              list.push(docs[i].toObject());
+          }
+          cb(true, list);
+      }
+  })
 };

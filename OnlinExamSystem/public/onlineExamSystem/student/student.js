@@ -6,8 +6,8 @@ var question = {
 };
 var examTime = {
     subject: "",
-    startTime: [],
-    endTime: []
+    startTime: {},
+    endTime: {}
 };
 var userId = $("#userId").val();
 var userStatus = $("#userStatus").val();
@@ -35,7 +35,7 @@ function init() {
 function getTimeDifference(timeList) {
     var tL = timeList;
     var now = new Date();
-    var startTime =  new Date(parseInt(tL[0]), parseInt(tL[1]-1), parseInt(tL[2]), parseInt(tL[3]), parseInt(tL[4]));
+    var startTime =  new Date(parseInt(tL.y), parseInt(tL.M-1), parseInt(tL.d), parseInt(tL.h), parseInt(tL.m));
     var timeDifference = startTime.getTime() - now.getTime();
     var second = parseInt(timeDifference / 1000);
     var time = {
@@ -196,6 +196,16 @@ function getExamTime() {
 }
 function cbGetExamTime(result) {
     examTime.subject = result.subject;
-    examTime.startTime = result.startTime;
-    examTime.endTime = result.endTime;
+    examTime.startTime = timeFormat(result.startTime);
+    examTime.endTime = timeFormat(result.endTime);
+}
+//格式化考试时间
+function timeFormat(data) {
+    var time = {};
+    time.y = parseInt(data.substring(0,4));
+    time.M = parseInt(data.substring(5,7));
+    time.d = parseInt(data.substring(8,10));
+    time.h = parseInt(data.substring(11,13));
+    time.m = parseInt(data.substring(14,16));
+    return time;
 }

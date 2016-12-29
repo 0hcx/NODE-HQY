@@ -76,6 +76,12 @@ router.get('/markPaper/:id', function(req, res, next) {
         });
     });
 });
+//获取考生成绩列表
+router.get('/studentGradeList', function(req, res, next) {
+    res.render('admin/studentGrade', {
+        user: req.session.user
+    });    
+});
 
 
 

@@ -13,21 +13,14 @@
                     <label id="subjectName"></label><br>
                     <label>考试开始时间：</label>
                     <div class="form-group setTimeArea">
-                        <input type="number" class="form-control" name="startTime" required>年
-                        <input type="number" class="form-control" name="startTime" required>月
-                        <input type="number" class="form-control" name="startTime" required>日
-                        <input type="number" class="form-control" name="startTime" required>时
-                        <input type="number" class="form-control" name="startTime" required>分
+                        <input class="workinput wicon" id="startTime" type="text" placeholder="开始时间" readonly>
                     </div>
                     <label>考试结束时间：</label>
                     <div class="form-group setTimeArea">
-                        <input type="number" class="form-control" name="endTime" required>年
-                        <input type="number" class="form-control" name="endTime" required>月
-                        <input type="number" class="form-control" name="endTime" required>日
-                        <input type="number" class="form-control" name="endTime" required>时
-                        <input type="number" class="form-control" name="endTime" required>分
+                        <input class="workinput wicon" id="endTime" type="text" placeholder="结束时间" readonly>
                     </div>
                 </div>
+
                 <div class="box-footer user-edit">
                     <button type="submit" class="btn btn-primary pull-right" id="setTimeBtn">设置时间</button>
                 </div>

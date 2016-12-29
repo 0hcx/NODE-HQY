@@ -249,17 +249,15 @@
 .question-head,
 label {
     font-family: "Microsoft JhengHei";
-    font-size: 30px;
+    font-size: 18px;
     font-weight: 900;
     color: #5e5e5e;
 }
 #answerCtn,
 .question-ctn {
-    background-color: #fff;
-    border: solid 1px #fff;
     border-radius: 6px;
     font-family: "Microsoft JhengHei";
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 900;
     color: #5e5e5e;
 }
@@ -268,7 +266,8 @@ label {
     min-height: 435px;
 }
 #answerCtn {
-    max-height: 800px;
+    /*max-height: 800px;*/
+    min-height: 200px;
     overflow-y: auto;
     width: 730px;
     /*white-space: normal;*/
@@ -370,9 +369,10 @@ label {
     font-weight: 900;
     font-size: 25px;
     color: #5e5e5e;
-    border-bottom: #5e5e5e solid 1px;
+    border-bottom: #5e5e5e dashed 1px;
 }
 .setTimeArea input {
-    width: 80px;
-    margin-left: 10px;
+    width: 290px;
+    padding: 5px;
+    background-color: transparent;
 }

@@ -1,5 +1,6 @@
 //题目
 var questionId = 0;
+var queIndex = 0;
 var studentId = $("#studentId").val();
 
 $(init);
@@ -21,6 +22,8 @@ function saveMark() {
 function cbSaveScore(result) {
     if(result.code == 99) {
         alert("批改失败");
+    } else {
+        $("body").find(".question-item").eq(queIndex).click();
     }
 }
 //显示题目内容和学生答题内容
@@ -30,6 +33,7 @@ function showContent(e) {
     var $this = $(this);
     questionId = $this.data('id');
     $("#question-head").text("第" + $(this).text() + "题");
+    queIndex = parseInt($(this).text());
     getQuestionCtn();
     getAnswerOne();
 }

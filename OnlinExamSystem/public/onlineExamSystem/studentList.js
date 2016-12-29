@@ -7,7 +7,7 @@ function init() {
     getAllStudents();
     $("body").on('click', '#exportBtn', doExport);
     $("body").on('click', '#importBtn', doImport);
-    $("body").on('click', '#countBtn', doStatistic);
+    // $("body").on('click', '#countBtn', doStatistic);
 }
 function postData(url, data, cb) {
     var promise = $.ajax({
@@ -37,7 +37,8 @@ function cbAllStudents(data) {
 function doExport() {
     var jsonData = JSON.stringify({
         "idList": student.idList,
-        "nameList": student.nameList
+        "nameList": student.nameList,
+        "type": "STUDENTS"
     });
     postData(urlExportExcel, jsonData, cbExportExcel);
 }
@@ -57,16 +58,16 @@ function cbImportExcel(result) {
     }
 }
 //统计成绩
-function doStatistic() {
-    var jsonData = JSON.stringify({
-        
-    });
-    postData(urlStatistic, jsonData, cbStatistic);
-}
-function cbStatistic(result) {
-    if(result == 99) {
-        alert("统计失败");
-    } else {
-        alert("统计成功");
-    }
-}
+// function doStatistic() {
+//     var jsonData = JSON.stringify({
+//        
+//     });
+//     postData(urlStatistic, jsonData, cbStatistic);
+// }
+// function cbStatistic(result) {
+//     if(result == 99) {
+//         alert("统计失败");
+//     } else {
+//         alert("统计成功");
+//     }
+// }

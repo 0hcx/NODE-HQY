@@ -3,6 +3,28 @@ $(init);
 function init() {
     getExamTime();
     $("body").on('click', '#setTimeBtn', doSetExamTime);
+    var start = {
+        format: 'YYYY-MM-DD hh:mm',
+        minDate: $.nowDate(0), //设定最小日期为当前日期
+        festival: true,
+        ishmsVal: false,
+        maxDate: '2099-06-30 23:59:59', //最大日期
+        choosefun: function(elem, datas){
+            end.minDate = datas; //开始日选好后，重置结束日的最小日期
+        }
+    };
+    var end = {
+        format: 'YYYY-MM-DD hh:mm',
+        minDate: start.maxDate, //设定最小日期为当前日期
+        festival: true,
+        ishmsVal: false,
+        maxDate: '2099-06-16 23:59:59', //最大日期
+        choosefun: function(elem, datas){
+            start.maxDate = datas; //将结束日的初始值设定为开始日的最大日期
+        }
+    };
+    $.jeDate('#startTime', start);
+    $.jeDate('#endTime', end);
 }
 function postData(url, data, cb) {
     var promise = $.ajax({
@@ -16,17 +38,12 @@ function postData(url, data, cb) {
 }
 //设置时间
 function doSetExamTime() {
-    var startTime = [], endTime = [];
-    $("input[name='startTime']").each(function () {
-        startTime.push($(this).val());
-    });
-    $("input[name='endTime']").each(function () {
-        endTime.push($(this).val());
-    });
+    var startDate = $("#startTime").val();
+    var endDate = $("#endTime").val();
     var jsonData = JSON.stringify({
         'subject': "WEB",
-        'startTime': startTime,
-        'endTime': endTime
+        'startTime': startDate,
+        'endTime': endDate
     });
     postData(urlSetExamTime, jsonData, cbSetExamTime);
 }
@@ -46,15 +63,8 @@ function getExamTime() {
     postData(urlGetExamTime, jsonData, cbGetExamTime);
 }
 function cbGetExamTime(result) {
-    var i = 0, j = 0;
     $("#subjectName").text("考试科目：" + result.subject);
-    $("input[name='startTime']").each(function () {
-        $(this).val(result.startTime[i]);
-        i++;
-    });
-    $("input[name='endTime']").each(function () {
-        $(this).val(result.endTime[j]);
-        j++;
-    });
+    $("#startTime").val(result.startTime);
+    $("#endTime").val(result.endTime);
 }
 
