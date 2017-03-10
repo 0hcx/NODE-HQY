@@ -1,0 +1,23 @@
+{
+  "name": "mysql-test",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "async": "^2.1.5",
+    "body-parser": "~1.16.0",
+    "cheerio": "^0.22.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.0",
+    "express": "~4.14.1",
+    "hbs": "~4.0.1",
+    "mkdirp": "^0.5.1",
+    "morgan": "~1.7.0",
+    "mysql2": "^1.2.0",
+    "request": "^2.79.0",
+    "serve-favicon": "~2.3.2",
+    "superagent": "^3.5.0"
+  }
+}
