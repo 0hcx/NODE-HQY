@@ -43,64 +43,46 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-
-// node-mysql测试
-
-// var mysql = require('mysql2/promise');
-//
-// var connection = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: '',
-//   database:'student'
-// });
-//
-// var sql1 = 'insert into security values ("222",222)';
-//
-// connection.query(sql1, function (err, results, fields) {
-//   if(err){
-//     console.log("error!");
-//   } else {
-//     console.log(results);
-//   }
-// });
-//
-// connection.end();
-
-
-// Nodejs Buffer测试
-// 爬取赶集网租房信息
+// 爬虫-我爱我家租房信息
+var mysql = require('mysql2');
 var cheerio = require('cheerio');
 var fs = require('fs');
-//var mkdirp = require('mkdirp');
 var request = require('superagent');
 var async = require('async');
+var schedule = require('node-schedule');
 
-var path = './public/data/杭州全部房源.txt';
-var pages = 1000;
+//连接数据库
+var connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'house'
+});
+var pages = 167;
 var data = [];
 
 //async按顺序执行
-async.waterfall([
-  getLinkArr,
-  start,
-  writeFile
-], function (err, result) {
-  if(err) {
-    console.log('error: ' + err);
-  } else {
-    console.log('任务完成！！！');
-  }
-});
+function saveToDB() {
+  async.waterfall([
+    getLinkArr,
+    start
+  ], function (err, result) {
+    if(err) {
+      console.log('error: ' + err);
+    } else {
+      connection.end();
+      console.log('任务完成！！！');
+      console.log('总共插入' + data.length + '条记录...');
+    }
+  });
+}
 //生成爬取页面的链接
 function getLinkArr(cb) {
   var links = [];
   for(var i = 0; i < pages; i++) {
-    var url = 'http://hz.ganji.com/fang1/o' + (i + 1) + '/';  //杭州房源网页地址
-    //var url = 'http://sh.ganji.com/fang1/o' + (i + 1) + '/';  //上海房源网页地址
+    var url = 'http://hz.5i5j.com/rent/n' + (i + 1);  //杭州房源网页地址
     links.push(url);
   }
-  readFile();
   cb(null, links);
 }
 //开始处理请求得到的html
@@ -147,89 +129,67 @@ function writeFile(data, cb) {
 //获取房屋基本信息
 function getRoom(html) {
   var $ = cheerio.load(html);
-  var room = $('.f-list-item').toArray();
+  var room = $('.list-info').toArray();
   var len = room.length;
   console.log('room is：' + len);
   for(var i = 0; i < len; i++) {
     var arr = {};
-    arr.title = $(room[i]).find('.dd-item.title a').attr('title');  // 房屋标题
-    arr.address = $(room[i]).find('.area').text().replace(/\s+/g, ''); // 地址
-    arr.price = $(room[i]).find('.price').text(); // 价格/月
-    arr.size = $(room[i]).find('.dd-item.size').text().replace(/\s+/g, ''); // 房屋大小等简介
-    var item = '{"title":"' + arr.title + '","address":"' + arr.address + '","price":"' + arr.price + '","size":"' + arr.size +'"}';  // 将数据组装成json格式的字符串
-    if(findItem(data, arr) == -1) {
+    var date = new Date();
+    var info = $(room[i]).find('.list-info-l li.font-balck').text().split(' ');
+
+    arr.title = $(room[i]).find('h2').text().replace(/\s+/g, '');  // 租房标题
+    arr.community = $(room[i]).find('.rent-font').text().replace(/\s+/g, ''); // 小区
+    arr.area = $(room[i]).find('.list-info-l li').eq(0).find('a').eq(1).text().replace(/\s+/g, ''); // 城区
+    arr.bizcircle = $(room[i]).find('.list-info-l li').eq(0).find('a').eq(2).text().replace(/\s+/g, '').replace(/租房/g, ''); // 商圈
+    arr.zone = info[0];  // 户型
+    arr.metres = info[1].replace(/[^0-9]/ig, ''); // 建筑面积/平
+    arr.orientation = info[2]; // 朝向
+    arr.floor = info[3]; // 楼层
+    arr.price = $(room[i]).find('.list-info-r h3').text().replace(/[^0-9]/ig, ''); // 租金/月
+    arr.look = $(room[i]).find('.list-info-l li').eq(2).text().replace(/[^0-9]/ig, ''); // 带看次数/次
+    arr.date = date.toLocaleDateString(); // 日期
+
+    var item = '{"title":"' + arr.title + '","community":"' + arr.community + '","area":"' + arr.area + '","bizcircle":"' + arr.bizcircle + '","zone":"' + arr.zone + '","metres":"' + arr.metres + '","orientation":"' + arr.orientation + '","floor":"' + arr.floor + '","price":"' + arr.price + '","look":"' + arr.look + '","date":"' + arr.date + '"}';  // 将数据组装成json格式的字符串
+    var str = JSON.stringify(data);
+    var sql = 'insert into rent values (null,' + '"' + arr.title + '",' + '"' + arr.community + '",' + '"' + arr.area + '",' + '"' + arr.bizcircle + '",' + '"' + arr.zone + '",' + arr.metres + ',"' + arr.orientation + '",' + '"' + arr.floor + '",' + arr.price + ',' + arr.look + ',"' + arr.date + '")';
+    if(str.indexOf(item) == -1) {     //查重
+      console.log(sql);
       try {
-        data.push(JSON.parse(formatString(item)));  // 将json格式的字符串push进data数组
-      } catch(err) {
-        console.log('JSON error!');
+        data.push(JSON.parse(item));  // 将json格式的字符串push进data数组
+        // 插入数据库
+        connection.query(sql, function (err, results, fields) {
+            if(err){
+              console.log("error!");
+            }
+        });
+      } catch(e) {
+        console.log(e.stack);
       }
     }
   }
 }
-//去重
-function findItem(data, item) {
-  for(var i = 0; i < data.length; i++) {
-    if(item.title === data[i].title && item.address === data[i].address && item.price === data[i].price && item.size === data[i].size) {
-      return i;
-    }
-  }
-  return -1;
-}
-//读取保存的文本数据
-function readFile() {
-  var fileData = '';
-  var readStream = fs.createReadStream(path);
 
-  readStream.setEncoding('UTF8');
-  readStream.on('data', function (chunk) {
-    fileData += chunk;
-  });
-  readStream.on('end', function () {
-    data = JSON.parse(formatString(fileData));
-    console.log(data)
-  });
-  readStream.on('error', function (err) {
-    console.log(err.stack);
+function DBQuery() {
+  var date = (new Date()).toLocaleDateString();
+  var sqlLook = 'select area,sum(look) from rent where date ="' + date + '" group by area';
+  var sqlZone = 'select zone,count(id) as total from rent where date ="' + date + '" group by zone order by total desc;'
+  connection.query(sqlLook, function(err, result) {
+    if(err) {
+      console.log(err);
+    }
+    console.log(result)
   })
 }
-//解析json前去掉BOM报头（UTF-8签名）
-function formatString(str) {
-  if (str != null) {
-    str = str.replace("\ufeff", "").replace(/\\/g, "/");
-  }
-  return str;
-}
-// function saveRoomImg(data) {
-//   var $ = cheerio.load(data.toString());
-//   var roomImg = $('.f-list-item img').toArray();
-//   var len = roomImg.length;
-//   console.log('共有图片张数：' + len);
-//   for(var i = 0; i < len; i++) {
-//     var imgsrc = $(roomImg[i]).data('original');
-//     if(imgsrc == undefined) {
-//       imgsrc = roomImg[i].attribs.src;
-//     }
-//     var imgName = roomImg[i].attribs.title + '.jpg';  //生成文件名
-//     console.log(i);
-//     downloadImg(imgsrc, imgName, function() {
-//       console.log(imgName + ' done!');
-//     });
-//   }
-// }
 
-// function parseUrlForFileName(address) {
-//   var filename = path.basename(address);
-//   return filename;
-// }
-// 下载图片
-// var downloadImg = function(uri, filename, callback){
-//   request.head(uri, function(err, res, body){
-//     if (err) {
-//       console.log('err: '+ err);
-//     }
-//     console.log('下载中...');
-//     request(uri).pipe(fs.createWriteStream('./public/data/img/' + filename)).on('close', callback);  //调用request的管道来下载到 images文件夹下
-//   });
-// };
+//每天的10:00爬取内容
+function scheduleControl() {
+  schedule.scheduleJob('0 44 22 * * *', function() {
+    console.log('时间：' + new Date() + ' 开始爬虫...');
+    saveToDB();
+  });
+}
+
+scheduleControl();
+
 
 module.exports = app;
