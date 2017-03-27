@@ -13,11 +13,16 @@ exports.DBQuery = function (data, cb) {
     var date = new Date(new Date() - 1000 * 60 * 60 * 24).toLocaleDateString();
     date = moment(date).format('YYYY/MM/DD');
     var type = data.type;
+    var comminuty = '';
     var sql = new Array(10);
     var title = ['各区域租房带看次数', '各户型均价对比', '各户型所占比例', '各城区当日均价','各城区租金走势', '带看量前20的小区租金', '各区域户型比例'];
     var areas = ['上城', '下城', '余杭', '拱墅', '江干', '滨江', '萧山', '西湖'];
     var zones = ['1室', '2室', '3室', '4室', '5室'];
 
+    if(type === 7) {
+        comminuty = data.community;
+        title[7] = comminuty;
+    }
     sql[0] = 'select area as name, sum(look) as y from rent where date ="' + date + '" group by area';  //各城区带看次数
     sql[1] = 'select left(zone, 2) as name, round(avg(price), 1) as y from rent where date ="' + date + '" group by name order by y desc'; //各户型均价对比
     sql[2] = 'select left(zone, 2) as name, count(id) as y from rent where date ="' + date + '" group by name'; //各户型比重对比
@@ -25,6 +30,8 @@ exports.DBQuery = function (data, cb) {
     sql[4] = 'select area as name, round(avg(price), 1) as y, date_format(date, "%Y-%m-%d") as duration from rent group by name, duration;';    // 各城区租金走势
     sql[5] = 'select community as name, round(avg(price), 1) as y from rent where date ="' + date + '" group by community order by sum(look) desc limit 20'; // 带看量前20的小区租金
     sql[6] = 'select left(zone, 2) as name, area ,count(*) as total from rent where date="' + date + '" group by name, area';  // 各区域户型比例
+    sql[7] = 'select community , round(avg(price), 1) as y, date_format(date, "%Y-%m-%d") as duration from rent where community = "' + comminuty + '" group by date';   //某一小区的租金走势
+    sql[8] = 'select community  from rent where date ="' + date + '" group by community;'; // 获取小区大全
 
     connection.query(sql[type], function(err, result) {
         var entries = [];
@@ -88,11 +95,33 @@ exports.DBQuery = function (data, cb) {
                         }
                     }
                 }
-                console.log(series)
+                //console.log(series)
                 entries = {
                     title: title[type],
                     areas: areas,
                     series: series
+                };
+                break;
+            case 7:
+                let priceDate = [], dateDuration = [];
+                for(let item of result) {
+                    priceDate.push(Number(item.y));
+                    dateDuration.push(item.duration);
+                }
+                entries = {
+                    title: comminuty + '小区的租金走势',
+                    comminuty: comminuty,
+                    data: priceDate,
+                    duration: dateDuration
+                };
+                break;
+            case 8:
+                let communityData = [];
+                for(let item of result) {
+                    communityData.push(item.community);
+                }
+                entries = {
+                    comminuty: communityData
                 };
                 break;
         }

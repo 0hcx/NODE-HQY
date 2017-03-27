@@ -10,6 +10,7 @@ Highcharts.setOptions({
         exportButtonTitle: "导出图片"
     }
 });
+var communityTags = []; // 小区大全
 /* type:
     0 => 各区域租房带看次数
     1 => 各户型均价对比
@@ -21,6 +22,19 @@ Highcharts.setOptions({
     7 => 带看次数走势
     8 => 价格占比
 */
+
+init();
+
+function init() {
+    //初始化各图表
+    for(let i = 0; i < 7; i++) {
+        getHouseData(i);
+    }
+    getHouseData(8);
+
+    //查询各小区租金走势
+    $('body').on('click', '#searchBtn', getSearchResult);
+}
 
 //获取数据
 function getHouseData(type) {
@@ -49,6 +63,8 @@ function getHouseData(type) {
         case 6:
             postData(urlGetData, jsonData, cbShowData6);
             break;
+        case 8:
+            postData(urlGetData, jsonData, cbCommunityData);
     }
 
 }
@@ -396,10 +412,64 @@ function cbShowData6(result) {
     });
 }
 
-getHouseData(0);
-getHouseData(1);
-getHouseData(2);
-getHouseData(3);
-getHouseData(4);
-getHouseData(5);
-getHouseData(6);
+// 获取全部小区名数据
+function cbCommunityData(result) {
+    communityTags = result.comminuty;
+    $( "#keyword" ).autocomplete({
+        source: communityTags
+    });
+    console.log(communityTags)
+}
+
+// 获取查询结果
+function getSearchResult() {
+    var community = $('#keyword').val();
+    var type = 7;
+    if(community) {
+        var jsonData = JSON.stringify({
+            "type": type,
+            "community": community
+        });
+        postData(urlGetData, jsonData, cbSearchResult);
+    } else {
+        alert("查询参数为空!")
+    }
+}
+function cbSearchResult(result) {
+    $('#searchChart').highcharts({
+        title: {
+            text: result.title,
+            x: -20
+        },
+        subtitle: {
+            text: subtext,
+            x: -20
+        },
+        xAxis: {
+            categories: result.duration
+        },
+        yAxis: {
+            title: {
+                text: '租金 (元/月)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '元/月'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [{
+            name: result.comminuty,
+            data: result.data
+        }]
+    });
+}

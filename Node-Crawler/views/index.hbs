@@ -1,4 +1,7 @@
 <section>
+    <div class="cm-hd">
+        <h1 class="title">杭州租房市场情况分析</h1>
+    </div>
     <div class="chart">
         <!--各区域带看次数对比-->
         <div id="chart_0" style="width: 500px;height:400px;"></div>
@@ -15,9 +18,26 @@
         <!--各区域户型比例-->
         <div id="chart_6" style="width: 1000px;height:650px;"></div>
     </div>
+    <div class="searchArea">
+        <div class="cm-hd">
+            <h1 class="title">输入小区名查询租金走势</h1>
+        </div>
+        <div class="searchInput">
+            <div class="sidebar-form">
+                <div class="input-group">
+                    <input type="text" id="keyword" class="form-control" placeholder="Search...">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-flat search-btn" id="searchBtn"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="searchResult">
+            <div id="searchChart" style="width: 1000px;height:400px;"></div>
+        </div>
+    </div>
 </section>
 
-<script src="/lib/jquery/jquery.min.js"></script>
 <script src="/lib/highcharts/highcharts.js"></script>
 <script src="/lib/highcharts/exporting.js"></script>
 <script src="/js/main/common.js"></script>

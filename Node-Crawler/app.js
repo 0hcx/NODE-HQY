@@ -183,7 +183,7 @@ function DBQuery() {
 
 //每天的10:00爬取内容
 function scheduleControl() {
-  schedule.scheduleJob('10 37 23 * * *', function() {
+  schedule.scheduleJob('40 43 22 * * *', function() {
     console.log('时间：' + new Date() + ' 开始爬虫...');
     saveToDB();
   });
