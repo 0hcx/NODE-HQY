@@ -1,9 +1,16 @@
-// 基于准备好的dom，初始化echarts实例
-var chart_1 = echarts.init(document.getElementById('chart_1'), 'vintage');
-var chart_2 = echarts.init(document.getElementById('chart_2'), 'vintage');
-var chart_3 = echarts.init(document.getElementById('chart_3'), 'vintage');
-var chart_4 = echarts.init(document.getElementById('chart_4'), 'vintage');
-var chart_5 = echarts.init(document.getElementById('chart_5'), 'vintage');
+var date = new Date(new Date() - 1000 * 60 * 60 * 24).toLocaleDateString();
+var subtext = '数据截止 ' + date + '  来源: 我爱我家';
+Highcharts.setOptions({
+    lang: {
+        printChart:"打印图表",
+        downloadJPEG: "下载JPEG 图片" ,
+        downloadPDF: "下载PDF文档"  ,
+        downloadPNG: "下载PNG 图片"  ,
+        downloadSVG: "下载SVG 矢量图" ,
+        exportButtonTitle: "导出图片"
+    }
+});
+var communityTags = []; // 小区大全
 /* type:
     0 => 各区域租房带看次数
     1 => 各户型均价对比
@@ -15,6 +22,19 @@ var chart_5 = echarts.init(document.getElementById('chart_5'), 'vintage');
     7 => 带看次数走势
     8 => 价格占比
 */
+
+init();
+
+function init() {
+    //初始化各图表
+    for(let i = 0; i < 7; i++) {
+        getHouseData(i);
+    }
+    getHouseData(8);
+
+    //查询各小区租金走势
+    $('body').on('click', '#searchBtn', getSearchResult);
+}
 
 //获取数据
 function getHouseData(type) {
@@ -37,175 +57,419 @@ function getHouseData(type) {
         case 4:
             postData(urlGetData, jsonData, cbShowData4);
             break;
+        case 5:
+            postData(urlGetData, jsonData, cbShowData5);
+            break;
+        case 6:
+            postData(urlGetData, jsonData, cbShowData6);
+            break;
+        case 8:
+            postData(urlGetData, jsonData, cbCommunityData);
     }
 
 }
-function cbShowData1(result) {
-    var name = [], value = [];
-    for(var i = 0; i < result.data.length; i++) {
-        name[i] = result.data[i].name;
-        value[i] = Number(result.data[i].value).toFixed(2);
-    }
-    // 指定图表的配置项和数据
-    var option = {
+// 各区域带看次数对比
+function cbShowData0(result) {
+    $('#chart_0').highcharts({
+        chart: {
+            type: 'column'
+        },
         title: {
             text: result.title
         },
-        tooltip: {},
-        legend: {
-            data:['均价元/月']
+        subtitle: {
+            text: subtext
         },
         xAxis: {
-            data: name
+            type: 'category',
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
         },
-        yAxis: {},
-        series: [{
-            name: '均价元/月',
-            type: 'bar',
-            data: value
-        }]
-    };
-    chart_1.setOption(option);
-}
-function cbShowData2(result) {
-    var name = [];
-    for(var i = 0; i < result.data.length; i++) {
-        name[i] = result.data[i].name;
-    }
-    var option = {
-        title : {
-            text: result.title,
-            x:'center'
-        },
-        tooltip : {
-            trigger: 'item',
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        yAxis: {
+            min: 0,
+            title: {
+                text: '带看次数 (/次)'
+            }
         },
         legend: {
-            orient: 'vertical',
-            left: 'left',
-            data: name
+            enabled: false
         },
-        series : [
-            {
-                name: '房源数',
-                type: 'pie',
-                radius : '55%',
-                center: ['50%', '60%'],
-                data: result.data,
-                itemStyle: {
-                    emphasis: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+        tooltip: {
+            pointFormat: '带看次数: <b>{point.y:.1f} 次</b>'
+        },
+        series: [{
+            name: '带看次数',
+            data: result.data,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y:.1f}',
+                y: 10,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        }]
+    });
+}
+// 各户型均价对比
+function cbShowData1(result) {
+    $('#chart_1').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: result.title
+        },
+        subtitle: {
+            text: subtext
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '租金 (元/月)'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            pointFormat: '平均租金: <b>{point.y:.1f} 元/月</b>'
+        },
+        series: [{
+            name: '平均租金',
+            data: result.data,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y:.1f}',
+                y: 10,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        }]
+    });
+}
+// 各户型所占比例
+function cbShowData2(result) {
+    $('#chart_2').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: result.title
+        },
+        tooltip: {
+            headerFormat: '{series.name}<br>',
+            pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
                 }
             }
-        ]
-    };
-    chart_2.setOption(option);
+        },
+        series: [{
+            type: 'pie',
+            name: result.title,
+            data: result.data
+        }]
+    });
 }
-//各城区均价
+// 各城区当日均价
 function cbShowData3(result) {
-    var name = [], value = [];
-    for(var i = 0; i < result.data.length; i++) {
-        name[i] = result.data[i].name;
-        value[i] = Number(result.data[i].value).toFixed(2);
-    }
-    // 指定图表的配置项和数据
-    var option = {
+    $('#chart_3').highcharts({
+        chart: {
+            type: 'column'
+        },
         title: {
             text: result.title
         },
-        tooltip: {},
-        legend: {
-            data:['均价元/月']
+        subtitle: {
+            text: subtext
         },
         xAxis: {
-            data: name
+            type: 'category',
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
         },
-        yAxis: {},
-        series: [{
-            name: '均价元/月',
-            type: 'bar',
-            data: value
-        }]
-    };
-    chart_3.setOption(option);
-}
-function cbShowData0(result) {
-    var name = [], value = [];
-    for(var i = 0; i < result.data.length; i++) {
-        name[i] = result.data[i].name;
-        value[i] = Number(result.data[i].value);
-    }
-    // 指定图表的配置项和数据
-    var option = {
-        title: {
-            text: result.title
+        yAxis: {
+            min: 0,
+            title: {
+                text: '租金 (元/月)'
+            }
         },
-        tooltip: {},
         legend: {
-            data:['带看次数/次']
+            enabled: false
         },
-        xAxis: {
-            data: name
+        tooltip: {
+            pointFormat: '平均租金: <b>{point.y:.1f} 元/月</b>'
         },
-        yAxis: {},
         series: [{
-            name: '带看次数/次',
-            type: 'bar',
-            data: value
+            name: '平均租金',
+            data: result.data,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y:.1f}',
+                y: 10,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
         }]
-    };
-    chart_4.setOption(option);
+    });
 }
 function cbShowData4(result) {
     var series = [];
     for(var i = 0; i < result.areaName.length; i++) {
         var arr = {
             name: result.areaName[i],
-            type:'line',
             data: result.data[i]
         };
         series.push(arr);
     }
-    var option = {
+    $('#chart_4').highcharts({
+        title: {
+            text: result.title,
+            x: -20
+        },
+        subtitle: {
+            text: subtext,
+            x: -20
+        },
+        xAxis: {
+            categories: result.duration
+        },
+        yAxis: {
+            title: {
+                text: '租金 (元/月)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '元/月'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: series
+    });
+}
+
+function cbShowData5(result) {
+    $('#chart_5').highcharts({
+        chart: {
+            type: 'column'
+        },
         title: {
             text: result.title
         },
-        tooltip: {
-            trigger: 'axis'
-        },
-        legend: {
-            data: result.areaName
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        toolbox: {
-            feature: {
-                saveAsImage: {}
-            }
+        subtitle: {
+            text: subtext
         },
         xAxis: {
             type: 'category',
-            boundaryGap: false,
-            data: result.duration
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
         },
         yAxis: {
-            type: 'value'
+            min: 0,
+            title: {
+                text: '租金 (元/月)'
+            }
         },
-        series: series
-    };
-    chart_5.setOption(option);
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            pointFormat: '平均租金: <b>{point.y:.1f} 元/月</b>'
+        },
+        series: [{
+            name: '平均租金',
+            data: result.data,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                format: '{point.y:.1f}',
+                y: 10,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        }]
+    });
+}
+function cbShowData6(result) {
+    $('#chart_6').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: result.title
+        },
+        xAxis: {
+            categories: result.areas
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '地区户型总量'
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -30,
+            verticalAlign: 'top',
+            y: 25,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    '总量: ' + this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black'
+                    }
+                }
+            }
+        },
+        series: result.series
+    });
 }
 
-getHouseData(1);
-getHouseData(2);
-getHouseData(3);
-getHouseData(0);
-getHouseData(4);
+// 获取全部小区名数据
+function cbCommunityData(result) {
+    communityTags = result.comminuty;
+    $( "#keyword" ).autocomplete({
+        source: communityTags
+    });
+    console.log(communityTags)
+}
+
+// 获取查询结果
+function getSearchResult() {
+    var community = $('#keyword').val();
+    var type = 7;
+    if(community) {
+        var jsonData = JSON.stringify({
+            "type": type,
+            "community": community
+        });
+        postData(urlGetData, jsonData, cbSearchResult);
+    } else {
+        alert("查询参数为空!")
+    }
+}
+function cbSearchResult(result) {
+    $('#searchChart').highcharts({
+        title: {
+            text: result.title,
+            x: -20
+        },
+        subtitle: {
+            text: subtext,
+            x: -20
+        },
+        xAxis: {
+            categories: result.duration
+        },
+        yAxis: {
+            title: {
+                text: '租金 (元/月)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '元/月'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [{
+            name: result.comminuty,
+            data: result.data
+        }]
+    });
+}

@@ -7,19 +7,31 @@ exports.DBQuery = function (data, cb) {
     var connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
-        password: '',
+        password: '19960124',
         database: 'house'
     });
     var date = new Date(new Date() - 1000 * 60 * 60 * 24).toLocaleDateString();
     date = moment(date).format('YYYY/MM/DD');
     var type = data.type;
-    var sql = new Array(5);
-    var title = ['各区域租房带看次数', '各户型均价对比', '各户型所占比例', '各城区当日均价','各城区租金走势'];
-    sql[0] = 'select area as name, sum(look) as value from rent where date ="' + date + '" group by area';  //各城区带看次数
-    sql[1] = 'select left(zone, 2) as name, avg(price) as value from rent where date ="' + date + '" group by name order by value desc'; //各户型均价对比
-    sql[2] = 'select left(zone, 2) as name, count(id) as value from rent where date ="' + date + '" group by name'; //各户型比重对比
-    sql[3] = 'select area as name, avg(price) as value from rent where date ="' + date + '" group by area;'; // 各城区当日均价
-    sql[4] = 'select area, avg(price) as value, date_format(date, "%Y-%m-%d") as duration from rent group by area, duration;';    // 各城区租金走势
+    var comminuty = '';
+    var sql = new Array(10);
+    var title = ['各区域租房带看次数', '各户型均价对比', '各户型所占比例', '各城区当日均价','各城区租金走势', '带看量前20的小区租金', '各区域户型比例'];
+    var areas = ['上城', '下城', '余杭', '拱墅', '江干', '滨江', '萧山', '西湖'];
+    var zones = ['1室', '2室', '3室', '4室', '5室'];
+
+    if(type === 7) {
+        comminuty = data.community;
+        title[7] = comminuty;
+    }
+    sql[0] = 'select area as name, sum(look) as y from rent where date ="' + date + '" group by area';  //各城区带看次数
+    sql[1] = 'select left(zone, 2) as name, round(avg(price), 1) as y from rent where date ="' + date + '" group by name order by y desc'; //各户型均价对比
+    sql[2] = 'select left(zone, 2) as name, count(id) as y from rent where date ="' + date + '" group by name'; //各户型比重对比
+    sql[3] = 'select area as name, avg(price) as y from rent where date ="' + date + '" group by area;'; // 各城区当日均价
+    sql[4] = 'select area as name, round(avg(price), 1) as y, date_format(date, "%Y-%m-%d") as duration from rent group by name, duration;';    // 各城区租金走势
+    sql[5] = 'select community as name, round(avg(price), 1) as y from rent where date ="' + date + '" group by community order by sum(look) desc limit 20'; // 带看量前20的小区租金
+    sql[6] = 'select left(zone, 2) as name, area ,count(*) as total from rent where date="' + date + '" group by name, area';  // 各区域户型比例
+    sql[7] = 'select community , round(avg(price), 1) as y, date_format(date, "%Y-%m-%d") as duration from rent where community = "' + comminuty + '" group by date';   //某一小区的租金走势
+    sql[8] = 'select community  from rent where date ="' + date + '" group by community;'; // 获取小区大全
 
     connection.query(sql[type], function(err, result) {
         var entries = [];
@@ -31,21 +43,25 @@ exports.DBQuery = function (data, cb) {
             case 1:
             case 2:
             case 3:
+            case 5:
+                for(let item of result) {
+                    item.y = Number(item.y);
+                }
                 entries = {
                     title: title[type],
                     data: result
                 };
                 break;
             case 4:
-                var duration = [], priceData = [];
-                var num = result.length / 8;    //天数
-                var areaName = new Array(8);    //区域名称
-                for(var i = 0, j = 0; i < areaName.length; i++, j+=num) {
-                    areaName[i] = result[j].area;
+                let duration = [], priceData = [];
+                let num = result.length / 8;    //天数
+                let areaName = new Array(8);    //区域名称
+                for(let i = 0, j = 0; i < areaName.length; i++, j+=num) {
+                    areaName[i] = result[j].name;
                 }
-                for(var m = 0; m < result.length; m++) {
+                for(let m = 0; m < result.length; m++) {
                     duration[m] = result[m].duration;
-                    priceData[m] = Number(result[m].value).toFixed(2);
+                    priceData[m] = Number(result[m].y);
                 }
                 entries = {
                     title: title[type],
@@ -53,9 +69,60 @@ exports.DBQuery = function (data, cb) {
                     duration: duration.slice(0, num)
                 };
                 entries.data = [];
-                for(var k = 0; k < areaName.length; k++) {
+                for(let k = 0; k < areaName.length; k++) {  // 地区
                     entries.data[k] = priceData.slice(num * k, num * (k+1));
                 }
+                break;
+            case 6:
+                let series = [], index = 0, nextZone = true; // index => result数组下标, nextZone = true 表示改变了户型
+                for(let i = 0; i < zones.length; i++) {
+                    let arr = new Array(areas.length).fill(0);  // 初始化每个户型的值为0
+                    let item = {
+                        name: zones[i],
+                        data: arr
+                    };
+                    series.push(item);
+                }
+                for(let i = 0; i < zones.length; i++) {
+                    for(let j = index; j < result.length; j++) {
+                        if(nextZone === true || (nextZone === false && result[j].name === result[j-1].name)) {
+                            nextZone = false;
+                            series[i].data[areas.indexOf(result[j].area)] = result[j].total;
+                        } else {
+                            index = j;
+                            nextZone = true;
+                            break;
+                        }
+                    }
+                }
+                //console.log(series)
+                entries = {
+                    title: title[type],
+                    areas: areas,
+                    series: series
+                };
+                break;
+            case 7:
+                let priceDate = [], dateDuration = [];
+                for(let item of result) {
+                    priceDate.push(Number(item.y));
+                    dateDuration.push(item.duration);
+                }
+                entries = {
+                    title: comminuty + '小区的租金走势',
+                    comminuty: comminuty,
+                    data: priceDate,
+                    duration: dateDuration
+                };
+                break;
+            case 8:
+                let communityData = [];
+                for(let item of result) {
+                    communityData.push(item.community);
+                }
+                entries = {
+                    comminuty: communityData
+                };
                 break;
         }
         connection.end();

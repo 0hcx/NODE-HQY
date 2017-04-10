@@ -55,7 +55,7 @@ var schedule = require('node-schedule');
 var connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: '19960124',
   database: 'house'
 });
 var pages = 167;
@@ -183,7 +183,7 @@ function DBQuery() {
 
 //每天的10:00爬取内容
 function scheduleControl() {
-  schedule.scheduleJob('0 44 22 * * *', function() {
+  schedule.scheduleJob('40 43 22 * * *', function() {
     console.log('时间：' + new Date() + ' 开始爬虫...');
     saveToDB();
   });
