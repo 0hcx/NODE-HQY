@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Axios from 'axios'
-import router from '../router'
 import Login from '@/components/login'
 import Register from '@/components/register'
 import Wrapper from '@/components/wrapper'
@@ -41,13 +40,12 @@ export default new Router({
         let pattern = /^(\/p)/g
         let token = sessionStorage.getItem('accessToken')
         if (pattern.test(to.path)) {
-          Axios.post('http://localhost:3000/isLogin', {access_token: token})
+          Axios.post('http://localhost:3000/api/isLogin', {access_token: token})
           .then(res => {
             if (res.data.code === 0) {
               next()
             } else {
-              router.push({name: 'Login'})
-              next()
+              next({name: 'Login'})
             }
           })
           .catch(err => {

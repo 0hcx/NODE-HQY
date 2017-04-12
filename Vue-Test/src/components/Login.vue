@@ -55,7 +55,7 @@ export default {
             'usr': this.loginForm.userName,
             'pwd': this.loginForm.pwd
           }
-          Axios.post('http://localhost:3000/login', data)
+          Axios.post('http://localhost:3000/api/login', data)
           .then(res => {
             if (res.data.code === 0) {
               sessionStorage.setItem('accessToken', res.data.access_token)
@@ -64,7 +64,7 @@ export default {
                 message: '登录成功',
                 type: 'success'
               })
-              router.push({name: 'LoadDemo', params: { username: res.data.username }})
+              router.push({name: 'Sidebar', params: { username: res.data.username }})
             } else {
               this.$message({
                 showClose: true,

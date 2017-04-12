@@ -23,5 +23,12 @@ router.post('/isLogin', function(req, res, next) {
     })
 });
 
+// getCaptcha
+router.post('/getCaptcha', function(req, res, next) {
+    dbHelper.sendCaptcha(req.body, function (success, doc) {
+        res.send(doc)
+    })
+});
+
 
 module.exports = router;

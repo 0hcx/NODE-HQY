@@ -44,7 +44,7 @@ app.use(cors({
 	methods: ['GET', 'POST']
 }))
 
-app.use('/', require('./routes/api'));
+app.use('/api', require('./routes/api'));
 
 // login
 // app.get('/isLogin', authority.isAuthenticated);

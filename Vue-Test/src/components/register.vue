@@ -15,6 +15,14 @@
         <el-form-item prop="checkPwd">
           <el-input v-model="registerForm.checkPwd" placeholder="请再次输入密码" type="password"></el-input>
         </el-form-item>
+        <el-form-item prop="email">
+          <el-input v-model="registerForm.email" placeholder="请输入接收验证码的邮箱"></el-input>
+        </el-form-item>
+        <el-form-item prop="captcha">
+          <el-input v-model="registerForm.captcha" placeholder="请输入验证码">
+            <el-button slot="append" @click='getCaptcha'>{{ captchaMsg }}</el-button>
+          </el-input>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('registerForm')" class="submitBtn">立即注册</el-button>
         </el-form-item>
@@ -66,10 +74,12 @@ export default {
       }
     }
     return {
+      captchaMsg: '发送验证码',
       registerForm: {
         userName: '',
         pwd: '',
-        checkPwd: ''
+        checkPwd: '',
+        email: ''
       },
       registerRule: {
         userName: [
@@ -80,6 +90,13 @@ export default {
         ],
         checkPwd: [
         { validator: validateCheckPwd, trigger: 'blur' }
+        ],
+        email: [
+        { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+        { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+        ],
+        captcha: [
+        { required: true, message: '请输入验证码', trigger: 'blur' }
         ]
       }
     }
@@ -92,7 +109,7 @@ export default {
             'usr': this.registerForm.userName,
             'pwd': this.registerForm.pwd
           }
-          Axios.post('http://localhost:3000/register', data)
+          Axios.post('http://localhost:3000/api/register', data)
           .then(res => {
             console.log(res.data)
             if (res.data.code === 0) {
@@ -106,6 +123,32 @@ export default {
               this.$message({
                 showClose: true,
                 message: '注册失败',
+                type: 'error'
+              })
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    getCaptcha () {
+      this.$refs.registerForm.validateField('email', (vaild) => {
+        if (!vaild) { // 没有错误信息
+          Axios.post('http://localhost:3000/api/getCaptcha', {email: this.registerForm.email})
+          .then(res => {
+            let code = res.data.code
+            if (code === 0) {
+              this.captchaMsg = '发送成功'
+            } else if (code === 88) {
+              this.captchaMsg = '已经发送'
+            } else if (code === 99) {
+              this.$message({
+                showClose: true,
+                message: '验证码发送失败',
                 type: 'error'
               })
             }
@@ -132,7 +175,6 @@ export default {
     align-items: center;
     width: 100%;
     font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
-    font-size: 18px;
 }
 
 .loginWrapper .hd {
@@ -140,8 +182,8 @@ export default {
 }
 
 .loginWrapper .hd h2 {
-    font-weight: 400;
-    color: #20A0FF;
+  font-weight: 400;
+  color: #20A0FF;
 }
 
 .loginWrapper .hd p {
