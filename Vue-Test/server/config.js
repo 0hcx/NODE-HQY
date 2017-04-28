@@ -9,6 +9,10 @@ var Config = {
         name: 'VueExam',
         host: 'localhost',
         url: 'mongodb://127.0.0.1:27017/VueExam'
+    },
+    page: {
+        path:'',
+        pagesize: 17
     }
 };
 module.exports = Config;

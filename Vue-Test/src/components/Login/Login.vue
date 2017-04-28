@@ -25,7 +25,7 @@
 
 <script>
 import Axios from 'axios'
-import router from '../router'
+import router from '../../router'
 
 export default {
   name: 'login',
@@ -59,12 +59,14 @@ export default {
           .then(res => {
             if (res.data.code === 0) {
               sessionStorage.setItem('accessToken', res.data.access_token)
+              sessionStorage.setItem('username', res.data.data.username)
+              this.$store.dispatch('showLogin')
               this.$message({
                 showClose: true,
                 message: '登录成功',
                 type: 'success'
               })
-              router.push({name: 'Sidebar', params: { username: res.data.username }})
+              router.push({path: '/p/index', params: { username: res.data.username }})
             } else {
               this.$message({
                 showClose: true,

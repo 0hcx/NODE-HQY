@@ -6,6 +6,7 @@ var ObjectId = Schema.Types.ObjectId;
 var captchaSchema = new Schema({
     email: String,
     captcha: String,
+    deadline: Date,
     meta: {
         updateAt: {type:Date, default: Date.now()},
         createAt: {type:Date, default: Date.now()}

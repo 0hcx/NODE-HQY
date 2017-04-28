@@ -13,7 +13,9 @@
 <style>
 body {
   margin: 0;
+  height: 100%;
   background: #E5E9F2;
+  overflow-y: hidden;
 }
 
 #app {

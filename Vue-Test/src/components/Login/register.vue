@@ -36,7 +36,7 @@
 
 <script>
 import Axios from 'axios'
-import router from '../router'
+import router from '../../router'
 
 export default {
   name: 'register',
@@ -79,7 +79,8 @@ export default {
         userName: '',
         pwd: '',
         checkPwd: '',
-        email: ''
+        email: '',
+        captcha: ''
       },
       registerRule: {
         userName: [
@@ -107,11 +108,13 @@ export default {
         if (valid) {
           var data = {
             'usr': this.registerForm.userName,
-            'pwd': this.registerForm.pwd
+            'pwd': this.registerForm.pwd,
+            'email': this.registerForm.email,
+            'captcha': this.registerForm.captcha
           }
           Axios.post('http://localhost:3000/api/register', data)
           .then(res => {
-            console.log(res.data)
+            console.log(res.data.code)
             if (res.data.code === 0) {
               this.$message({
                 showClose: true,
@@ -119,10 +122,16 @@ export default {
                 type: 'success'
               })
               router.push({name: 'Login'})
-            } else {
+            } else if (res.data.code === 88) {
               this.$message({
                 showClose: true,
-                message: '注册失败',
+                message: '验证码错误',
+                type: 'error'
+              })
+            } else if (res.data.code === 99) {
+              this.$message({
+                showClose: true,
+                message: '用户已存在',
                 type: 'error'
               })
             }

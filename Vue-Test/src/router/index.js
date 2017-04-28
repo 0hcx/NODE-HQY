@@ -1,11 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Axios from 'axios'
-import Login from '@/components/login'
-import Register from '@/components/register'
-import Wrapper from '@/components/wrapper'
-import Sidebar from '@/components/sidebar'
-import LoadDemo from '@/components/loadDemo'
+import Login from '@/components/Login/login'
+import Register from '@/components/Login/register'
 
 Vue.use(Router)
 
@@ -22,20 +19,8 @@ export default new Router({
       component: Register
     },
     {
-      path: '/p/:id',
-      component: Wrapper,
-      children: [
-        {
-          path: '/p/sidebar',
-          name: 'Sidebar',
-          component: Sidebar
-        },
-        {
-          path: '/p/loadDemo',
-          name: 'LoadDemo',
-          component: LoadDemo
-        }
-      ],
+      path: '/p/index',
+      component: require('../components/Home/index.vue'),
       beforeEnter: (to, from, next) => {
         let pattern = /^(\/p)/g
         let token = sessionStorage.getItem('accessToken')
@@ -53,6 +38,10 @@ export default new Router({
           })
         }
       }
+    },
+    {
+      path: '*',
+      component: require('../components/NotFound.vue')
     }
   ]
 })

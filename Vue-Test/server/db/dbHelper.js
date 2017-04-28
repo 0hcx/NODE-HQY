@@ -3,34 +3,52 @@ var entries = require('./jsonRes')
 var moment = require('moment')
 var jwt = require('jwt-simple')
 var nodemailer = require('nodemailer');
+var async = require('async')
 var Schema = mongoose.Schema
 
 var User = require('./schema/user')
 var Captcha = require('./schema/captcha')
+var Job = require('./schema/job')
+var config = require('../config')
 
 const jwtTokenSecret = 'vue-exercise'
+var PAGE_SIZE = config.page.pagesize
 
 // addUser
 exports.addUser = function (data, cb) {
-    User.findOne({
-        username: data.usr
-    }, function(err, doc) {
+    Captcha.findOne({
+        email: data.email,
+        captcha: data.captcha
+    }, function (err, doc) {
         if (err) {
             console.log(err)
-        } else if (doc !== null) {
-            entries.code = 99
-            cb(false, entries)
         } else if (doc === null) {
-            var user = new User({
-                username: data.usr,
-                password: data.pwd
-            })
-            user.save(function(err, doc) {
+            entries.code = 88   // 验证码错误
+            cb(false, entries)
+        } else if (doc !== null) {
+            User.findOne({
+                username: data.usr
+            }, function(err, doc) {
                 if (err) {
+                    console.log(err)
+                } else if (doc !== null) {
                     entries.code = 99
-                    cb(false, err)
-                } else {
-                    cb(true, entries)
+                    cb(false, entries)
+                } else if (doc === null) {
+                    var user = new User({
+                        username: data.usr,
+                        password: data.pwd,
+                        email: data.email
+                    })
+                    user.save(function(err, doc) {
+                        if (err) {
+                            entries.code = 99
+                            cb(false, err)
+                        } else {
+                            entries.code = 0
+                            cb(true, entries)
+                        }
+                    })
                 }
             })
         }
@@ -104,10 +122,12 @@ exports.sendCaptcha = function (data, cb) {
         if (err) {
             console.log(err)
         } else if (doc !== null) {
-            let [updateAt, nowAt] = [parseInt(docData.meta.update / 1000 / 60), parseInt(Date.now() / 1000 / 60)]
-            if (nowAt - updateAt >= 30) {    // 验证码超过30分钟才允许重新发送
+            let [deadline, nowAt] = [parseInt(docData.deadline / 1000 / 60), parseInt(Date.now() / 1000 / 60)]
+            console.log(nowAt- deadline);
+            if (nowAt - deadline >= 30) {    // 验证码超过30分钟才允许重新发送
                 Captcha.update({"_id": docData._id}, {$set : {
-                    "captcha": randomWord
+                    "captcha": randomWord,
+                    "deadline": Date.now()
                 }
                 }, function (err, result) {
                     if(err) {
@@ -125,7 +145,8 @@ exports.sendCaptcha = function (data, cb) {
         } else if (doc === null) {
             var captcha = new Captcha({
                 email: data.email,
-                captcha: randomWord
+                captcha: randomWord,
+                deadline: Date.now()
             })
             captcha.save(function(err, doc) {
                 if (err) {
@@ -180,9 +201,101 @@ exports.sendCaptchaMail = function (emailTo, msg) {
             console.log(error);
             result = 99
         } else {
-            console.log('111');
             console.log('Message sent: ' + info.response);
         }
     })
     return result
 }
+
+// 保存爬取的工作信息
+exports.addJobs = function (posname, company, money, area, pubdate, edu, exp, desc, welfare, type, count) {
+    var job = new Job({
+        posname: posname,
+        company: company,
+        money: money,
+        area: area,
+        pubdate: pubdate,
+        edu: edu,
+        exp: exp,
+        desc: desc,
+        welfare: welfare,
+        type: type,
+        count: count
+    });
+    job.save(function(err, doc) {
+        if (err) {
+            console.log('err');
+        }
+    })
+}
+
+// 查询工作
+exports.findJobs = function (data, cb) {
+    let searchItem = {
+        company: new RegExp(data.company),
+        type: new RegExp(data.type),
+        money: { $gt: data.salaryMin, $lt: data.salaryMax }
+    }
+    for (let item in searchItem) {  // 若条件为空则删除
+        if (searchItem[item] === '//') {
+            delete searchItem[item]
+        }
+    }
+    // Job.find(searchItem, {_id: 0, __v: 0}, function (err, docs) {
+    //     if (err) {
+    //         console.log(err)
+    //         entries.code = 99
+    //         cb(true, entries)
+    //     } else {
+    //         var jobList = new Array()
+    //         for(let item of docs) {
+    //             jobList.push(item.toObject());
+    //         }
+    //         entries.code = 0
+    //         entries.jobList = jobList
+    //         cb(true, entries)
+    //     }
+    // })
+    var page = data.page || 1
+    this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {_id: 0, __v: 0}, {
+        posname: 'desc'
+    }, function (error, data) {
+        if (error) {
+            next(error)
+        } else {
+            cb(true, data)
+        }
+    })
+}
+
+// 分页
+exports.pageQuery = function (page, pageSize, Model, populate, queryParams, projection, sortParams, callback) {
+    var start = (page - 1) * pageSize;
+    var $page = {
+        pageNumber: page
+    };
+    async.parallel({
+        count: function (done) {  // 查询数量
+            Model.count(queryParams).exec(function (err, count) {
+                done(err, count);
+            });
+        },
+        records: function (done) {   // 查询一页的记录
+            Model.find(queryParams, projection).skip(start).limit(pageSize).populate(populate).sort(sortParams).exec(function (err, doc) {
+                done(err, doc);
+            });
+        }
+    }, function (err, results) {
+
+        var list = new Array();
+        for (let item of results.records) {
+            list.push(item.toObject())
+        }
+
+        var count = results.count;
+        $page.pageCount = parseInt((count - 1) / pageSize + 1);
+        $page.results = list;
+        $page.count = count;
+        callback(err, $page);
+    });
+};
