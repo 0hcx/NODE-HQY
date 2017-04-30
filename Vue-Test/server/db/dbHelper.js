@@ -234,31 +234,16 @@ exports.findJobs = function (data, cb) {
     let searchItem = {
         company: new RegExp(data.company),
         type: new RegExp(data.type),
-        money: { $gt: data.salaryMin, $lt: data.salaryMax }
+        money: { $gte: data.salaryMin, $lte: data.salaryMax }
     }
     for (let item in searchItem) {  // 若条件为空则删除
         if (searchItem[item] === '//') {
             delete searchItem[item]
         }
     }
-    // Job.find(searchItem, {_id: 0, __v: 0}, function (err, docs) {
-    //     if (err) {
-    //         console.log(err)
-    //         entries.code = 99
-    //         cb(true, entries)
-    //     } else {
-    //         var jobList = new Array()
-    //         for(let item of docs) {
-    //             jobList.push(item.toObject());
-    //         }
-    //         entries.code = 0
-    //         entries.jobList = jobList
-    //         cb(true, entries)
-    //     }
-    // })
     var page = data.page || 1
     this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {_id: 0, __v: 0}, {
-        posname: 'desc'
+        money: 'asc'
     }, function (error, data) {
         if (error) {
             next(error)
