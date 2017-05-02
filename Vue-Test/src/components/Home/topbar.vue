@@ -24,7 +24,6 @@ export default {
   methods: {
     showLogin () {
       this.$store.dispatch('showLogin')
-      console.log(this.$store.getters.showState)
     },
     showDropdown () {
       this.dropdownMenu = !this.dropdownMenu
@@ -78,6 +77,8 @@ export default {
     font-size: 14px;
     background-color: #fff;
     transition: all 1s;
+    z-index: 99;
+    border: 1px solid #ddd;
 
     div:hover {
       background-color: #f5f5f5;

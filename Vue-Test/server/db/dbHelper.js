@@ -9,6 +9,7 @@ var Schema = mongoose.Schema
 var User = require('./schema/user')
 var Captcha = require('./schema/captcha')
 var Job = require('./schema/job')
+var Star = require('./schema/star')
 var config = require('../config')
 
 const jwtTokenSecret = 'vue-exercise'
@@ -43,7 +44,7 @@ exports.addUser = function (data, cb) {
                     user.save(function(err, doc) {
                         if (err) {
                             entries.code = 99
-                            cb(false, err)
+                            cb(false, entries)
                         } else {
                             entries.code = 0
                             cb(true, entries)
@@ -242,7 +243,7 @@ exports.findJobs = function (data, cb) {
         }
     }
     var page = data.page || 1
-    this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {_id: 0, __v: 0}, {
+    this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {__v: 0}, {
         money: 'asc'
     }, function (error, data) {
         if (error) {
@@ -284,3 +285,42 @@ exports.pageQuery = function (page, pageSize, Model, populate, queryParams, proj
         callback(err, $page);
     });
 };
+
+// 添加关注的工作
+exports.addStar = function (data, cb) {     // data包含uid, jobId
+    var item = {
+        uid: data.uid,
+        jobId: data.jobId
+    }
+    Star.findOne(item, function(err, doc) {
+        if (err) {
+            console.log(err)
+        } else if (doc !== null) {
+            entries.code = 99
+            cb(false, entries)
+        } else if (doc === null) {
+            var star = new Star(item)
+            star.save(function(err, doc) {
+                if (err) {
+                    entries.code = 99
+                    cb(false, entries)
+                } else {
+                    entries.code = 0
+                    cb(true, entries)
+                }
+            })
+        }
+    })
+}
+
+// 获取关注的工作
+exports.getStarJob = function (req, cb) {
+    var page = 1
+    this.pageQuery(page, PAGE_SIZE, Star, 'jobId', {uid: req.uid}, {}, {}, function (error, data) {
+        if (error) {
+            next(error)
+        } else {
+            cb(true, data)
+        }
+    })
+}

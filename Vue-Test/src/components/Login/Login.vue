@@ -60,6 +60,7 @@ export default {
             if (res.data.code === 0) {
               sessionStorage.setItem('accessToken', res.data.access_token)
               sessionStorage.setItem('username', res.data.data.username)
+              sessionStorage.setItem('uid', res.data.data._id)
               this.$store.dispatch('showLogin')
               this.$message({
                 showClose: true,

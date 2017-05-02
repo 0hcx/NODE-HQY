@@ -37,5 +37,19 @@ router.post('/searchJobs', function(req, res, next) {
     })
 });
 
+// addStarJob
+router.post('/addStarJob', function(req, res, next) {
+    dbHelper.addStar(req.body, function (success, doc) {
+        res.send(doc)
+    })
+});
+
+// getStarJob
+router.post('/getStarJob', function(req, res, next) {
+    dbHelper.getStarJob(req.body, function (success, doc) {
+        res.send(doc)
+    })
+});
+
 
 module.exports = router;

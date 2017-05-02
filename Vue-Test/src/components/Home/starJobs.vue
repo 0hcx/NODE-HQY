@@ -1,29 +1,7 @@
 <template>
     <div class="main">
       <DescMsg :jobDesc="jobDesc" :showMsg="showMsg" v-on:hideMsg="hideJobDesc"></DescMsg>
-      <div class="searchForm">
-        <form @submit.prevent="onSubmit">
-          <div class="input-group">
-            <span class="input-group-addon">公司名称</span>
-            <input type="text" class="form-control" placeholder="公司名称" v-model="company">
-          </div>
-          <div class="input-group">
-          <span class="input-group-addon">职位类型</span>
-            <input type="text" class="form-control" placeholder="职位类型" v-model="type">
-          </div>
-          <div class="salary-group">
-            <div class="input-group">
-              <span class="input-group-addon">月薪</span>
-              <input type="number" class="form-control" placeholder="Min" v-model.number="salaryMin">
-            </div>
-            &nbsp;-&nbsp;
-            <input type="number" class="form-control" placeholder="Max" v-model.number="salaryMax">
-          </div>
-          <div>
-            <button type="button" class="btn btn-primary" @click='onSubmit(-1)'>查询</button>
-          </div>
-        </form>
-      </div>
+      <!-- 展示结果 -->
       <div class="searchResult">
         <table class="table table-hover">
           <tbody class="jobList">
@@ -67,10 +45,6 @@ export default {
   components: { DescMsg },
   data () {
     return {
-      company: '',
-      type: '',
-      salaryMin: '',
-      salaryMax: '',
       title: ['标题', '公司', '月薪', '地点', '发布时间', '最低学历', '工作经验', '详情', '福利', '职位类别', '招聘人数'],
       searchResults: [],
       page: {

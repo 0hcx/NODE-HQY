@@ -1,20 +1,25 @@
 <template>
-  <div class="wrapper" @click="hideShade" v-if="showMsg">
+  <div class="wrapper" v-if="showMsg">
+    <div class="shade" @click="hideShade"></div>
     <div class="msgBox">
       <h4 class="msgTitle">详情介绍</h4>
       <table class="table table-hover">
         <tbody class="jobList">
-          <tr v-for="item in jobDesc" :key="item.id">
+          <tr v-for="(item, index) in jobDesc" v-if="index > 0">
             <td class="title">{{ item.title }}</td>
             <td class="ctn">{{ item.value }}</td>
           </tr>
         </tbody>
       </table>
+      <div class="ft">
+        <button type="button" class="btn btn-primary" @click="starJob">关注</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Axios from 'axios'
 
 export default {
   data () {
@@ -34,6 +39,31 @@ export default {
   methods: {
     hideShade () {
       this.$emit('hideMsg')
+    },
+    starJob () {
+      var data = {
+        uid: sessionStorage.getItem('uid'),
+        jobId: this.jobDesc[0].value
+      }
+      Axios.post('http://localhost:3000/api/addStarJob', data)
+        .then(res => {
+          if (res.data.code === 0) {
+            this.$message({
+              showClose: false,
+              message: '关注成功',
+              type: 'success'
+            })
+          } else if (res.data.code === 99) {
+            this.$message({
+              showClose: false,
+              message: '已添加关注',
+              type: 'error'
+            })
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   }
 }
@@ -55,6 +85,12 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
+}
+
+.shade {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   background-color: hsla(0, 0%, 0%, .7);
   z-index: 999;
 }
@@ -64,6 +100,7 @@ export default {
   height: auto;
   background-color: @blue;
   border-radius: 1em;
+  z-index: 9999;
 
   h4 {
     color: @white;
@@ -72,8 +109,8 @@ export default {
   table {
     background-color: #E5E9F2;
     margin-bottom: 0;
-    border-bottom-right-radius: 1em;
-    border-bottom-left-radius: 1em;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
   }
 
   .title {
@@ -93,10 +130,16 @@ export default {
     word-wrap: break-word;
     word-break: normal;
   }
-
-
 }
 
+.ft {
+  background-color: #E5E9F2;
+  border-bottom-left-radius: 1em;
+  border-bottom-right-radius: 1em;
 
+  button {
+    margin: 8px 0 8px 0;
+  }
+}
 
 </style>
