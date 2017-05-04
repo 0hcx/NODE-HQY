@@ -12,7 +12,8 @@
         </tbody>
       </table>
       <div class="ft">
-        <button type="button" class="btn btn-primary" @click="starJob">关注</button>
+        <button type="button" class="btn btn-primary" @click="starJob" v-if="descType === 'DO_STAR'">关注</button>
+        <button type="button" class="btn btn-primary" @click="cancleStar" v-else-if="descType === 'CANCLE_STAR'">取消关注</button>
       </div>
     </div>
   </div>
@@ -20,6 +21,7 @@
 
 <script>
 import Axios from 'axios'
+import API from '../../api'
 
 export default {
   data () {
@@ -34,6 +36,10 @@ export default {
     showMsg: {
       type: Boolean,
       default: false
+    },
+    descType: {
+      type: String,
+      default: ''
     }
   },
   methods: {
@@ -45,7 +51,7 @@ export default {
         uid: sessionStorage.getItem('uid'),
         jobId: this.jobDesc[0].value
       }
-      Axios.post('http://localhost:3000/api/addStarJob', data)
+      Axios.post(API.addStarJob, data)
         .then(res => {
           if (res.data.code === 0) {
             this.$message({
@@ -65,6 +71,32 @@ export default {
         .catch(err => {
           console.log(err)
         })
+    },
+    cancleStar () {
+      var data = {
+        uid: sessionStorage.getItem('uid'),
+        jobId: this.jobDesc[0].value
+      }
+      Axios.post(API.cancleStar, data)
+      .then(res => {
+        if (res.data.code === 0) {
+          this.$message({
+            showClose: false,
+            message: '取消成功',
+            type: 'success'
+          })
+          this.$store.dispatch('updateStar')
+        } else if (res.data.code === 99) {
+          this.$message({
+            showClose: false,
+            message: '取消失败',
+            type: 'error'
+          })
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
     }
   }
 }

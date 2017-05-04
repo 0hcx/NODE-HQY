@@ -6,6 +6,7 @@ var ObjectId = Schema.Types.ObjectId;
 var starSchema = new Schema({
     uid: String,
     jobId: { type: ObjectId, ref: 'Job' },
+    vaild: 0,	// 1代表已取消关注，默认为0
     meta: {
         updateAt: {type:Date, default: Date.now()},
         createAt: {type:Date, default: Date.now()}

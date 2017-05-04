@@ -7,7 +7,8 @@ export default new Vuex.Store({
   state: {
     showLogin: false,
     tab: 'SEARCH',         // 主页TAB
-    starCount: 0           // 新关注数量
+    starCount: 0,          // 新关注数量
+    updateStar: true
   },
   mutations: {
     SHOW_LOGIN (state) {
@@ -21,6 +22,9 @@ export default new Vuex.Store({
     },
     CLEAR_STAR (state) {
       state.starCount = 0
+    },
+    UPDATE_STAR (state) {
+      state.updateStar = !state.updateStar
     }
   },
   actions: {
@@ -36,6 +40,9 @@ export default new Vuex.Store({
       } else if (msg === 'clear') {
         commit('CLEAR_STAR')
       }
+    },
+    updateStar ({ commit }) {
+      commit('UPDATE_STAR')
     }
   },
   getters: {
@@ -47,6 +54,9 @@ export default new Vuex.Store({
     },
     getStar: function (state) {
       return state.starCount
+    },
+    getUpdateStar: function (state) {
+      return state.updateStar
     }
   }
 })

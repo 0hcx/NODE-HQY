@@ -44,6 +44,13 @@ router.post('/addStarJob', function(req, res, next) {
     })
 });
 
+// cancleStarJob
+router.post('/cancleStar', function(req, res, next) {
+    dbHelper.cancleStar(req.body, function (success, doc) {
+        res.send(doc)
+    })
+});
+
 // getStarJob
 router.post('/getStarJob', function(req, res, next) {
     dbHelper.getStarJob(req.body, function (success, doc) {

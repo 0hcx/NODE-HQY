@@ -1,5 +1,5 @@
 <template>
-  <div class="pageButtons">
+  <div class="pageButtons" v-if="show">
     <nav aria-label="Page navigation">
       <ul class="pagination">
         <li :class="{disabled: isMin}">
@@ -36,7 +36,8 @@ export default {
         { active: false, value: 1 }
       ],
       isMin: false,
-      isMax: false
+      isMax: false,
+      show: false
     }
   },
   props: {
@@ -46,8 +47,9 @@ export default {
     }
   },
   watch: {
-    pageCount (val, oldVal) {
+    pageCount () {
       this.init(-1)
+      this.show = true
     }
   },
   methods: {

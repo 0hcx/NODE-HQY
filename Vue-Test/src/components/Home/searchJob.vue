@@ -1,6 +1,5 @@
 <template>
     <div class="main" v-show="tab === 'SEARCH'">
-      <DescMsg :jobDesc="jobDesc" :showMsg="showMsg" v-on:hideMsg="hideJobDesc"></DescMsg>
       <div class="searchForm">
         <form @submit.prevent="onSubmit">
           <div class="input-group">
@@ -24,18 +23,8 @@
           </div>
         </form>
       </div>
-      <div class="searchResult">
-        <table class="table table-hover">
-          <tbody class="jobList">
-            <tr>
-              <th v-for="item in title">{{ item }}</th>
-            </tr>
-            <tr v-for="(item, index) in searchResults" @click="showDesc(index)">
-              <td v-for="(value, key) in item" v-if="key !== '_id' && key !== '__v'">{{ value }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <!-- 展示结果 -->
+      <SearchResult :searchResults="searchResults" :descType="descType"></SearchResult>
       <!-- 底部页号栏 -->
       <Pagination :pageCount="pageCount" @pageChanged="pageChanged"></Pagination>
     </div>
@@ -44,23 +33,21 @@
 <script>
 import Axios from 'axios'
 import API from '../../api'
-import DescMsg from './descMsg'
-import Pagination from './pagination'
+import Pagination from '../common/pagination'
+import SearchResult from '../common/searchResult'
 
 export default {
-  components: { DescMsg, Pagination },
+  components: { SearchResult, Pagination },
   data () {
     return {
       company: '',
       type: '',
       salaryMin: '',
       salaryMax: '',
-      title: ['标题', '公司', '月薪', '地点', '发布时间', '最低学历', '工作经验', '详情', '福利', '职位类别', '招聘人数'],
       searchResults: [],
       pageCount: 0,
       page: 1,
-      jobDesc: [],
-      showMsg: false
+      descType: 'DO_STAR'
     }
   },
   props: {
@@ -69,8 +56,15 @@ export default {
       default: ''
     }
   },
+  // watch: {
+  //   tab: function (tab) {
+  //     if (tab === 'SEARCH') {
+  //       this.onSubmit()
+  //     }
+  //   }
+  // },
   methods: {
-    onSubmit (index) {
+    onSubmit () {
       let searchData = {
         company: this.company,
         type: this.type,
@@ -84,32 +78,10 @@ export default {
       .then(res => {
         this.searchResults = res.data.results // 单页查询结果
         this.pageCount = res.data.pageCount
-        // console.log(searchData.page)
       })
       .catch(err => {
         console.log(err)
       })
-    },
-    showDesc (index) {
-      let item = this.searchResults[index]
-      this.jobDesc = [
-        { title: '_id', value: item._id },
-        { title: '标题', value: item.posname },
-        { title: '公司', value: item.company },
-        { title: '月薪', value: item.money },
-        { title: '地点', value: item.area },
-        { title: '发布时间', value: item.pubdate },
-        { title: '最低学历', value: item.edu },
-        { title: '工作经验', value: item.exp },
-        { title: '详情', value: item.desc },
-        { title: '福利', value: item.welfare },
-        { title: '职位类别', value: item.type },
-        { title: '招聘人数', value: item.count }
-      ]
-      this.showMsg = true
-    },
-    hideJobDesc () {
-      this.showMsg = false
     },
     pageChanged (page) {
       this.page = page

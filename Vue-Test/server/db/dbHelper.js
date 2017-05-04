@@ -290,7 +290,8 @@ exports.pageQuery = function (page, pageSize, Model, populate, queryParams, proj
 exports.addStar = function (data, cb) {     // data包含uid, jobId
     var item = {
         uid: data.uid,
-        jobId: data.jobId
+        jobId: data.jobId,
+        vaild: 0
     }
     Star.findOne(item, function(err, doc) {
         if (err) {
@@ -313,10 +314,34 @@ exports.addStar = function (data, cb) {     // data包含uid, jobId
     })
 }
 
+// 取消关注
+exports.cancleStar = function (data, cb) {
+    var item = {
+        uid: data.uid,
+        jobId: data.jobId
+    }
+    Star.update(item, {$set: {
+        vaild: 1
+    }}, function (err, result) {
+        if (err) {
+            console.log(err)
+            entries.code = 99
+            cb(false, entries)
+        } else {
+            entries.code = 0
+            cb(true, entries)
+        }
+    })
+}
+
 // 获取关注的工作
 exports.getStarJob = function (req, cb) {
     var page = req.page || 1
-    this.pageQuery(page, PAGE_SIZE, Star, 'jobId', {uid: req.uid}, {}, {}, function (error, data) {
+    var searchItem = {
+        uid: req.uid,
+        vaild: 0
+    }
+    this.pageQuery(page, PAGE_SIZE, Star, 'jobId', searchItem, {}, {}, function (error, data) {
         if (error) {
             next(error)
         } else {
