@@ -2,11 +2,11 @@
   <div class="wrapper">
     <Topbar></Topbar>
     <div class="bd">
-      <Sidebar v-on:toggleTab="toggleTab"></Sidebar>
+      <Sidebar></Sidebar>
       <div class="right-bd">
         <div class="main">
-          <SearchJob v-if="tab === 'SEARCH'"></SearchJob>
-          <StarJobs v-if="tab === 'STAR'"></StarJobs>
+          <SearchJob :tab="tab"></SearchJob>
+          <StarJobs :tab="tab"></StarJobs>
         </div>
       </div>
     </div>
@@ -23,13 +23,14 @@ export default {
   components: { Topbar, Sidebar, SearchJob, StarJobs },
   data () {
     return {
-      tab: this.$store.getters.getTab
+    }
+  },
+  computed: {
+    tab () {
+      return this.$store.getters.getTab
     }
   },
   methods: {
-    toggleTab () {
-      this.tab = this.$store.getters.getTab
-    }
   }
 }
 

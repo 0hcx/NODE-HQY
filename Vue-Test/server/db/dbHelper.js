@@ -243,7 +243,7 @@ exports.findJobs = function (data, cb) {
         }
     }
     var page = data.page || 1
-    this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {__v: 0}, {
+    this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {}, {
         money: 'asc'
     }, function (error, data) {
         if (error) {
@@ -315,11 +315,16 @@ exports.addStar = function (data, cb) {     // data包含uid, jobId
 
 // 获取关注的工作
 exports.getStarJob = function (req, cb) {
-    var page = 1
+    var page = req.page || 1
     this.pageQuery(page, PAGE_SIZE, Star, 'jobId', {uid: req.uid}, {}, {}, function (error, data) {
         if (error) {
             next(error)
         } else {
+            let list = new Array()
+            for (let item of data.results) {
+                list.push(item.jobId)
+            }
+            data.results = list
             cb(true, data)
         }
     })

@@ -1,5 +1,5 @@
 <template>
-    <div class="main">
+    <div class="main" v-show="tab === 'STAR'">
       <DescMsg :jobDesc="jobDesc" :showMsg="showMsg" v-on:hideMsg="hideJobDesc"></DescMsg>
       <!-- 展示结果 -->
       <div class="searchResult">
@@ -9,106 +9,59 @@
               <th v-for="item in title">{{ item }}</th>
             </tr>
             <tr v-for="(item, index) in searchResults" @click="showDesc(index)">
-              <td v-for="(value, key) in item" v-if="key !== '_id'">{{ value }}</td>
+              <td v-for="(value, key) in item" v-if="key !== '_id' && key !== '__v'">{{ value }}</td>
             </tr>
           </tbody>
         </table>
       </div>
       <!-- 底部页号栏 -->
-      <div class="pageButtons">
-        <nav aria-label="Page navigation">
-          <ul class="pagination">
-            <li :class="{disabled: minPage}">
-              <a aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-            <li v-for="(item, index) of pageList" :class="{active: item.active}">
-              <a @click="onSubmit(index)">{{ item.value }}</a>
-            </li>
-            <li :class="{disabled: maxPage}">
-              <a aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+      <Pagination :pageCount="pageCount" @pageChanged="pageChanged"></Pagination>
     </div>
 </template>
 
 <script>
 import Axios from 'axios'
+import API from '../../api'
 import DescMsg from './descMsg'
+import Pagination from './pagination'
 
 export default {
-  components: { DescMsg },
+  components: { DescMsg, Pagination },
   data () {
     return {
       title: ['标题', '公司', '月薪', '地点', '发布时间', '最低学历', '工作经验', '详情', '福利', '职位类别', '招聘人数'],
       searchResults: [],
-      page: {
-        selected: 0,  // 选中页数
-        count: 0,     // 总页数
-        size: 10      // 最大显示页数
-      },
-      pageList: [
-        {active: false, value: 1}
-      ],
-      minPage: false,
-      maxPage: false,
+      pageCount: 0,
+      page: 1,
       jobDesc: [],
       showMsg: false
     }
   },
+  props: {
+    tab: {
+      type: String,
+      default: ''
+    }
+  },
+  watch: {
+    tab: function (tab) {
+      if (tab === 'STAR') {
+        this.onSubmit()
+        this.$store.dispatch('showStar', 'clear')
+      }
+    }
+  },
   methods: {
-    onSubmit (index) {
-      if (index === -1) {
-        index = 0
-        this.page.selected = 0
-        this.pageList = [
-          {active: false, value: 1}
-        ]
+    onSubmit () {
+      var searchData = {
+        uid: sessionStorage.getItem('uid'),
+        page: this.page
       }
-      let searchData = {
-        company: this.company,
-        type: this.type,
-        salaryMin: this.salaryMin,
-        salaryMax: this.salaryMax,
-        page: this.pageList[index].value
-      }
-      searchData.salaryMin = (searchData.salaryMin === '') ? -1 : searchData.salaryMin
-      searchData.salaryMax = (searchData.salaryMax === '') ? 99999999 : searchData.salaryMax
-      Axios.post('http://localhost:3000/api/searchJobs', searchData)
+      Axios.post(API.getStarJob, searchData)
       .then(res => {
-        this.searchResults = res.data.results       // 单页查询结果
-        this.page.count = res.data.pageCount   // 总页数
-        console.log('总页数' + this.page.count)           // 总数据量
-        // 页号栏变动
-        // this.pageList = []
-        let pageNumber = 1  // 实际页号like15页
-        if (index >= 6 && (this.page.count - this.pageList[9].value) > 0) {
-          pageNumber = this.pageList[1].value
-          index--
-        } else if (index < 6 && this.pageList[0].value !== 1) {
-          pageNumber = this.pageList[0].value - 1
-          index++
-        }
-        this.pageList = []
-        this.page.size = (this.page.count > 10) ? 10 : this.page.count
-        for (let i = 0; i < this.page.size; i++) {
-          let item = {
-            active: false,
-            value: pageNumber
-          }
-          pageNumber++
-          this.pageList.push(item)
-        }
-        // 改变当前选中页号下标样式
-        this.pageList[this.page.selected].active = false
-        this.pageList[index].active = true
-        this.page.selected = index
-        console.log(searchData.page)
+        this.searchResults = res.data.results // 单页查询结果
+        this.pageCount = res.data.pageCount
+        // console.log(searchData.page)
       })
       .catch(err => {
         console.log(err)
@@ -134,6 +87,10 @@ export default {
     },
     hideJobDesc () {
       this.showMsg = false
+    },
+    pageChanged (page) {
+      this.page = page
+      this.onSubmit()
     }
   }
 }

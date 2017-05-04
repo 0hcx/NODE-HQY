@@ -53,6 +53,7 @@ export default {
               message: '关注成功',
               type: 'success'
             })
+            this.$store.dispatch('showStar', 'add')
           } else if (res.data.code === 99) {
             this.$message({
               showClose: false,
@@ -74,6 +75,7 @@ export default {
 
 @white: #FFFFFF;
 @blue: #20A0FF;
+@box-radius: .5em;
 
 .wrapper {
   position: absolute;
@@ -99,7 +101,7 @@ export default {
   width: 400px;
   height: auto;
   background-color: @blue;
-  border-radius: 1em;
+  border-radius: @box-radius;
   z-index: 9999;
 
   h4 {
@@ -134,8 +136,8 @@ export default {
 
 .ft {
   background-color: #E5E9F2;
-  border-bottom-left-radius: 1em;
-  border-bottom-right-radius: 1em;
+  border-bottom-left-radius: @box-radius;
+  border-bottom-right-radius: @box-radius;
 
   button {
     margin: 8px 0 8px 0;
