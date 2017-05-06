@@ -36,7 +36,9 @@
 
 <script>
 import Axios from 'axios'
+import API from '../../api1'
 import router from '../../router'
+import { showMsg } from '../../common/vHelper'
 
 export default {
   name: 'register',
@@ -112,28 +114,15 @@ export default {
             'email': this.registerForm.email,
             'captcha': this.registerForm.captcha
           }
-          Axios.post('http://localhost:3000/api/register', data)
+          Axios.post(API.register, data)
           .then(res => {
-            console.log(res.data.code)
             if (res.data.code === 0) {
-              this.$message({
-                showClose: true,
-                message: '注册成功',
-                type: 'success'
-              })
+              showMsg(this, true, '注册成功', 'success')
               router.push({name: 'Login'})
             } else if (res.data.code === 88) {
-              this.$message({
-                showClose: true,
-                message: '验证码错误',
-                type: 'error'
-              })
+              showMsg(this, true, '验证码错误', 'error')
             } else if (res.data.code === 99) {
-              this.$message({
-                showClose: true,
-                message: '用户已存在',
-                type: 'error'
-              })
+              showMsg(this, true, '用户名已被注册', 'error')
             }
           })
           .catch(err => {
@@ -155,11 +144,7 @@ export default {
             } else if (code === 88) {
               this.captchaMsg = '已经发送'
             } else if (code === 99) {
-              this.$message({
-                showClose: true,
-                message: '验证码发送失败',
-                type: 'error'
-              })
+              showMsg(this, true, '验证码发送失败', 'error')
             }
           })
           .catch(err => {

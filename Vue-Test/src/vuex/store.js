@@ -8,7 +8,15 @@ export default new Vuex.Store({
     showLogin: false,
     tab: 'SEARCH',         // 主页TAB
     starCount: 0,          // 新关注数量
-    updateStar: true
+    updateStar: true,
+    searchJobs: {
+      data: [],
+      pageCount: 0
+    },
+    starJobs: {
+      data: [],
+      pageCount: 0
+    }
   },
   mutations: {
     SHOW_LOGIN (state) {
@@ -25,6 +33,12 @@ export default new Vuex.Store({
     },
     UPDATE_STAR (state) {
       state.updateStar = !state.updateStar
+    },
+    UPDATE_SEARCH_JOBS (state, data) {
+      state.searchJobs = data
+    },
+    UPDATE_STAR_JOBS (state, data) {
+      state.starJobs = data
     }
   },
   actions: {
@@ -43,6 +57,12 @@ export default new Vuex.Store({
     },
     updateStar ({ commit }) {
       commit('UPDATE_STAR')
+    },
+    updateSearchJobs ({ commit }, data) {
+      commit('UPDATE_SEARCH_JOBS', data)
+    },
+    updateStarJobs ({ commit }, data) {
+      commit('UPDATE_STAR_JOBS', data)
     }
   },
   getters: {
@@ -57,6 +77,12 @@ export default new Vuex.Store({
     },
     getUpdateStar: function (state) {
       return state.updateStar
+    },
+    getSearchJobs: function (state) {
+      return state.searchJobs
+    },
+    getStarJobs: function (state) {
+      return state.starJobs
     }
   }
 })

@@ -24,15 +24,15 @@
         </form>
       </div>
       <!-- 展示结果 -->
-      <SearchResult :searchResults="searchResults" :descType="descType"></SearchResult>
+      <SearchResult :descType="descType"></SearchResult>
       <!-- 底部页号栏 -->
       <Pagination :pageCount="pageCount" @pageChanged="pageChanged"></Pagination>
     </div>
 </template>
 
 <script>
-import Axios from 'axios'
-import API from '../../api'
+// import Axios from 'axios'
+import { searchJobs } from '../../vuex/actions'
 import Pagination from '../common/pagination'
 import SearchResult from '../common/searchResult'
 
@@ -45,7 +45,6 @@ export default {
       salaryMin: '',
       salaryMax: '',
       searchResults: [],
-      pageCount: 0,
       page: 1,
       descType: 'DO_STAR'
     }
@@ -56,13 +55,11 @@ export default {
       default: ''
     }
   },
-  // watch: {
-  //   tab: function (tab) {
-  //     if (tab === 'SEARCH') {
-  //       this.onSubmit()
-  //     }
-  //   }
-  // },
+  computed: {
+    pageCount () {
+      return this.$store.getters.getSearchJobs.pageCount
+    }
+  },
   methods: {
     onSubmit () {
       let searchData = {
@@ -74,14 +71,7 @@ export default {
       }
       searchData.salaryMin = (searchData.salaryMin === '') ? -1 : searchData.salaryMin
       searchData.salaryMax = (searchData.salaryMax === '') ? 99999999 : searchData.salaryMax
-      Axios.post(API.searchJobs, searchData)
-      .then(res => {
-        this.searchResults = res.data.results // 单页查询结果
-        this.pageCount = res.data.pageCount
-      })
-      .catch(err => {
-        console.log(err)
-      })
+      searchJobs('ALL', searchData)
     },
     pageChanged (page) {
       this.page = page

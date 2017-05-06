@@ -21,7 +21,7 @@
 
 <script>
 import Axios from 'axios'
-import API from '../../api'
+import API from '../../api1'
 
 export default {
   data () {

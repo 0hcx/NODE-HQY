@@ -27,13 +27,19 @@ export default {
     }
   },
   props: {
-    searchResults: {
-      type: Array,
-      defalut: []
-    },
     descType: {
       type: String,
       defalut: ''
+    }
+  },
+  computed: {
+    searchResults () {
+      let tab = this.$store.getters.getTab
+      if (tab === 'SEARCH') {
+        return this.$store.getters.getSearchJobs.data
+      } else if (tab === 'STAR') {
+        return this.$store.getters.getStarJobs.data
+      }
     }
   },
   methods: {
