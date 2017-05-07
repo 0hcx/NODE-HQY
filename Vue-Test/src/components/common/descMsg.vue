@@ -20,8 +20,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import API from '../../api1'
+import { doStarJob, doCancleStar } from '../../lib/vueHelper'
 
 export default {
   data () {
@@ -47,56 +46,18 @@ export default {
       this.$emit('hideMsg')
     },
     starJob () {
-      var data = {
+      let data = {
         uid: sessionStorage.getItem('uid'),
         jobId: this.jobDesc[0].value
       }
-      Axios.post(API.addStarJob, data)
-        .then(res => {
-          if (res.data.code === 0) {
-            this.$message({
-              showClose: false,
-              message: '关注成功',
-              type: 'success'
-            })
-            this.$store.dispatch('showStar', 'add')
-          } else if (res.data.code === 99) {
-            this.$message({
-              showClose: false,
-              message: '已添加关注',
-              type: 'error'
-            })
-          }
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      doStarJob(this, data)
     },
     cancleStar () {
-      var data = {
+      let data = {
         uid: sessionStorage.getItem('uid'),
         jobId: this.jobDesc[0].value
       }
-      Axios.post(API.cancleStar, data)
-      .then(res => {
-        if (res.data.code === 0) {
-          this.$message({
-            showClose: false,
-            message: '取消成功',
-            type: 'success'
-          })
-          this.$store.dispatch('updateStar')
-        } else if (res.data.code === 99) {
-          this.$message({
-            showClose: false,
-            message: '取消失败',
-            type: 'error'
-          })
-        }
-      })
-      .catch(err => {
-        console.log(err)
-      })
+      doCancleStar(this, data)
     }
   }
 }

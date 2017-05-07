@@ -37,7 +37,8 @@ export default {
       ],
       isMin: false,
       isMax: false,
-      show: false
+      show: false,
+      isInit: false
     }
   },
   props: {
@@ -50,6 +51,7 @@ export default {
     pageCount () {
       this.init(-1)
       this.show = true
+      this.onSubmit(0)
     }
   },
   methods: {
@@ -61,6 +63,10 @@ export default {
         index = 0
         this.page.min = 1
         this.page.max = this.page.size
+        this.isInit = false
+        this.page.selected = index
+      } else {
+        this.isInit = true
       }
 
       if (index >= 6 && (this.page.count - this.pageList[9].value) > 0) {
@@ -68,7 +74,7 @@ export default {
         index--
         this.page.min++
         this.page.max++
-      } else if (index < 6 && this.pageList[0].value !== 1) {
+      } else if (this.isInit && index < 6 && this.pageList[0].value !== 1) {
         pageNumber = this.pageList[0].value - 1
         index++
         this.page.min--

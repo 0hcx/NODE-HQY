@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { searchJobs } from '../../vuex/actions'
+import { searchJobs } from '../../lib/vueHelper'
 import Pagination from '../common/pagination'
 import SearchResult from '../common/searchResult'
 

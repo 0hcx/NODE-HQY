@@ -124,7 +124,7 @@ exports.sendCaptcha = function (data, cb) {
             console.log(err)
         } else if (doc !== null) {
             let [deadline, nowAt] = [parseInt(docData.deadline / 1000 / 60), parseInt(Date.now() / 1000 / 60)]
-            console.log(nowAt- deadline);
+            // console.log(nowAt- deadline);
             if (nowAt - deadline >= 30) {    // 验证码超过30分钟才允许重新发送
                 Captcha.update({"_id": docData._id}, {$set : {
                     "captcha": randomWord,

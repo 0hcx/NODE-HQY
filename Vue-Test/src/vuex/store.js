@@ -6,8 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     showLogin: false,
-    tab: 'SEARCH',         // 主页TAB
-    starCount: 0,          // 新关注数量
+    tab: 'SEARCH',
+    starCount: 0,
     updateStar: true,
     searchJobs: {
       data: [],
@@ -16,7 +16,8 @@ export default new Vuex.Store({
     starJobs: {
       data: [],
       pageCount: 0
-    }
+    },
+    captchaMsg: '发送验证码'
   },
   mutations: {
     SHOW_LOGIN (state) {
@@ -39,6 +40,9 @@ export default new Vuex.Store({
     },
     UPDATE_STAR_JOBS (state, data) {
       state.starJobs = data
+    },
+    UPDATE_CAPTCHA_MSG (state, data) {
+      state.captchaMsg = data
     }
   },
   actions: {
@@ -63,6 +67,9 @@ export default new Vuex.Store({
     },
     updateStarJobs ({ commit }, data) {
       commit('UPDATE_STAR_JOBS', data)
+    },
+    updateCaptchaMsg ({ commit }, data) {
+      commit('UPDATE_CAPTCHA_MSG', data)
     }
   },
   getters: {
@@ -83,6 +90,9 @@ export default new Vuex.Store({
     },
     getStarJobs: function (state) {
       return state.starJobs
+    },
+    getCaptchaMsg: function (state) {
+      return state.captchaMsg
     }
   }
 })

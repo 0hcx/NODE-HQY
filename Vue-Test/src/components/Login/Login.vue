@@ -24,8 +24,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import router from '../../router'
+import { doLogin } from '../../lib/vueHelper'
 
 export default {
   name: 'login',
@@ -55,30 +54,7 @@ export default {
             'usr': this.loginForm.userName,
             'pwd': this.loginForm.pwd
           }
-          Axios.post('http://localhost:3000/api/login', data)
-          .then(res => {
-            if (res.data.code === 0) {
-              sessionStorage.setItem('accessToken', res.data.access_token)
-              sessionStorage.setItem('username', res.data.data.username)
-              sessionStorage.setItem('uid', res.data.data._id)
-              this.$store.dispatch('showLogin')
-              this.$message({
-                showClose: true,
-                message: '登录成功',
-                type: 'success'
-              })
-              router.push({path: '/p/index', params: { username: res.data.username }})
-            } else {
-              this.$message({
-                showClose: true,
-                message: '登录失败，账号或密码错误',
-                type: 'error'
-              })
-            }
-          })
-          .catch(err => {
-            console.log(err)
-          })
+          doLogin(this, data)
         } else {
           return false
         }
