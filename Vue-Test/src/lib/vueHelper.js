@@ -129,3 +129,22 @@ export const doCancleStar = (that, data) => {
     console.log(err)
   })
 }
+
+// getChartData
+export const getChartData = (data) => {
+  api.getChartData(data)
+  .then(res => {
+    if (res.data.code === 0) {
+      let result = {
+        chartType: res.data.chartType,
+        data: res.data.chart
+      }
+      store.dispatch('updateChart', result)
+    } else if (res.data.code === 99) {
+      console.log('err')
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+}

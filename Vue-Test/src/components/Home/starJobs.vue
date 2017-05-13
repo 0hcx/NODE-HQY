@@ -31,7 +31,6 @@ export default {
     tab: function (tab) {
       if (tab === 'STAR') {
         this.onSubmit()
-        this.$store.dispatch('showStar', 'clear')
       }
     },
     updateStar: function (val) {
@@ -53,6 +52,7 @@ export default {
         page: this.page
       }
       searchJobs('STAR', searchData)
+      this.$store.dispatch('showStar', 'clear')
     },
     pageChanged (page) {
       this.page = page

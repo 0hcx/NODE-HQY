@@ -22,5 +22,8 @@ export default {
   },
   getStarJob (data) {
     return Axios.post(API.getStarJob, data)
+  },
+  getChartData (data) {
+    return Axios.post(API.getChart, data)
   }
 }

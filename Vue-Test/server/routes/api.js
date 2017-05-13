@@ -58,5 +58,12 @@ router.post('/getStarJob', function(req, res, next) {
     })
 });
 
+// getChart
+router.post('/getChartData', function(req, res, next) {
+    dbHelper.getJobChart(req.body, function (success, doc) {
+        res.send(doc)
+    })
+});
+
 
 module.exports = router;

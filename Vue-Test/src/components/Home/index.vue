@@ -7,6 +7,7 @@
         <div class="main">
           <SearchJob :tab="tab"></SearchJob>
           <StarJobs :tab="tab"></StarJobs>
+          <Chart :tab="tab"></Chart>
         </div>
       </div>
     </div>
@@ -18,9 +19,10 @@ import Topbar from './topbar'
 import Sidebar from './sidebar'
 import SearchJob from './searchJob'
 import StarJobs from './starJobs'
+import Chart from './chart'
 
 export default {
-  components: { Topbar, Sidebar, SearchJob, StarJobs },
+  components: { Topbar, Sidebar, SearchJob, StarJobs, Chart },
   data () {
     return {
     }
@@ -41,13 +43,15 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
 }
 
 .bd {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding-bottom: 100%;
+  /*padding-bottom: 100%;*/
+  height: 100%;
 }
 
 .right-bd {
@@ -55,5 +59,8 @@ export default {
   flex-grow: 2;
 }
 
+.main {
+  height: 100%;
+}
 
 </style>

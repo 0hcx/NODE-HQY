@@ -10,7 +10,7 @@ var dbHelper = require('./db/dbHelper');
 var jwt = require('jwt-simple');
 var job = require('./db/jobSpider')
 
-// job.saveToDB();
+// dbHelper.getJobChart();
 
 app.get('/', function (req, res) {
   res.send('Hello World!');

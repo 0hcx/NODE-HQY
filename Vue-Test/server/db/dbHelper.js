@@ -354,3 +354,36 @@ exports.getStarJob = function (req, cb) {
         }
     })
 }
+
+// 获取各职位的数量饼状图
+exports.getJobChart = function (data, cb) {
+    let sql
+    switch(data.chartType) {
+        case 'COUNT':
+            sql = config.sql.count
+            break
+        case 'SALARY':
+            sql = config.sql.salary
+            break
+    }
+    Job.aggregate(sql, function (err, docs) {
+            if (err) {
+                console.log(err)
+                entries.code = 99
+                cb(true, entries)
+            } else {
+                let chart = []
+                for (let item of docs) {
+                    let doc = {
+                        name: item._id,
+                        y: item.value
+                    }
+                    chart.push(doc)
+                }
+                entries.chartType = data.chartType
+                entries.chart = chart
+                entries.code = 0
+                cb(true, entries)
+            }
+        })
+}

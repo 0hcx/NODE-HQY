@@ -13,6 +13,10 @@ var Config = {
     page: {
         path:'',
         pagesize: 17
+    },
+    sql: {
+        count: [{ $group: { _id: "$type", value: { $sum: 1 }}}],
+        salary: [{ $group: { _id: "$type", value: { $avg: "$money" }}}, { $sort: { value: -1 }}]
     }
 };
 module.exports = Config;

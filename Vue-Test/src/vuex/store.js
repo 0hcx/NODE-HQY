@@ -17,7 +17,11 @@ export default new Vuex.Store({
       data: [],
       pageCount: 0
     },
-    captchaMsg: '发送验证码'
+    captchaMsg: '发送验证码',
+    chart: {
+      count: [],
+      salary: []
+    }
   },
   mutations: {
     SHOW_LOGIN (state) {
@@ -43,6 +47,13 @@ export default new Vuex.Store({
     },
     UPDATE_CAPTCHA_MSG (state, data) {
       state.captchaMsg = data
+    },
+    UPDATE_CHART (state, data) {
+      if (data.chartType === 'COUNT') {
+        state.chart.count = data.data
+      } else if (data.chartType === 'SALARY') {
+        state.chart.salary = data.data
+      }
     }
   },
   actions: {
@@ -70,6 +81,9 @@ export default new Vuex.Store({
     },
     updateCaptchaMsg ({ commit }, data) {
       commit('UPDATE_CAPTCHA_MSG', data)
+    },
+    updateChart ({ commit }, data) {
+      commit('UPDATE_CHART', data)
     }
   },
   getters: {
@@ -93,6 +107,9 @@ export default new Vuex.Store({
     },
     getCaptchaMsg: function (state) {
       return state.captchaMsg
+    },
+    getChart: function (state) {
+      return state.chart
     }
   }
 })
