@@ -12,7 +12,8 @@
         </tbody>
       </table>
       <div class="ft">
-        <button type="button" class="btn btn-primary" @click="starJob" v-if="descType === 'DO_STAR'">关注</button>
+        <button type="button" class="btn btn-primary" @click="followComp" v-if="descType === 'DO_STAR'">跟踪该公司</button>
+        <button type="button" class="btn btn-primary" @click="starJob" v-if="descType === 'DO_STAR'">关注该工作</button>
         <button type="button" class="btn btn-primary" @click="cancleStar" v-else-if="descType === 'CANCLE_STAR'">取消关注</button>
       </div>
     </div>
@@ -20,7 +21,7 @@
 </template>
 
 <script>
-import { doStarJob, doCancleStar } from '../../lib/vueHelper'
+import { doStarJob, doCancleStar, doFollowComp } from '../../lib/vueHelper'
 
 export default {
   data () {
@@ -51,6 +52,13 @@ export default {
         jobId: this.jobDesc[0].value
       }
       doStarJob(this, data)
+    },
+    followComp () {
+      let data = {
+        uid: sessionStorage.getItem('uid'),
+        company: this.jobDesc[2].value
+      }
+      doFollowComp(this, data)
     },
     cancleStar () {
       let data = {
@@ -134,6 +142,10 @@ export default {
 
   button {
     margin: 8px 0 8px 0;
+  }
+
+  button:nth-child(n+2) {
+    margin-left: 10px;
   }
 }
 

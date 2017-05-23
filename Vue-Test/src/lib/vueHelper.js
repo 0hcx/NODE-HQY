@@ -114,6 +114,22 @@ export const doStarJob = (that, data) => {
   })
 }
 
+// doFollowComp
+export const doFollowComp = (that, data) => {
+  api.addFollowComp(data)
+  .then(res => {
+    if (res.data.code === 0) {
+      showMsg(that, false, '跟踪成功', 'success')
+      // store.dispatch('showStar', 'add')
+    } else if (res.data.code === 99) {
+      showMsg(that, false, '已添加跟踪', 'error')
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+}
+
 // doCancleStar
 export const doCancleStar = (that, data) => {
   api.cancleStar(data)

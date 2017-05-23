@@ -2,14 +2,17 @@ var mongoose = require('./db.js')
 var entries = require('./jsonRes')
 var moment = require('moment')
 var jwt = require('jwt-simple')
-var nodemailer = require('nodemailer');
+var nodemailer = require('nodemailer')
 var async = require('async')
+var Promise = require('bluebird')
+mongoose.Promise = Promise
 var Schema = mongoose.Schema
 
 var User = require('./schema/user')
 var Captcha = require('./schema/captcha')
 var Job = require('./schema/job')
 var Star = require('./schema/star')
+var Follow = require('./schema/follow')
 var config = require('../config')
 
 const jwtTokenSecret = 'vue-exercise'
@@ -17,59 +20,51 @@ var PAGE_SIZE = config.page.pagesize
 
 // addUser
 exports.addUser = function (data, cb) {
-    Captcha.findOne({
-        email: data.email,
-        captcha: data.captcha
-    }, function (err, doc) {
-        if (err) {
-            console.log(err)
-        } else if (doc === null) {
-            entries.code = 88   // 验证码错误
-            cb(false, entries)
-        } else if (doc !== null) {
-            User.findOne({
-                username: data.usr
-            }, function(err, doc) {
-                if (err) {
-                    console.log(err)
-                } else if (doc !== null) {
-                    entries.code = 99
-                    cb(false, entries)
-                } else if (doc === null) {
-                    var user = new User({
-                        username: data.usr,
-                        password: data.pwd,
-                        email: data.email
-                    })
-                    user.save(function(err, doc) {
-                        if (err) {
-                            entries.code = 99
-                            cb(false, entries)
-                        } else {
-                            entries.code = 0
-                            cb(true, entries)
-                        }
-                    })
-                }
-            })
+    let error = new Error()
+    Captcha.findOne({ email: data.email, captcha: data.captcha })
+    .exec()
+    .then(doc => {
+        if (doc === null) {
+            error.msg = 'captcha'
+            throw error   // 验证码错误
         }
+    })
+    .then(() => {
+        return User.findOne({ username: data.usr }) // 检查用户是否已存在
+    })
+    .then(doc => {
+        if (doc !== null) {
+            error.msg = 'user'
+            throw error   // 用户已存在
+        }
+    })
+    .then(() => new User({   // 保存用户
+        username: data.usr,
+        password: data.pwd,
+        email: data.email
+    }).save())
+    .then(() => {
+        entries.code = 0
+        cb(true, entries)
+    })
+    .catch(err => {
+        if (err.msg === 'captcha') {
+            entries.code = 88
+        } else {
+            entries.code = 99
+        }
+        cb(false, entries)
     })
 }
 
 // findUser
 exports.findUser = function (data, cb) {
-    User.findOne({
-        username: data.usr
-    }, function(err, doc) {
+    User.findOne({ username: data.usr })
+    .exec()
+    .then(doc => {
         var user = (doc !== null) ? doc.toObject() : ''
-        if (err) {
-            console.log(err)
-        } else if (doc === null) {
-            entries.code = 99
-            cb(false, entries)
-        } else if (user.password !== data.pwd) {
-            entries.code = 99
-            cb(false, entries)
+        if (doc === null || user.password !== data.pwd) {
+            throw new Error()
         } else {
             entries.data = user
             entries.code = 0
@@ -81,7 +76,11 @@ exports.findUser = function (data, cb) {
             cb(true, entries)
         }
     })
- }
+    .catch(err => {
+        entries.code = 99
+        cb(false, entries)
+    })
+}
 
 // 登录验证
 exports.authority = function (req, cb) {
@@ -113,52 +112,46 @@ exports.authority = function (req, cb) {
 
 // 发送验证码
 exports.sendCaptcha = function (data, cb) {
+    let error = new Error()
     let randomWord = this.getRandomWord(false, 6, 6)
     let that = this
-    Captcha.findOne({
-        email: data.email
-    }, function(err, doc) {
-        console.log(data.email)
+    Captcha.findOne({ email: data.email })
+    .exec()
+    .then(doc => {
         var docData = (doc !== null) ? doc.toObject() : ''
-        if (err) {
-            console.log(err)
-        } else if (doc !== null) {
+        if (doc !== null) {
             let [deadline, nowAt] = [parseInt(docData.deadline / 1000 / 60), parseInt(Date.now() / 1000 / 60)]
             // console.log(nowAt- deadline);
             if (nowAt - deadline >= 30) {    // 验证码超过30分钟才允许重新发送
-                Captcha.update({"_id": docData._id}, {$set : {
+                return Captcha.update({"_id": docData._id}, {$set : {
                     "captcha": randomWord,
                     "deadline": Date.now()
-                }
-                }, function (err, result) {
-                    if(err) {
-                        console.log(error)
-                    }
-                    if (that.sendCaptchaMail(data.email, randomWord) === 99) {
-                        entries.code = 99
-                    }
-                    cb(true, entries)
-                })
+                }})
             } else {
-                entries.code = 88   // 提示已经发送
-                cb(true, entries)
+                error.code = 88    // 提示已经发送
+                throw error
             }
         } else if (doc === null) {
-            var captcha = new Captcha({
+            // console.log(data.email)
+            return new Captcha({
                 email: data.email,
                 captcha: randomWord,
                 deadline: Date.now()
-            })
-            captcha.save(function(err, doc) {
-                if (err) {
-                    console.log(err)
-                }
-                if (that.sendCaptchaMail(data.email, randomWord) === 99) {
-                    entries.code = 99
-                }
-                cb(true, entries)
-            })
+            }).save()
         }
+    })
+    .then(() => {
+        if (that.sendCaptchaMail(data.email, randomWord) === 99) {
+            error.code = 99
+            throw error
+        } else {
+            entries.code = 0
+            cb(true, entries)
+        }
+    })
+    .catch(err => {
+        entries.code = (error.code !== null) ? error.code : 99
+        cb(true, entries)
     })
 }
 
@@ -355,6 +348,32 @@ exports.getStarJob = function (req, cb) {
     })
 }
 
+// 添加关注的工作
+exports.addFollow = function (data, cb) {     // data包含uid, jobId
+    var item = {
+        uid: data.uid,
+        company: data.company,
+        vaild: 0
+    }
+    Follow.findOne(item)
+    .exec()
+    .then((doc) => {
+        if (doc !== null) {
+            throw new Error()
+        }
+    })
+    .then(() => new Follow(item).save())
+    .then(() => {
+        entries.code = 0
+        cb(true, entries)
+    })
+    .catch(err => {
+        entries.code = 99
+        cb(true, entries)
+    })
+}
+
+
 // 获取各职位的数量饼状图
 exports.getJobChart = function (data, cb) {
     let sql
@@ -387,3 +406,4 @@ exports.getJobChart = function (data, cb) {
             }
         })
 }
+

@@ -17,6 +17,9 @@ export default {
   addStarJob (data) {
     return Axios.post(API.addStarJob, data)
   },
+  addFollowComp (data) {
+    return Axios.post(API.addFollowComp, data)
+  },
   cancleStar (data) {
     return Axios.post(API.cancleStar, data)
   },

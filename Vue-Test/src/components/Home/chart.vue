@@ -1,7 +1,7 @@
 <template>
     <div class="main" v-show="tab === 'CHART'">
         <!--各职业所占比例-->
-        <div id="chartCount" style="width:600px;height:400px;" class="chart"></div>
+        <div id="chartCount" class="chart"></div>
         <!-- 各职业工资对比 -->
         <div id="chartSalary" style="width:1000px;height:420px;" class="chart"></div>
     </div>
@@ -37,6 +37,9 @@ export default {
         downloadPNG: '下载PNG 图片',
         downloadSVG: '下载SVG 矢量图',
         exportButtonTitle: '导出图片'
+      },
+      credits: {
+        enabled: false
       }
     })
   },
@@ -71,10 +74,7 @@ export default {
         type: 'pie',
         name: '职业数量占比',
         data: this.$store.getters.getChart.count
-      }],
-      credits: {
-        enabled: false
-      }
+      }]
     })
     // salary
     Highcharts.chart('chartSalary', {
@@ -145,14 +145,18 @@ export default {
 .main {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  background-color: #fff;
   height: 100%;
+  padding: 10px;
   overflow-y: auto;
 /*  padding-bottom: 100%;*/
 }
 
 .chart {
+  margin-bottom: 30px;
   flex-shrink: 0;
+  border: 1px solid #ddd;
 }
-
 
 </style>

@@ -65,5 +65,12 @@ router.post('/getChartData', function(req, res, next) {
     })
 });
 
+// addFollowComp
+router.post('/addFollowComp', function(req, res, next) {
+    dbHelper.addFollow(req.body, function (success, doc) {
+        res.send(doc)
+    })
+});
+
 
 module.exports = router;
