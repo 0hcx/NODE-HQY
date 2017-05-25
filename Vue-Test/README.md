@@ -1,30 +1,11 @@
-# vue-test
+使用VUE实现求职系统
+---
+> 系统主要功能包括 
+`注册`，`登录`，`职位查询`，`职位保存`，`求职跟踪`，`报表系统`
 
-> A Vue.js project
-
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
-```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+- [x] 新用户可以注册账号，注册需要通过email，系统将验证码发送到邮箱，用户需要填写验证码完成注册；  
+- [x] 用户可以根据用户名和密码登录系统； 
+- [x] 在职位查询中，用户可以根据公司名称，薪水，职位类型查询求职信息；
+- [x] 用户可以将查询中的某些记录加入到自己的关注信息；
+- [ ] 用户可以将某些公司加入到求职跟踪，系统从招聘网站（比如智联招聘）抓取数据，并自动统计该公司每周的求职信息，发送给用户；
+- [x] 报表系统提供多种信息分析图表，比如各职位的数量饼状图，某职位的薪资变化图等等；
