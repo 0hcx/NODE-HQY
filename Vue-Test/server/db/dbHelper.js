@@ -235,48 +235,38 @@ exports.findJobs = function (data, cb) {
             delete searchItem[item]
         }
     }
-    var page = data.page || 1
-    this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {}, {
-        money: 'asc'
-    }, function (error, data) {
-        if (error) {
-            next(error)
-        } else {
-            cb(true, data)
-        }
+    var page = data.page || 1;
+    this.pageQuery(page, PAGE_SIZE, Job, '', searchItem, {}, { money: 'asc' })
+    .then(results => {
+        cb(true, results);
+    })
+    .catch(err => {
+        console.log(err);
     })
 }
 
 // 分页
-exports.pageQuery = function (page, pageSize, Model, populate, queryParams, projection, sortParams, callback) {
+exports.pageQuery = function (page, pageSize, Model, populate, queryParams, projection, sortParams) {
     var start = (page - 1) * pageSize;
     var $page = {
         pageNumber: page
     };
-    async.parallel({
-        count: function (done) {  // 查询数量
-            Model.count(queryParams).exec(function (err, count) {
-                done(err, count);
-            });
-        },
-        records: function (done) {   // 查询一页的记录
-            Model.find(queryParams, projection).skip(start).limit(pageSize).populate(populate).sort(sortParams).exec(function (err, doc) {
-                done(err, doc);
-            });
-        }
-    }, function (err, results) {
-
-        var list = new Array();
-        for (let item of results.records) {
+    var getCount = Model.count(queryParams).exec()
+    var getRecords = Model.find(queryParams, projection).skip(start).limit(pageSize).populate(populate).sort(sortParams).exec()
+    return Promise.all([
+        getCount,
+        getRecords
+    ])
+    .then(([count, records]) =>{
+        var list = new Array()
+        for (let item of records) {
             list.push(item.toObject())
         }
-
-        var count = results.count;
         $page.pageCount = parseInt((count - 1) / pageSize + 1);
         $page.results = list;
         $page.count = count;
-        callback(err, $page);
-    });
+        return $page;
+    })
 };
 
 // 添加关注的工作
@@ -286,24 +276,22 @@ exports.addStar = function (data, cb) {     // data包含uid, jobId
         jobId: data.jobId,
         vaild: 0
     }
-    Star.findOne(item, function(err, doc) {
-        if (err) {
-            console.log(err)
-        } else if (doc !== null) {
-            entries.code = 99
-            cb(false, entries)
-        } else if (doc === null) {
-            var star = new Star(item)
-            star.save(function(err, doc) {
-                if (err) {
-                    entries.code = 99
-                    cb(false, entries)
-                } else {
-                    entries.code = 0
-                    cb(true, entries)
-                }
-            })
+    Star.findOne(item)
+    .exec()
+    .then(doc => {
+        if (doc !== null) {
+            throw new Error();
+        } else {
+            return new Star(item).save();
         }
+    })
+    .then(() => {
+        entries.code = 0
+        cb(true, entries)
+    })
+    .catch(err => {
+        entries.code = 99
+        cb(false, entries)
     })
 }
 
@@ -313,17 +301,15 @@ exports.cancleStar = function (data, cb) {
         uid: data.uid,
         jobId: data.jobId
     }
-    Star.update(item, {$set: {
-        vaild: 1
-    }}, function (err, result) {
-        if (err) {
-            console.log(err)
-            entries.code = 99
-            cb(false, entries)
-        } else {
-            entries.code = 0
-            cb(true, entries)
-        }
+    Star.update(item, {$set: { vaild: 1 }})
+    .then(() => {
+        entries.code = 0
+        cb(true, entries)
+    })
+    .catch(err => {
+        console.log(err)
+        entries.code = 99
+        cb(false, entries)
     })
 }
 
@@ -334,17 +320,17 @@ exports.getStarJob = function (req, cb) {
         uid: req.uid,
         vaild: 0
     }
-    this.pageQuery(page, PAGE_SIZE, Star, 'jobId', searchItem, {}, {}, function (error, data) {
-        if (error) {
-            next(error)
-        } else {
-            let list = new Array()
-            for (let item of data.results) {
-                list.push(item.jobId)
-            }
-            data.results = list
-            cb(true, data)
+    this.pageQuery(page, PAGE_SIZE, Star, 'jobId', searchItem, {}, {})
+    .then(data => {
+        let list = new Array()
+        for (let item of data.results) {
+            list.push(item.jobId)
         }
+        data.results = list
+        cb(true, data)
+    })
+    .catch(err => {
+        console.log(err);
     })
 }
 
@@ -376,7 +362,7 @@ exports.addFollow = function (data, cb) {     // data包含uid, jobId
 
 // 获取各职位的数量饼状图
 exports.getJobChart = function (data, cb) {
-    let sql
+    let sql;
     switch(data.chartType) {
         case 'COUNT':
             sql = config.sql.count
@@ -385,25 +371,30 @@ exports.getJobChart = function (data, cb) {
             sql = config.sql.salary
             break
     }
-    Job.aggregate(sql, function (err, docs) {
-            if (err) {
-                console.log(err)
-                entries.code = 99
-                cb(true, entries)
-            } else {
-                let chart = []
-                for (let item of docs) {
-                    let doc = {
-                        name: item._id,
-                        y: item.value
-                    }
-                    chart.push(doc)
-                }
-                entries.chartType = data.chartType
-                entries.chart = chart
-                entries.code = 0
-                cb(true, entries)
+    Job.aggregate(sql)
+    .exec()
+    .then(docs => {
+        let chart = []
+        for (let item of docs) {
+            let doc = {
+                name: item._id,
+                y: item.value
             }
-        })
+            chart.push(doc)
+        }
+        entries.chartType = data.chartType
+        entries.chart = chart
+        entries.code = 0
+        cb(true, entries)
+    })
+    .catch(err => {
+        console.log(err)
+        entries.code = 99
+        cb(true, entries)
+    })
 }
 
+// promise test
+let f = () => console.log('111');
+Promise.try(f);
+console.log('222')
